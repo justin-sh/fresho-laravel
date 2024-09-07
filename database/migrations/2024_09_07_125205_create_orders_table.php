@@ -41,7 +41,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('orders_details', function (Blueprint $table) {
+        Schema::create('order_details', function (Blueprint $table) {
             $table->uuid('order_id');
             $table->string('prd_code', 32);
             $table->string('prd_name', 255);

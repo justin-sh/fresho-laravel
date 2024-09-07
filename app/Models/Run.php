@@ -11,5 +11,10 @@ class Run extends Model
 {
     use HasFactory, HasUuids, HasTimestamps;
 
-    protected $fillable = ['id', 'code', 'name'];
+    protected static function booted()
+    {
+        parent::booted();
+        static::unguard();
+    }
+
 }

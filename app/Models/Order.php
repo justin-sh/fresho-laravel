@@ -10,4 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory, HasTimestamps, HasUuids;
+
+    protected static function booted()
+    {
+        parent::booted();
+        static::unguard();
+    }
 }
