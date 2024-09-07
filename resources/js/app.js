@@ -1,5 +1,3 @@
-import './bootstrap';
-
 import {createApp} from 'vue'
 import {createBootstrap} from 'bootstrap-vue-next'
 
