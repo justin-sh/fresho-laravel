@@ -1,36 +1,33 @@
 <template>
     <header>
         <div>
-            <b-navbar toggleable="md" type="dark" variant="info">
-                <b-navbar-brand>Fresho Ext</b-navbar-brand>
+            <BNavbar toggleable="md" type="dark" variant="info">
+                <BNavbarBrand>Fresho Ext</BNavbarBrand>
 
-                <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+                <BNavbarToggle target="nav-collapse"></BNavbarToggle>
 
-                <b-collapse id="nav-collapse" is-nav>
-                    <b-navbar-nav>
-                        <b-nav-item :to="{name:'home'}">
+                <BCollapse id="nav-collapse" is-nav>
+                    <BNavbarNav>
+                        <BNavItem :to="{name:'home'}">
                             Home
-                        </b-nav-item>
-                        <b-nav-item :to="{name:'orders'}">
+                        </BNavItem>
+                        <BNavItem :to="{name:'orders'}">
                             Orders
-                        </b-nav-item>
-                        <b-nav-item :to="{name:'files-upload'}">
-                            Files Upload
-                        </b-nav-item>
-                    </b-navbar-nav>
+                        </BNavItem>
+                    </BNavbarNav>
 
 
-                    <b-navbar-nav class="ml-auto">
-                        <b-nav-item-dropdown right>
+                    <BNavbarNav class="ml-auto">
+                        <BNavItemDropdown right>
                             <template #button-content>
                                 <em>User</em>
                             </template>
-                            <b-dropdown-item href="#">Profile</b-dropdown-item>
-                            <b-dropdown-item href="#">Sign Out</b-dropdown-item>
-                        </b-nav-item-dropdown>
-                    </b-navbar-nav>
-                </b-collapse>
-            </b-navbar>
+                            <BDropdownItem href="#">Profile</BDropdownItem>
+                            <BDropdownItem href="#">Sign Out</BDropdownItem>
+                        </BNavItemDropdown>
+                    </BNavbarNav>
+                </BCollapse>
+            </BNavbar>
         </div>
     </header>
 
