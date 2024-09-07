@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->uuid()->primary();
+            $table->uuid('id')->primary();
             $table->string('order_number', 255)->unique();
             $table->date('delivery_date')->index();
             $table->uuid('receiving_company_id');
