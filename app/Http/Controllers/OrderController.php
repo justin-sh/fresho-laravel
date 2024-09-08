@@ -8,6 +8,7 @@ use App\Models\Order;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
@@ -57,6 +58,25 @@ class OrderController extends Controller
         $delivery_date = $request->str('delivery_date');
         Log::debug("init order data for $delivery_date");
 
+        $headers = [
+            "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+            "Accept" => "application/json, text/javascript, */*; q=0.01",
+            "Connection" => "keep-alive",
+        ];
+
+        $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders';
+        $params = [
+            'page' => 1,
+            'per_page' => 200,
+            'q[order_state]' => 'all',
+            'q[receiving_company_id]' => '',
+            'q[delivery_run_code]' => '',
+            'q[delivery_date]' => $delivery_date,
+            'sort' => '-delivery_date,-submitted_at,-order_number',
+        ];
+
+        $resp = Http::withOptions(['debug' => true])->get($url, $params)->json();
+        Log::debug('data:' . json_encode($resp));
         return json_encode(['ok' => true]);
     }
 
