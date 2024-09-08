@@ -89,7 +89,7 @@
 
         <BTable id="ordertable" striped hover :current-page="currentPage" :per-page="page_size" :items="orders"
                 :fields="fields">
-            <template #cell(order_number)="row">
+            <template #cell(orderNo)="row">
                 <a :href="'https://app.fresho.com/supplier/orders/' + row.item.id" target="_blank">
                     {{ row.value }}
                 </a>
@@ -138,13 +138,13 @@ const orders = shallowRef([])
 let orders_backup = []
 
 const fields = [
-    {key: 'order_number', label: 'Order#', sortable: true},
+    {key: 'orderNo', label: 'Order#', sortable: true},
     {key: 'delivery_date_md', label: 'Date', sortable: true},
-    {key: 'receiving_company_name', label: 'Customer', sortable: true},
+    {key: 'customer', label: 'Customer', sortable: true},
     {key: 'state', label: 'State', sortable: true},
-    {key: 'delivery_by', label: 'By', sortable: true},
+    {key: 'by', label: 'By', sortable: true},
     {key: 'delivery_at_hm', label: 'At', sortable: true},
-    {key: 'delivery_proof', label: 'Proof', sortable: true},
+    {key: 'proof', label: 'Proof', sortable: true},
     {key: 'show_details', label: 'Action'},
 ]
 
@@ -184,13 +184,13 @@ const loading_data = async () => {
                 credit: credit.value,
             },
             {signal: abortController.signal}
-        )).data
+        )).data.data
 
 
         orders.value = data.map(function (x) {
             x.detailsShowing = false
-            x.delivery_date_md = formatInTimeZone(new Date(x.delivery_date), localTZ, "MM-dd")
-            x.delivery_at_hm = x.delivery_at ? formatInTimeZone(new Date(x.delivery_at), localTZ, "HH:mm") : ''
+            x.delivery_date_md = formatInTimeZone(new Date(x.deliveryDate), localTZ, "MM-dd")
+            x.delivery_at_hm = x.at ? formatInTimeZone(new Date(x.at), localTZ, "HH:mm") : ''
             return x
         })
 
@@ -246,7 +246,7 @@ watch([deliveryDate, customer, product, status, credit, runs], async ([deliveryD
     runs_old = runs_old || []
     if (runs_new.toString() !== runs_old.toString()) {
         const _s = new Date().getTime()
-        let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.delivery_run))
+        let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
         console.log("filter data in js:" + (new Date().getTime() - _s))
         orders.value = x
         setTimeout(() => {
