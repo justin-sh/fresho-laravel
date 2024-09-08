@@ -52,7 +52,7 @@ class OrderController extends Controller
         //
     }
 
-    public function init(Request $request)
+    public function init(Request $request): string
     {
         $delivery_date = $request->str('delivery_date');
         Log::debug("init order data for $delivery_date");
