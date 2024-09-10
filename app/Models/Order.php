@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
 /**
@@ -34,5 +35,10 @@ class Order extends Model
     {
         parent::booted();
         static::unguard();
+    }
+
+    public function details(): HasMany
+    {
+        return $this->hasMany(OrderDetail::class);
     }
 }

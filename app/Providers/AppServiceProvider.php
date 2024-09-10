@@ -36,9 +36,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         DB::listen(function (QueryExecuted $query) {
-            Log::debug(Str::padRight('sql', 10) . $query->sql);
-            Log::debug(Str::padRight('bindings', 10) . json_encode($query->bindings));
-            Log::debug(Str::padRight('time', 10) . $query->time);
+//            Log::debug(Str::padRight('sql', 20) . $query->sql);
+//            Log::debug(Str::padRight('bindings', 10) . json_encode($query->bindings));
+//            Log::debug(Str::padRight('elapsed time', 20) . $query->time);
         });
     }
 }
