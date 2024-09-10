@@ -10,6 +10,6 @@ Route::get('/user-info', function (Request $request) {
     return json_encode($user);
 });
 
-Route::get('/orders/init', [OrderController::class, 'syncSummary']);
-Route::get('/orders/init', [OrderController::class, 'syncDetail']);
+Route::get('/orders/sync-summary', [OrderController::class, 'syncSummary']);
+Route::get('/orders/sync-detail', [OrderController::class, 'syncDetail']);
 Route::apiResource('/orders', OrderController::class)->only(['index', 'show']);
