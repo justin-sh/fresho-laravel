@@ -46,7 +46,10 @@ class SyncOrderSummary implements ShouldQueue
                 'sort' => '-delivery_date,-submitted_at,-order_number',
             ];
 
-            $resp = Http::withOptions(['debug' => true])->get($url, $params)->json();
+//            Log::debug(json_encode($params));
+            $resp = Http::get($url, $params)->json();
+//            Log::debug(json_encode($resp));
+
 
             $data = [];
             collect($resp['supplier_orders'])->each(function ($order) use (&$data) {
@@ -78,7 +81,7 @@ class SyncOrderSummary implements ShouldQueue
 
 //            Log::debug('updated data:' . json_encode($data));
 
-            if ($resp['meta']['total_pages'] >= $curPage) {
+            if ($resp['meta']['total_pages'] <= $curPage) {
                 break;
             } else {
                 $curPage++;
