@@ -53,7 +53,17 @@ class OrderController extends Controller
         //
     }
 
-    public function init(Request $request): string
+    public function syncSummary(Request $request): string
+    {
+        $delivery_date = $request->str('delivery_date');
+        Log::debug("init order data for $delivery_date");
+
+        SyncOrderSummary::dispatchAfterResponse($delivery_date);
+
+        return json_encode(['ok' => true]);
+    }
+
+    public function syncDetail(Request $request): string
     {
         $delivery_date = $request->str('delivery_date');
         Log::debug("init order data for $delivery_date");
