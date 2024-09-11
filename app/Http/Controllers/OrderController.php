@@ -66,10 +66,9 @@ class OrderController extends Controller
 
     public function syncDetail(Request $request): string
     {
-        $delivery_date = $request->str('delivery_date');
-        Log::debug("sync order detail data for $delivery_date");
+        Log::debug("sync order detail data");
 
-        SyncOrderDetail::dispatchAfterResponse($delivery_date);
+        SyncOrderDetail::dispatchAfterResponse([]);
 
         return json_encode(['ok' => true]);
     }
