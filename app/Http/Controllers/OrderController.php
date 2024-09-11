@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrdersResource;
-use App\Jobs\SyncOrderSummary;
 use App\Jobs\SyncOrderDetail;
+use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -66,11 +66,9 @@ class OrderController extends Controller
 
     public function syncDetail(Request $request): string
     {
-        Log::debug("sync order detail data");
         $delivery_date = $request->str('delivery_date');
+        Log::debug("sync order detail data for $delivery_date");
         $ids = Order::query()->where('delivery_date', $delivery_date)->get('id')->pluck('id');
-//        $ids->pluck()
-        Log::debug(json_encode($ids));
         SyncOrderDetail::dispatchAfterResponse($ids);
 
         return json_encode(['ok' => true]);
