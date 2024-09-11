@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderDetail extends Model
 {
+
+    public $timestamps = false;
+
     protected static function booted()
     {
         parent::booted();
