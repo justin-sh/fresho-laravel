@@ -39,6 +39,6 @@ class Order extends Model
 
     public function details(): HasMany
     {
-        return $this->hasMany(OrderDetail::class);
+        return $this->hasMany(OrderDetail::class, 'order_number', 'order_number');
     }
 }
