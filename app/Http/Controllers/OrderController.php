@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrdersResource;
+use App\Jobs\SyncOrderDeliveryProof;
 use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
@@ -73,6 +74,14 @@ class OrderController extends Controller
 
         return json_encode(['ok' => true]);
     }
+
+    public function syncDeliveryProof(Request $request): string
+    {
+        SyncOrderDeliveryProof::dispatch();
+
+        return json_encode(['ok' => true]);
+    }
+
 
     /**
      * Display the specified resource.
