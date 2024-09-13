@@ -77,7 +77,7 @@ class OrderController extends Controller
 
     public function syncDeliveryProof(Request $request): string
     {
-        SyncOrderDeliveryProof::dispatch();
+        SyncOrderDeliveryProof::dispatchAfterResponse();
 
         return json_encode(['ok' => true]);
     }
