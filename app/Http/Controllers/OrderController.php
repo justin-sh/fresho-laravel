@@ -25,6 +25,11 @@ class OrderController extends Controller
         $product = $request->str('product', '')->value();
         $status = $request->input('status');
         $credit = $request->boolean('credit');
+
+        if (empty($delivery_date . $customer . $product)) {
+            return new OrdersResource(collect());
+        }
+
         $orders = Order::query()->with('details')
             ->when($delivery_date, function (Builder $query, string $delivery_date) {
                 $query->where('delivery_date', $delivery_date);
