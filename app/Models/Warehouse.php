@@ -6,6 +6,7 @@ use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -20,4 +21,9 @@ use Ramsey\Uuid\Uuid;
 class Warehouse extends Model
 {
     use HasFactory, HasUuids, Timestamp;
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
+    }
 }

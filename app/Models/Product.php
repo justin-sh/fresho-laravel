@@ -7,6 +7,7 @@ use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -23,4 +24,9 @@ class Product extends Model
     use HasFactory, Timestamp, HasUuids;
 
     protected $casts = ['cat' => ProductCategory::class];
+
+    public function warehouses(): BelongsToMany
+    {
+        return $this->belongsToMany(Warehouse::class);
+    }
 }
