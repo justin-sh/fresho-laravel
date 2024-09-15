@@ -20,23 +20,22 @@ class OrderController extends Controller
      */
     public function index(Request $request): JsonResource
     {
-        $delivery_date = $request->str('delivery_date');
-        $customer = $request->str('customer');
-        $product = $request->str('product');
+        $delivery_date = $request->str('delivery_date', '')->value();
+        $customer = $request->str('customer', '')->value();
+        $product = $request->str('product', '')->value();
         $status = $request->input('status');
         $credit = $request->boolean('credit');
-        $orders = Order::query()
+        $orders = Order::query()->with('details')
             ->when($delivery_date, function (Builder $query, string $delivery_date) {
-                if ($delivery_date)
-                    $query->where('delivery_date', $delivery_date);
+                $query->where('delivery_date', $delivery_date);
             })
             ->when($customer, function (Builder $query, string $customer) {
-                if ($customer) {
-                    $query->whereLike('receiving_company_name', $customer);
-                }
+                $query->whereLike('receiving_company_name', '%' . $customer . '%');
             })
             ->when($product, function (Builder $query, string $product) {
-//                $query->where('delivery_date', $product);
+                $query->whereHas('details', function (Builder $query) use ($product) {
+                    $query->whereLike('prd_name', '%' . $product . '%');
+                });
             })
             ->when($status, function (Builder $query, array $status) {
                 $query->whereIn('state', $status);

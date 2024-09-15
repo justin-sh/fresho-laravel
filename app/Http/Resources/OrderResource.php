@@ -28,6 +28,7 @@ class OrderResource extends JsonResource
             'by' => $this->resource->delivery_by,
             'at' => $this->resource->delivery_at,
             'proof' => $this->resource->delivery_proof,
+            'products' => OrderDetailResource::collection($this->resource->details),
         ];
     }
 }

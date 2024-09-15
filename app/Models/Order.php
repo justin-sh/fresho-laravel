@@ -15,6 +15,7 @@ use Ramsey\Uuid\Nonstandard\Uuid;
  * @property string $order_number
  * @property Date $delivery_date
  * @property string $receiving_company_name
+ * @property array $details
  * @property OrderState $state
  * @property string $delivery_run
  * @property Date $delivery_at
