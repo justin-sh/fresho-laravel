@@ -14,8 +14,33 @@
                         <BNavItem :to="{name:'orders'}">
                             Orders
                         </BNavItem>
+                        <BNavItem :to="{name:'salesOrders'}">
+                            Sales Orders
+                        </BNavItem>
+                        <BNavItem :to="{name:'purchaseOrders'}">
+                            Purchase Orders
+                        </BNavItem>
+                        <BNavItem :to="{name:'products'}">
+                            Products
+                        </BNavItem>
                     </BNavbarNav>
 
+                    <BNavbarNav>
+                        <BNavItemDropdown>
+                            <template #button-content>
+                                New +
+                            </template>
+                            <BDropdownItem href="#">
+                                new Sales Order
+                            </BDropdownItem>
+                            <BDropdownItem href="#">
+                                new Purchase Order
+                            </BDropdownItem>
+                            <BDropdownItem href="#">
+                                new Product
+                            </BDropdownItem>
+                        </BNavItemDropdown>
+                    </BNavbarNav>
 
                     <BNavbarNav class="ml-auto">
                         <BNavItemDropdown right>
