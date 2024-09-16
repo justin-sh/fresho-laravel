@@ -14,6 +14,12 @@ export interface OrderFilter {
     credit: string
 }
 
+export interface ProductFilter {
+    name?: string
+    cat?: string[]
+    wh: string[]
+}
+
 export interface OptionConfig {
     signal?: GenericAbortSignal
 }

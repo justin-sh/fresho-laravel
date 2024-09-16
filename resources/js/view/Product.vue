@@ -10,7 +10,7 @@
                     <label>Warehouse</label>
                     <div class="d-flex">
                         <BFormCheckboxGroup v-model="wh">
-                            <BFormCheckbox switch :value="w.code" v-for="w in warehouses">
+                            <BFormCheckbox switch :value="w.id" v-for="w in warehouses">
                                 {{ w.name }}
                             </BFormCheckbox>
                         </BFormCheckboxGroup>
@@ -18,14 +18,14 @@
                 </div>
                 <div class="ml-3 align-content-center col">
                     <label for="customer" class="justify-content-start">Product Name</label>
-                    <BFormInput id="customer" v-model="customer"></BFormInput>
+                    <BFormInput id="name" v-model="name"></BFormInput>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
                     <label>Category</label>
                     <div class="d-flex">
-                        <BFormCheckboxGroup v-model="status">
+                        <BFormCheckboxGroup v-model="cat">
                             <BFormCheckbox value="BEEF" switch>BEEF</BFormCheckbox>
                             <BFormCheckbox value="LAMB" switch>LAMB</BFormCheckbox>
                             <BFormCheckbox value="PORK" switch>PORK</BFormCheckbox>
@@ -111,18 +111,18 @@ import {onMounted, ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
 import {getProductsWithFilters, getWarehousesWithFilters} from '../api'
 
-import {formatInTimeZone, toDate} from "date-fns-tz";
-import {onBeforeRouteLeave, useRouter} from "vue-router";
+import {formatInTimeZone} from "date-fns-tz";
+import {useRouter} from "vue-router";
 
 const router = useRouter()
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const deliveryDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
-const customer = shallowRef('')
+const name = shallowRef('')
 const product = shallowRef('')
-const status = shallowRef(['BEEF', 'LAMB', 'PORK', 'CHICKEN', 'DUCK', 'OTHERS'])
-const wh = shallowRef([])
+const cat = shallowRef(['BEEF', 'LAMB', 'PORK', 'CHICKEN', 'DUCK', 'OTHERS'])
+const wh = shallowRef<string[]>([])
 const runs = shallowRef([])
 
 const products = shallowRef([])
@@ -166,16 +166,9 @@ const loading_data = async () => {
         abortController = new AbortController()
 
         const data = (await getProductsWithFilters(
+            {wh: wh.value, name: name.value, cat: cat.value},
             {signal: abortController.signal}
         )).data.data
-
-
-        // products.value = data.map(function (x) {
-        //     x.detailsShowing = false
-        //     x.delivery_date_md = formatInTimeZone(new Date(x.deliveryDate), localTZ, "MM-dd")
-        //     x.delivery_at_hm = x.at ? formatInTimeZone(new Date(x.at), localTZ, "HH:mm") : ''
-        //     return x
-        // })
 
         products_backup = products.value = data
 
@@ -193,7 +186,9 @@ onMounted(async () => {
     const data = (await getWarehousesWithFilters()).data.data
     warehouses.value = data
 
-    wh.value = data.map(x=>x.code)
+    wh.value = data.map(x => x.id)
+
+    await loading_data();
 })
 
 // onBeforeRouteLeave((to, before) => {
@@ -209,25 +204,26 @@ onMounted(async () => {
 //     }
 // })
 
-watch([deliveryDate, customer, product, status, runs],
-    async ([deliveryDate_new, customer_new, product_new, status_new, runs_new],
-           [deliveryDate2, customer2, product2, status2, runs_old]) => {
-        runs_old = runs_old || []
-        if (runs_new.toString() !== runs_old.toString()) {
-            const _s = new Date().getTime()
-            let x = runs_new.length === 0 ? products_backup : products_backup.filter((o) => runs.value.includes(o.run))
-            console.log("filter data in js:" + (new Date().getTime() - _s))
-            products.value = x
-            setTimeout(() => {
-                console.log("update page:" + (new Date().getTime() - _s))
-            }, 0);
-        } else {
+watch([name, cat, wh],
+    async ([ name_new, status_new, wh_new],
+           [ name2, status2, wh_old]) => {
+        // wh_old = wh_old || []
+        // if (wh_new.toString() !== wh_new.toString()) {
+        //     const _s = new Date().getTime()
+        //     let x = wh_new.length === 0 ? products_backup : products_backup.filter((o) => runs.value.includes(o.run))
+        //     console.log("filter data in js:" + (new Date().getTime() - _s))
+        //     products.value = x
+        //     setTimeout(() => {
+        //         console.log("update page:" + (new Date().getTime() - _s))
+        //     }, 0);
+        // } else {
             console.log('loading data')
             await loading_data()
-        }
-    }, {immediate: true})
+        // }
+    })
 
 const tableHeaderRefEl = ref<HTMLElement | null>(null)
+
 const goTableHead = (page: number) => {
     // console.log(page)
     tableHeaderRefEl.value?.scrollIntoView({behavior: 'smooth'})
