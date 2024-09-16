@@ -18,6 +18,7 @@ use Ramsey\Uuid\Uuid;
  * @property int $onhand_qty
  * @property int $free_qty
  * @property string $comment
+ * @property array $warehouses
  */
 class Product extends Model
 {
@@ -27,6 +28,7 @@ class Product extends Model
 
     public function warehouses(): BelongsToMany
     {
-        return $this->belongsToMany(Warehouse::class);
+        return $this->belongsToMany(Warehouse::class)
+            ->withPivot(['onhand_qty', 'free_qty']);
     }
 }

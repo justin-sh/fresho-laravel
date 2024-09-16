@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Product;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,6 +19,10 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+//        $wh = $request->input('wh',[]);
+//        $wh = $wh??Warehouse::query()->get('id')
+//        $this->resource->warehouses[0]->pivot->
+
         return [
             'id' => $this->resource->id,
             'cat' =>$this->resource->cat,

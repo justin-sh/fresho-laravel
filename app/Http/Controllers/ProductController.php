@@ -4,17 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResource
+    public function index(Request $request): JsonResource
     {
-        $products = Product::query()->get();
+        $cat = $request->input('cat', []);
+        $wh = $request->input('wh', []);
+        $name = $request->str('name', '')->value();
+
+        $products = Product::query()
+            ->when($cat, function (Builder $query, $cat) {
+                $query->whereIn('cat', $cat);
+            })
+            ->when($name, function (Builder $query, $name) {
+                $query->whereLike('name', '%' . $name . '%');
+            })
+            ->with('warehouses', function (BelongsToMany $query) use ($wh) {
+                Log::debug($query->getTable());
+                $query->whereIn('warehouse_id', $wh);
+            })
+            ->get();
 
         return ProductResource::collection($products);
     }
