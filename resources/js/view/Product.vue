@@ -2,10 +2,6 @@
     <BCard title="Filters" class="mb-2 filters">
         <BForm inline>
             <div class="row">
-                <div class="ml-3 align-content-center col">
-                    <label for="customer" class="justify-content-start">Product Name</label>
-                    <BFormInput id="customer" v-model="customer"></BFormInput>
-                </div>
                 <!--                <div class="ml-3  col">-->
                 <!--                    <label for="product" class="justify-content-start">Product</label>-->
                 <!--                    <BFormInput id="product" v-model="product"></BFormInput>-->
@@ -20,10 +16,14 @@
                         </BFormCheckboxGroup>
                     </div>
                 </div>
+                <div class="ml-3 align-content-center col">
+                    <label for="customer" class="justify-content-start">Product Name</label>
+                    <BFormInput id="customer" v-model="customer"></BFormInput>
+                </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <label>State</label>
+                    <label>Category</label>
                     <div class="d-flex">
                         <BFormCheckboxGroup v-model="status">
                             <BFormCheckbox value="BEEF" switch>BEEF</BFormCheckbox>
@@ -142,7 +142,7 @@ const fields = [
 const data_loading = shallowRef(false)
 
 const currentPage = shallowRef(1)
-const page_size = shallowRef(30)
+const page_size = shallowRef(50)
 const page_size_options = [
     {item: 30, name: '30'},
     {item: 50, name: '50'},
@@ -196,18 +196,18 @@ onMounted(async () => {
     wh.value = data.map(x=>x.code)
 })
 
-onBeforeRouteLeave((to, before) => {
-    if (to.name == 'dept-report') {
-        to.meta.orders = orders.value
-
-        const weedDay = toDate(deliveryDate.value).getDay()
-        if ([2, 4].includes(weedDay)) {
-            to.meta.ordered_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-        } else {
-            to.meta.ordered_run = ['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-        }
-    }
-})
+// onBeforeRouteLeave((to, before) => {
+//     if (to.name == 'dept-report') {
+//         to.meta.orders = orders.value
+//
+//         const weedDay = toDate(deliveryDate.value).getDay()
+//         if ([2, 4].includes(weedDay)) {
+//             to.meta.ordered_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
+//         } else {
+//             to.meta.ordered_run = ['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
+//         }
+//     }
+// })
 
 watch([deliveryDate, customer, product, status, runs],
     async ([deliveryDate_new, customer_new, product_new, status_new, runs_new],
