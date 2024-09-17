@@ -26,6 +26,12 @@ class Product extends Model
 
     protected $casts = ['cat' => ProductCategory::class];
 
+    protected static function booted()
+    {
+        parent::booted();
+        static::unguard();
+    }
+
     public function warehouses(): BelongsToMany
     {
         return $this->belongsToMany(Warehouse::class)
