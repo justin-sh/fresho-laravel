@@ -28,8 +28,10 @@ class ProductController extends Controller
             ->when($name, function (Builder $query, $name) {
                 $query->whereLike('name', '%' . $name . '%');
             })
+            ->orderBy('cat')
+            ->orderBy('name')
             ->with('warehouses', function (BelongsToMany $query) use ($wh) {
-                Log::debug($query->getTable());
+//                Log::debug($query->getTable());
                 $query->whereIn('warehouse_id', $wh);
             })
             ->get();

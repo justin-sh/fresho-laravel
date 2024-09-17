@@ -110,42 +110,37 @@
 import {onMounted, ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
 import {getProductsWithFilters, getWarehousesWithFilters} from '../api'
-
-import {formatInTimeZone} from "date-fns-tz";
 import {useRouter} from "vue-router";
 
 const router = useRouter()
 
-const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-const deliveryDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
 const name = shallowRef('')
 const product = shallowRef('')
-const cat = shallowRef(['BEEF', 'LAMB', 'PORK', 'CHICKEN', 'DUCK', 'OTHERS'])
+const cat = shallowRef()
 const wh = shallowRef<string[]>([])
-const runs = shallowRef([])
 
 const products = shallowRef([])
 let products_backup = []
 
-const fields = [
+const fields_base = [
     {key: 'rowNo', label: '#'},
     {key: 'cat', label: 'Category', sortable: true},
-    {key: 'code', label: 'Code', sortable: true},
+    // {key: 'code', label: 'Code', sortable: true},
     {key: 'name', label: 'Name', sortable: true},
     {key: 'comment', label: 'Comment'},
     // {key: 'delivery_at_hm', label: 'At', sortable: true},
     // {key: 'proof', label: 'Proof', sortable: true},
     // {key: 'show_details', label: 'Action'},
 ]
+const fields = shallowRef([])
 
 const data_loading = shallowRef(false)
 
 const currentPage = shallowRef(1)
 const page_size = shallowRef(50)
 const page_size_options = [
-    {item: 30, name: '30'},
     {item: 50, name: '50'},
+    {item: 100, name: '100'},
     {item: 999, name: 'all'}
 ]
 
@@ -186,7 +181,13 @@ onMounted(async () => {
     const data = (await getWarehousesWithFilters()).data.data
     warehouses.value = data
 
-    wh.value = data.map(x => x.id)
+    // wh.value = data.map(x => x.id)
+
+    fields_base.push(...data.map(function (x) {
+        return {key: x.code}
+    }))
+
+    fields.value = [...fields_base]
 
     await loading_data();
 })
@@ -205,8 +206,8 @@ onMounted(async () => {
 // })
 
 watch([name, cat, wh],
-    async ([ name_new, status_new, wh_new],
-           [ name2, status2, wh_old]) => {
+    async ([name_new, status_new, wh_new],
+           [name2, status2, wh_old]) => {
         // wh_old = wh_old || []
         // if (wh_new.toString() !== wh_new.toString()) {
         //     const _s = new Date().getTime()
@@ -217,8 +218,8 @@ watch([name, cat, wh],
         //         console.log("update page:" + (new Date().getTime() - _s))
         //     }, 0);
         // } else {
-            console.log('loading data')
-            await loading_data()
+        console.log('loading data')
+        await loading_data()
         // }
     })
 

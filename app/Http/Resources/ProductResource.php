@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use App\Models\Product;
-use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,17 +18,21 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-//        $wh = $request->input('wh',[]);
-//        $wh = $wh??Warehouse::query()->get('id')
-//        $this->resource->warehouses[0]->pivot->
+        $whs = [];
+
+        collect($this->resource->warehouses)->each(function ($w) use (&$whs) {
+//            $whs[$w->code] = ['onhand_qty' => $w->pivot->onhand_qty];
+            $whs[$w->code] = $w->pivot->onhand_qty;
+        });
 
         return [
             'id' => $this->resource->id,
-            'cat' =>$this->resource->cat,
-            'code' => $this->resource->code,
+            'cat' => $this->resource->cat,
+//            'code' => $this->resource->code,
             'name' => $this->resource->name,
-            'onhand_qty' => $this->resource->onhand_qty,
-            'comment' => $this->resource->comment,
+//            'onhand_qty' => $this->resource->onhand_qty,
+//            'comment' => $this->resource->comment,
+            $this->merge($whs),
         ];
     }
 }
