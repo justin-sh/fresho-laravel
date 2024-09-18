@@ -32,7 +32,9 @@ class ProductController extends Controller
             ->orderBy('name')
             ->with('warehouses', function (BelongsToMany $query) use ($wh) {
 //                Log::debug($query->getTable());
-                $query->whereIn('warehouse_id', $wh);
+                if($wh){
+                    $query->whereIn('warehouse_id', $wh);
+                }
             })
             ->get();
 
