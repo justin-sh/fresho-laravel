@@ -37,28 +37,6 @@
                 </div>
             </div>
         </BForm>
-
-        <!--        <template #footer>-->
-        <!--            <div class="row clear">-->
-        <!--                <div class="col">-->
-        <!--                    <BButton variant="outline-primary" size="sm" :loading="init_loading"-->
-        <!--                             @click.stop="initOrder2Server">-->
-        <!--                        S1: re-INIT Order-->
-        <!--                    </BButton>-->
-        <!--                    <BButton variant="outline-primary" class="ms-2" size="sm" :loading="detail_syncing"-->
-        <!--                             @click.stop="syncDetails">-->
-        <!--                        S2: Sync Detail-->
-        <!--                    </BButton>-->
-        <!--                    <BButton variant="outline-primary" class="ms-2" size="sm" @click.stop="goDeptRepot">-->
-        <!--                        Dept Report-->
-        <!--                    </BButton>-->
-        <!--                    <BButton variant="outline-primary" class="ms-2" size="sm" :loading="syncing_del_proof"-->
-        <!--                             @click.stop="syncDeliveryProofs">-->
-        <!--                        Sync Delivery Proof-->
-        <!--                    </BButton>-->
-        <!--                </div>-->
-        <!--            </div>-->
-        <!--        </template>-->
     </BCard>
 
     <BCard class="products">
@@ -125,12 +103,8 @@ let products_backup = []
 const fields_base = [
     {key: 'rowNo', label: '#'},
     {key: 'cat', label: 'Category', sortable: true},
-    // {key: 'code', label: 'Code', sortable: true},
     {key: 'name', label: 'Name', sortable: true},
     {key: 'comment', label: 'Comment'},
-    // {key: 'delivery_at_hm', label: 'At', sortable: true},
-    // {key: 'proof', label: 'Proof', sortable: true},
-    // {key: 'show_details', label: 'Action'},
 ]
 const fields = shallowRef([])
 
@@ -181,10 +155,8 @@ onMounted(async () => {
     const data = (await getWarehousesWithFilters()).data.data
     warehouses.value = data
 
-    // wh.value = data.map(x => x.id)
-
     fields_base.push(...data.map(function (x) {
-        return {key: x.code}
+        return {key: x.code, sortable: true}
     }))
 
     fields.value = [...fields_base]
@@ -208,17 +180,7 @@ onMounted(async () => {
 watch([name, cat, wh],
     async ([name_new, status_new, wh_new],
            [name2, status2, wh_old]) => {
-        // wh_old = wh_old || []
-        // if (wh_new.toString() !== wh_new.toString()) {
-        //     const _s = new Date().getTime()
-        //     let x = wh_new.length === 0 ? products_backup : products_backup.filter((o) => runs.value.includes(o.run))
-        //     console.log("filter data in js:" + (new Date().getTime() - _s))
-        //     products.value = x
-        //     setTimeout(() => {
-        //         console.log("update page:" + (new Date().getTime() - _s))
-        //     }, 0);
-        // } else {
-        console.log('loading data')
+        // console.log('loading data')
         await loading_data()
         // }
     })
