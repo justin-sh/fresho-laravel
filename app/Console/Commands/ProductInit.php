@@ -33,6 +33,12 @@ class ProductInit extends Command
         $products = DB::connection('mysql2')->select('select * from hoc_products');
 
         $hocWhId = Warehouse::query()->where('code', 'HoC')->first('id')->id;
+
+        if (empty($hocWhId)) {
+            $this->error("Please seeder warehouse database first");
+            return;
+        }
+
         $prds = [];
         $pws = [];
         collect($products)->each(function ($prd) use (&$prds, &$pws, $hocWhId) {
