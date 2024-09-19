@@ -1,11 +1,7 @@
 <template>
     <BCard title="Filters" class="mb-2 filters">
         <BForm inline>
-            <div class="row">
-                <!--                <div class="ml-3  col">-->
-                <!--                    <label for="product" class="justify-content-start">Product</label>-->
-                <!--                    <BFormInput id="product" v-model="product"></BFormInput>-->
-                <!--                </div>-->
+            <div class="d-flex flex-row">
                 <div class="col">
                     <label>Warehouse</label>
                     <div class="d-flex">
@@ -16,13 +12,13 @@
                         </BFormCheckboxGroup>
                     </div>
                 </div>
-                <div class="ml-3 align-content-center col">
+                <div class="col ms-3">
                     <label for="customer" class="justify-content-start">Product Name</label>
-                    <BFormInput id="name" v-model="name"></BFormInput>
+                    <BFormInput id="name" size="md" v-model="name"></BFormInput>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
+            <div class="row mt-2">
+                <div class="col-8">
                     <label>Category</label>
                     <div class="d-flex">
                         <BFormCheckboxGroup v-model="cat">
@@ -33,6 +29,14 @@
                             <BFormCheckbox value="DUCK" switch>DUCK</BFormCheckbox>
                             <BFormCheckbox value="OTHERS" switch>OTHERS</BFormCheckbox>
                         </BFormCheckboxGroup>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <label>Stock</label>
+                    <div class="d-flex">
+                        <BFormCheckbox switch v-model="hasStock">
+                            Has Stock
+                        </BFormCheckbox>
                     </div>
                 </div>
             </div>
@@ -96,6 +100,7 @@ const name = shallowRef('')
 const product = shallowRef('')
 const cat = shallowRef()
 const wh = shallowRef<string[]>([])
+const hasStock = shallowRef(true)
 
 const products = shallowRef([])
 let products_backup = []
@@ -135,7 +140,7 @@ const loading_data = async () => {
         abortController = new AbortController()
 
         const data = (await getProductsWithFilters(
-            {wh: wh.value, name: name.value, cat: cat.value},
+            {wh: wh.value, name: name.value, cat: cat.value, hasStock: hasStock.value},
             {signal: abortController.signal}
         )).data.data
 
@@ -177,9 +182,9 @@ onMounted(async () => {
 //     }
 // })
 
-watch([name, cat, wh],
-    async ([name_new, status_new, wh_new],
-           [name2, status2, wh_old]) => {
+watch([name, cat, wh, hasStock],
+    async ([name_new, status_new, wh_new, hasStock_new],
+           [name2, status2, wh_old, hasStock_old]) => {
         // console.log('loading data')
         await loading_data()
         // }

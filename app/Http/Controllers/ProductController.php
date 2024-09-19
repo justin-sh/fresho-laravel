@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -20,6 +18,7 @@ class ProductController extends Controller
         $cat = $request->input('cat', []);
         $wh = $request->input('wh', []);
         $name = $request->str('name', '')->value();
+        $hasStock = $request->boolean('hasStock', false);
 
         $products = Product::query()
             ->when($cat, function (Builder $query, $cat) {
@@ -28,14 +27,17 @@ class ProductController extends Controller
             ->when($name, function (Builder $query, $name) {
                 $query->whereLike('name', '%' . $name . '%');
             })
-            ->orderBy('cat')
-            ->orderBy('name')
-            ->with('warehouses', function (BelongsToMany $query) use ($wh) {
-//                Log::debug($query->getTable());
-                if($wh){
+            ->whereRelation('warehouses', function (Builder $query) use ($wh, $hasStock) {
+                if ($wh) {
                     $query->whereIn('warehouse_id', $wh);
                 }
+                if ($hasStock) {
+                    $query->where('onhand_qty', '>', 0);
+                }
             })
+            ->with('warehouses')
+            ->orderBy('cat')
+            ->orderBy('name')
             ->get();
 
         return ProductResource::collection($products);

@@ -18,6 +18,7 @@ export interface ProductFilter {
     name?: string
     cat?: string[]
     wh: string[]
+    hasStock : boolean
 }
 
 export interface OptionConfig {
