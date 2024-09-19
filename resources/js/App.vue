@@ -33,10 +33,10 @@
                             <BDropdownItem href="#">
                                 new Sales Order
                             </BDropdownItem>
-                            <BDropdownItem href="#">
+                            <BDropdownItem :to="{name:'purchaseOrderNew'}">
                                 new Purchase Order
                             </BDropdownItem>
-                            <BDropdownItem href="#">
+                            <BDropdownItem :to="{name:'purchaseOrderNew'}">
                                 new Product
                             </BDropdownItem>
                         </BNavItemDropdown>
