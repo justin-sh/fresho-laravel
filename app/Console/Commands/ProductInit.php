@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Product;
+use App\Models\Warehouse;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class ProductInit extends Command
@@ -32,9 +32,10 @@ class ProductInit extends Command
     {
         $products = DB::connection('mysql2')->select('select * from hoc_products');
 
+        $hocWhId = Warehouse::query()->where('code', 'HoC')->first('id')->id;
         $prds = [];
         $pws = [];
-        collect($products)->each(function ($prd) use (&$prds, &$pws) {
+        collect($products)->each(function ($prd) use (&$prds, &$pws, $hocWhId) {
             $pid = Uuid::uuid4();
             $prds[] = [
                 'id' => $pid,
@@ -44,24 +45,24 @@ class ProductInit extends Command
                 'comment' => $prd->comment,
             ];
             $pws[] = [
-                'pId'=> $pid,
-                'whId'=> '5e9523a6-3f9b-4ae0-b45f-c3a0b97b8936',
-                'qty'=> $prd->onhand_qty,
-                'crat'=> Carbon::now(),
-                'upat'=> Carbon::now(),
+                'pId' => $pid,
+                'whId' => $hocWhId,
+                'qty' => $prd->onhand_qty,
+                'crat' => Carbon::now(),
+                'upat' => Carbon::now(),
             ];
         });
 
-        if($this->option('clean')){
+        if ($this->option('clean')) {
             Product::truncate();
             DB::delete('delete from product_warehouse');
         }
 
         // Log::debug($prdIds);
 
-        DB::transaction(function() use($prds, $pws){
+        DB::transaction(function () use ($prds, $pws) {
             $sql = 'insert into product_warehouse(product_id,warehouse_id,onhand_qty,free_qty,created_at,updated_at) values (:pId,:whId,:qty,0,:crat,:upat)';
-            collect($pws)->each(function($pw) use ($sql) {
+            collect($pws)->each(function ($pw) use ($sql) {
                 DB::insert($sql, $pw);
             });
 
