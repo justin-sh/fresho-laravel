@@ -18,6 +18,7 @@ Route::get('/orders/sync-detail', [OrderController::class, 'syncDetail']);
 Route::get('/orders/sync-delivery-proof', [OrderController::class, 'syncDeliveryProof']);
 Route::apiResource('/orders', OrderController::class)->only(['index', 'show']);
 
+Route::get('/products/all', [ProductController::class, 'all']);
 Route::apiResource('/products', ProductController::class);
 
 Route::apiResource('/warehouses', WarehouseController::class);

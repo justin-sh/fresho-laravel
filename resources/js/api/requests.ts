@@ -9,6 +9,7 @@ export const initOrders = (delivery_date: string) => axios.get('/api/orders/sync
 export const syncOrderDetails = (delivery_date: string) => axios.get('/api/orders/sync-detail', {params: {delivery_date}})
 export const syncOrderDeliveryProofs = () => axios.get('/api/orders/sync-delivery-proof')
 export const getProductsWithFilters = (params: ProductFilter, options?: OptionConfig) => axios.get('/api/products', {params, ...options})
+export const getAllProducts = () => axios.get('/api/products/all')
 export const getWarehousesWithFilters = (options?: OptionConfig) => axios.get('/api/warehouses', {...options})
 
 export const getPoList = () => axios.get('/api/purchase-orders')

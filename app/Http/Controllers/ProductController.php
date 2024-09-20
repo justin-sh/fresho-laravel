@@ -43,6 +43,12 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
+    public function all(Request $request): JsonResource
+    {
+        $products = Product::query()->get(['id', 'cat', 'name']);
+        return ProductResource::collection($products);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

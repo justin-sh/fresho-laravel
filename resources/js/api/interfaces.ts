@@ -17,18 +17,21 @@ export interface OrderFilter {
 export interface ProductFilter {
     name?: string
     cat?: string[]
-    wh: string[]
+    wh?: string[]
     hasStock: boolean
 }
 
 export interface PoDetail {
-
+    prdId?: string
+    qty?: number
+    location?: string
+    comment?: string
 }
 
 export interface PurchaseOrder {
     id?: string
     title?: string
-    arrivalAt?: Date
+    arrivalAt?: string
     qty?: number
     whId?: string
     status?: string
