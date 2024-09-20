@@ -29,9 +29,9 @@ export interface PurchaseOrder {
     id?: string
     title?: string
     arrivalAt?: Date
-    qty: number
-    whId: string
-    status: string
+    qty?: number
+    whId?: string
+    status?: string
     details?: Array<PoDetail>
 }
 
