@@ -26,6 +26,7 @@ return new class extends Migration {
             $table->uuid('prd_id');
             $table->integer('row_no')->default(0);
             $table->integer('qty')->default(0);
+            $table->string('location', 32)->nullable();
             $table->string('comment', 128)->nullable();
             $table->timestamps();
             $table->primary(['po_id', 'prd_id', 'row_no']);

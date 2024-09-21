@@ -16,7 +16,11 @@
                     <BInput type="number" class="d-inline" v-model="nrow"/>
                 </BCol>
                 <BCol sm="8" class="d-flex justify-content-center">
-                    <BButton variant="outline-primary" :loading="processing" @click="savePo">Save</BButton>
+                    <BButton variant="outline-primary" :loading="processing" @click="save">Save</BButton>
+                    <BButton v-if="'purchaseOrderNew' !== route.name" variant="outline-primary" :loading="processing"
+                             @click="approvePo" class="ms-2">
+                        Approve
+                    </BButton>
                 </BCol>
             </BRow>
         </template>
@@ -27,7 +31,7 @@
                     <label for="title">Title</label>
                 </BCol>
                 <BCol sm="4">
-                    <BFormInput id="title" v-model="po.title"></BFormInput>
+                    <BFormInput id="title" v-model="po.title" :state="po.title.length>0"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -35,7 +39,7 @@
                     <label for="arrive-at">Arrive At</label>
                 </BCol>
                 <BCol sm="2">
-                    <BFormInput id="arrive-at" type="date" v-model="po.arrivalAt"></BFormInput>
+                    <BFormInput id="arrive-at" type="date" v-model="po.arrivalAt" :state="po.arrivalAt!==''"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -43,7 +47,7 @@
                     <label for="qty">Qty</label>
                 </BCol>
                 <BCol sm="2">
-                    <BFormInput id="qty" type="number" v-model="po.qty" readonly></BFormInput>
+                    {{ po.qty }}
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -51,7 +55,7 @@
                     <label for="status">Status</label>
                 </BCol>
                 <BCol sm="2">
-                    <BFormInput id="status" v-model="po.status" readonly></BFormInput>
+                    {{ po.status }}
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -68,51 +72,107 @@
             </BRow>
         </BForm>
 
-        <BTable id="po-list" class="mt-2" striped hover :fields="fields" :items="po.details">
-            <template #cell(rowNo)="row">
-                {{ row.index + 1 }}
-            </template>
-        </BTable>
+        <!--        <BTable id="po-list" class="mt-2" striped hover :fields="fields" :items="po.details">-->
+        <!--            <template #cell(rowNo)="row">-->
+        <!--                {{ row.index + 1 }}-->
+        <!--            </template>-->
+        <!--        </BTable>-->
+
+        <table class="w-100 mt-4">
+            <thead>
+            <tr>
+                <th v-for="f in fields" :key="f.key">{{ f.label }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(d, idx) in po.details">
+                <td>{{ idx + 1 }}</td>
+                <td class="col-1">{{ d.cat }}</td>
+                <td class="col-4 px-2">
+
+                    <v-select v-model="po.details[idx].prdId"
+                              :options="products_list"
+                              label="name"
+                              @option:selected="(o)=>po.details[idx].cat=o.cat"
+                              :reduce="prd => prd.id"/>
+                </td>
+                <td class="col-2 ms-2">
+                    <BFormInput type="number" required="required"
+                                :state="po.details[idx].qty>0"
+                                v-model="po.details[idx].qty"
+                                :min="0"
+                                @change="updateQty"
+                    />
+                </td>
+                <td class="col-2 px-2">
+                    <BFormInput v-model="po.details[idx].location"/>
+                </td>
+                <td>
+                    <BFormInput v-model="po.details[idx].comment"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <BFormDatalist id="products-list" :options="products_list"/>
     </BCard>
 </template>
 
 <script lang="ts" setup>
-import {getAllProducts, getWarehousesWithFilters, type PurchaseOrder} from "../api";
+import {getAllProducts, getWarehousesWithFilters, type PurchaseOrder, savePo} from "../api";
 import {onMounted, ref, shallowRef, watchEffect} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
+
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const route = useRoute()
+const router = useRouter()
 
 const pageTitle = shallowRef('')
 const warehouses = shallowRef([])
-const products = shallowRef([])
+let products = {}
+const products_list = shallowRef([])
 const nrow = shallowRef('1')
 
 const po = ref<PurchaseOrder>({
     arrivalAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
     qty: 0,
     status: 'INIT',
-    details: [{qty: 1}]
+    details: [{qty: 0}]
 });
 const processing = shallowRef(false)
 
 const fields = [
     {key: 'rowNo', label: '#'},
     {key: 'cat', label: 'Category'},
-    {key: 'name', label: 'Name'},
+    {key: 'name', label: 'Product'},
     {key: 'qty', label: 'Qty'},
-    {key: 'location', label: 'Location'},
+    {key: 'location', label: 'Location(04L1F1)'},
     {key: 'comment', label: 'Comment'},
 ]
 
-const savePo = async function () {
+const save = async function () {
     processing.value = true
 
     try {
-        getWarehousesWithFilters();
+        const rv = (await savePo(po.value)).data
+        console.log(rv)
+
+        if (rv.ok) {
+            await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
+        }
+    } finally {
+        processing.value = false
+    }
+}
+
+const approvePo = async function () {
+    processing.value = true
+
+    try {
+        // getWarehousesWithFilters();
+        // savePo(po.value)
     } finally {
         processing.value = false
     }
@@ -122,6 +182,15 @@ const addNRow = function () {
     [...Array(parseInt(nrow.value)).keys()].forEach(function (x) {
         po.value.details.push({qty: 1})
     });
+}
+
+const updateQty = function () {
+    po.value.qty = 0;
+    po.value.details.forEach(function (x) {
+        if (x.qty && x.prdId) {
+            po.value.qty += parseInt(x.qty)
+        }
+    })
 }
 
 watchEffect(function () {
@@ -135,7 +204,7 @@ onMounted(async function () {
     if ('purchaseOrderNew' == route.name) {
         pageTitle.value = 'New'
     } else {
-        pageTitle.value = "update"
+        pageTitle.value = "Update"
     }
 
     const data = (await getWarehousesWithFilters()).data.data
@@ -143,7 +212,12 @@ onMounted(async function () {
 
     po.value.whId = data.find((x) => x.code = 'HoC')?.id
 
-    products.value = (await getAllProducts()).data.data
+    const prds = (await getAllProducts()).data.data
+    prds.forEach(function (x) {
+        products[x.id] = x
+    })
+
+    products_list.value = prds
 
 })
 </script>

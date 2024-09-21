@@ -1,5 +1,5 @@
 import {axios} from "../axios";
-import {type OptionConfig, type OrderFilter, ProductFilter, type User} from "./interfaces";
+import {type OptionConfig, type OrderFilter, ProductFilter, PurchaseOrder, type User} from "./interfaces";
 
 export const getUserInfo = () => axios.get<User>('/auth/user-info')
 // @ts-ignore
@@ -13,3 +13,4 @@ export const getAllProducts = () => axios.get('/api/products/all')
 export const getWarehousesWithFilters = (options?: OptionConfig) => axios.get('/api/warehouses', {...options})
 
 export const getPoList = () => axios.get('/api/purchase-orders')
+export const savePo = (params: PurchaseOrder) => axios.post('/api/purchase-orders', params)
