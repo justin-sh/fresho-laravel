@@ -13,4 +13,6 @@ export const getAllProducts = () => axios.get('/api/products/all')
 export const getWarehousesWithFilters = (options?: OptionConfig) => axios.get('/api/warehouses', {...options})
 
 export const getPoList = () => axios.get('/api/purchase-orders')
+export const getPo = (id: string) => axios.get(`/api/purchase-orders/${id}`)
 export const savePo = (params: PurchaseOrder) => axios.post('/api/purchase-orders', params)
+export const updatePo = (params: PurchaseOrder) => axios.put(`/api/purchase-orders/${params.id}`, params)

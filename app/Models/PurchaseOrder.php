@@ -27,6 +27,7 @@ class PurchaseOrder extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'purchase_order_details', 'po_id', 'prd_id')
+            ->withPivot(['qty', 'location', 'comment'])
             ->withTimestamps();
     }
 

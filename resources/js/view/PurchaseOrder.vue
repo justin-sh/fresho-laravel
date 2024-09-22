@@ -31,7 +31,7 @@
                     <label for="title">Title</label>
                 </BCol>
                 <BCol sm="4">
-                    <BFormInput id="title" v-model="po.title" :state="po.title.length>0"/>
+                    <BFormInput id="title" v-model="po.title" :state="po.title?.length>0"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -55,7 +55,7 @@
                     <label for="status">Status</label>
                 </BCol>
                 <BCol sm="2">
-                    {{ po.status }}
+                    {{ po.state }}
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -63,7 +63,7 @@
                     <label for="status">Warehouse</label>
                 </BCol>
                 <BCol sm="6">
-                    <BFormRadioGroup v-model="po.whId" name="wh-radio">
+                    <BFormRadioGroup v-model="po.wh.id" name="wh-radio">
                         <BFormRadio :value="w.id" v-for="w in warehouses">
                             {{ w.name }}
                         </BFormRadio>
@@ -118,7 +118,7 @@
 </template>
 
 <script lang="ts" setup>
-import {getAllProducts, getWarehousesWithFilters, type PurchaseOrder, savePo} from "../api";
+import {getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, savePo, updatePo} from "../api";
 import {onMounted, ref, shallowRef, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
@@ -130,6 +130,7 @@ const route = useRoute()
 const router = useRouter()
 
 const pageTitle = shallowRef('')
+const isNew = shallowRef(false)
 const warehouses = shallowRef([])
 let products = {}
 const products_list = shallowRef([])
@@ -138,7 +139,8 @@ const nrow = shallowRef('1')
 const po = ref<PurchaseOrder>({
     arrivalAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
     qty: 0,
-    status: 'INIT',
+    state: 'INIT',
+    wh: {},
     details: [{qty: 0}]
 });
 const processing = shallowRef(false)
@@ -156,11 +158,14 @@ const save = async function () {
     processing.value = true
 
     try {
-        const rv = (await savePo(po.value)).data
-        console.log(rv)
+        if (isNew.value) {
+            const rv = (await savePo(po.value)).data
 
-        if (rv.ok) {
-            await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
+            if (rv.ok) {
+                await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
+            }
+        } else {
+            (await updatePo(po.value)).data
         }
     } finally {
         processing.value = false
@@ -195,22 +200,28 @@ const updateQty = function () {
 
 watchEffect(function () {
     // update title
-    const wh = warehouses.value.find((x) => x.id == po.value.whId)?.code
-    po.value.title = `${po.value.arrivalAt?.toString().replace(/-/g, '')} po of ${wh}`
+    // const wh = warehouses.value.find((x) => x.id == po.value.whId)?.code
+    if (pageTitle.value == 'new') {
+        const wh = po.value.wh.code || ''
+        po.value.title = `${po.value.arrivalAt?.toString().replace(/-/g, '')} po of ${wh}`
+    }
 })
 
 onMounted(async function () {
 
-    if ('purchaseOrderNew' == route.name) {
-        pageTitle.value = 'New'
-    } else {
-        pageTitle.value = "Update"
-    }
-
     const data = (await getWarehousesWithFilters()).data.data
     warehouses.value = data
 
-    po.value.whId = data.find((x) => x.code = 'HoC')?.id
+    if ('purchaseOrderNew' == route.name) {
+        pageTitle.value = 'New'
+        isNew.value = true
+        po.value.whId = data.find((x) => x.code = 'HoC')?.id
+    } else {
+        pageTitle.value = "Update"
+        isNew.value = false
+
+        po.value.id = route.params.id
+    }
 
     const prds = (await getAllProducts()).data.data
     prds.forEach(function (x) {
@@ -218,6 +229,10 @@ onMounted(async function () {
     })
 
     products_list.value = prds
+
+    const po2 = (await getPo(po.value.id)).data.data
+    po.value = po2
+
 
 })
 </script>
