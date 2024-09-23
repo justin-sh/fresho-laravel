@@ -24,3 +24,5 @@ Route::apiResource('/products', ProductController::class);
 Route::apiResource('/warehouses', WarehouseController::class);
 
 Route::apiResource('/purchase-orders', PurchaseOrderController::class);
+
+Route::put('/purchase-orders/{purchase_order}/approve', [PurchaseOrderController::class, 'approve']);

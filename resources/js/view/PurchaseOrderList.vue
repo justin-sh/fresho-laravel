@@ -51,7 +51,7 @@ const fields = [
     {key: 'qty', label: 'Qty'},
     {key: 'state', label: 'State'},
     {key: 'arrivalAt', label: 'Arrival At', sortable: true},
-    {key: 'wh.code', label: 'Warehouse', sortable: true},
+    {key: 'wh', label: 'Warehouse', sortable: true},
 ]
 
 const data = shallowRef([])

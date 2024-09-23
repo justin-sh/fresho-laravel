@@ -8,7 +8,7 @@
             </div>
         </template>
         <template #footer>
-            <BRow>
+            <BRow v-if="!isView">
                 <BCol class="col-auto pe-0">
                     <BButton variant="outline-primary" class="d-inline" @click="addNRow">Add N rows:</BButton>
                 </BCol>
@@ -17,8 +17,8 @@
                 </BCol>
                 <BCol sm="8" class="d-flex justify-content-center">
                     <BButton variant="outline-primary" :loading="processing" @click="save">Save</BButton>
-                    <BButton v-if="'purchaseOrderNew' !== route.name" variant="outline-primary" :loading="processing"
-                             @click="approvePo" class="ms-2">
+                    <BButton v-if="!isNew" variant="outline-primary" :loading="processing"
+                             @click="approve" class="ms-2">
                         Approve
                     </BButton>
                 </BCol>
@@ -31,7 +31,7 @@
                     <label for="title">Title</label>
                 </BCol>
                 <BCol sm="4">
-                    <BFormInput id="title" v-model="po.title" :state="po.title?.length>0"/>
+                    <BFormInput id="title" v-model="po.title" :disabled="isView"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -39,7 +39,7 @@
                     <label for="arrive-at">Arrive At</label>
                 </BCol>
                 <BCol sm="2">
-                    <BFormInput id="arrive-at" type="date" v-model="po.arrivalAt" :state="po.arrivalAt!==''"/>
+                    <BFormInput id="arrive-at" type="date" v-model="po.arrivalAt" :disabled="isView"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -63,8 +63,8 @@
                     <label for="status">Warehouse</label>
                 </BCol>
                 <BCol sm="6">
-                    <BFormRadioGroup v-model="po.wh.id" name="wh-radio">
-                        <BFormRadio :value="w.id" v-for="w in warehouses">
+                    <BFormRadioGroup v-model="po.whId" name="wh-radio">
+                        <BFormRadio :value="w.id" v-for="w in warehouses" :disabled="isView">
                             {{ w.name }}
                         </BFormRadio>
                     </BFormRadioGroup>
@@ -93,22 +93,23 @@
                     <v-select v-model="po.details[idx].prdId"
                               :options="products_list"
                               label="name"
+                              :disabled="isView"
                               @option:selected="(o)=>po.details[idx].cat=o.cat"
                               :reduce="prd => prd.id"/>
                 </td>
-                <td class="col-2 ms-2">
+                <td class="col-1 ms-2">
                     <BFormInput type="number" required="required"
-                                :state="po.details[idx].qty>0"
                                 v-model="po.details[idx].qty"
                                 :min="0"
+                                :disabled="isView"
                                 @change="updateQty"
                     />
                 </td>
                 <td class="col-2 px-2">
-                    <BFormInput v-model="po.details[idx].location"/>
+                    <BFormInput v-model="po.details[idx].location" :disabled="isView"/>
                 </td>
                 <td>
-                    <BFormInput v-model="po.details[idx].comment"/>
+                    <BFormInput v-model="po.details[idx].comment" :disabled="isView"/>
                 </td>
             </tr>
             </tbody>
@@ -118,8 +119,8 @@
 </template>
 
 <script lang="ts" setup>
-import {getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, savePo, updatePo} from "../api";
-import {onMounted, ref, shallowRef, watchEffect} from "vue";
+import {approvePo, getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, savePo, updatePo} from "../api";
+import {computed, onMounted, ref, shallowRef, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
 
@@ -130,19 +131,12 @@ const route = useRoute()
 const router = useRouter()
 
 const pageTitle = shallowRef('')
-const isNew = shallowRef(false)
 const warehouses = shallowRef([])
 let products = {}
 const products_list = shallowRef([])
 const nrow = shallowRef('1')
 
-const po = ref<PurchaseOrder>({
-    arrivalAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
-    qty: 0,
-    state: 'INIT',
-    wh: {},
-    details: [{qty: 0}]
-});
+const po = ref<PurchaseOrder>({});
 const processing = shallowRef(false)
 
 const fields = [
@@ -172,12 +166,14 @@ const save = async function () {
     }
 }
 
-const approvePo = async function () {
+const approve = async function () {
     processing.value = true
-
     try {
-        // getWarehousesWithFilters();
-        // savePo(po.value)
+        const params = {id: po.value.id};
+        const rv = (await approvePo(params)).data
+        if (rv.ok == true) {
+            po.value.state = 'APPROVE';
+        }
     } finally {
         processing.value = false
     }
@@ -198,30 +194,22 @@ const updateQty = function () {
     })
 }
 
-watchEffect(function () {
-    // update title
-    // const wh = warehouses.value.find((x) => x.id == po.value.whId)?.code
-    if (pageTitle.value == 'new') {
-        const wh = po.value.wh.code || ''
-        po.value.title = `${po.value.arrivalAt?.toString().replace(/-/g, '')} po of ${wh}`
-    }
-})
+const isView = computed(function () {
+    return po.value.id && po.value?.state === 'APPROVE';
+});
+
+const isNew = computed(function () {
+    return !po.value.id;
+});
+
+watchEffect(() => {
+    po.value.title = `${(po.value.arrivalAt ?? '').toString().replace(/-/g, '')} po`
+});
 
 onMounted(async function () {
 
     const data = (await getWarehousesWithFilters()).data.data
     warehouses.value = data
-
-    if ('purchaseOrderNew' == route.name) {
-        pageTitle.value = 'New'
-        isNew.value = true
-        po.value.whId = data.find((x) => x.code = 'HoC')?.id
-    } else {
-        pageTitle.value = "Update"
-        isNew.value = false
-
-        po.value.id = route.params.id
-    }
 
     const prds = (await getAllProducts()).data.data
     prds.forEach(function (x) {
@@ -230,9 +218,28 @@ onMounted(async function () {
 
     products_list.value = prds
 
-    const po2 = (await getPo(po.value.id)).data.data
-    po.value = po2
+    if ('purchaseOrderNew' == route.name) {
+        pageTitle.value = 'New'
 
+        po.value = {
+            arrivalAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
+            qty: 0,
+            state: 'INIT',
+            whId: data.find((x) => x.code === 'HoC')?.id,
+            details: [{qty: 0}]
+        }
+    } else {
+        po.value.id = route.params.id
+
+        const po2 = (await getPo(po.value.id)).data.data
+        po.value = po2
+
+        if ('APPROVE' == po2.state) {
+            pageTitle.value = "View"
+        } else {
+            pageTitle.value = "Update"
+        }
+    }
 
 })
 </script>

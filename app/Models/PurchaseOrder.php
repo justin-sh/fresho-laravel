@@ -17,12 +17,14 @@ use Ramsey\Uuid\Uuid;
  * @property string $title
  * @property Carbon $arrival_at
  * @property int $qty
+ * @property Uuid $wh_id
  * @property PurchaseStatus $state
- * @property Warehouse $warehouse
  */
 class PurchaseOrder extends Model
 {
     use HasFactory, HasUuids, Timestamp;
+
+    protected $fillable = ['title', 'qty', 'arrival_at'];
 
     public function products(): BelongsToMany
     {

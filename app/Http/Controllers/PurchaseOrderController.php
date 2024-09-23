@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PurchaseOrderResource;
 use App\Models\PurchaseOrder;
 use App\Models\Warehouse;
+use App\PurchaseStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class PurchaseOrderController extends Controller
 {
@@ -17,7 +18,6 @@ class PurchaseOrderController extends Controller
      */
     public function index(Request $request): JsonResource
     {
-        $curPage = 1;
         $pageSize = 50;
         $data = PurchaseOrder::query()
             ->with('warehouse')
@@ -62,8 +62,6 @@ class PurchaseOrderController extends Controller
      */
     public function show(PurchaseOrder $purchaseOrder)
     {
-        Log::debug('show id=' . $purchaseOrder->id);
-
         $purchaseOrder->load('products');
         return new PurchaseOrderResource($purchaseOrder);
     }
@@ -74,16 +72,33 @@ class PurchaseOrderController extends Controller
     public function update(Request $request, PurchaseOrder $purchaseOrder): array
     {
         $data = $request->json()->all();
-        Log::debug('update....');
-        Log::debug('update..data->qty..' . $data['qty']);
-        Log::debug('update..->qty..' . $purchaseOrder->qty);
-
         DB::transaction(function () use ($data, $purchaseOrder) {
             $purchaseOrder->update(['title' => $data['title'], 'qty' => $data['qty'], 'arrival_at' => $data['arrivalAt']]);
-            //todo update details
+
+            $details = [];
+            collect($data['details'])->each(function ($pod) use (&$details) {
+                $details[$pod['prdId']] = [
+                    'qty' => Arr::get($pod, 'qty'),
+                    'location' => Arr::get($pod, 'location'),
+                    'comment' => Arr::get($pod, 'comment')
+                ];
+            });
+
+            $purchaseOrder->products()->sync($details);
         });
 
         return ['ok' => true, 'data' => []];
+    }
+
+    public function approve(PurchaseOrder $purchaseOrder): array
+    {
+        if (PurchaseStatus::INIT->value == $purchaseOrder->state) {
+
+            $purchaseOrder->state = PurchaseStatus::APPROVE;
+            $purchaseOrder->update();
+        }
+
+        return ['ok' => true];
     }
 
     /**

@@ -33,7 +33,7 @@ export interface PurchaseOrder {
     title?: string
     arrivalAt?: string
     qty?: number
-    wh?: { id?: string, code?: string }
+    whId?: string
     state?: string
     details?: Array<PoDetail>
 }

@@ -24,10 +24,10 @@ class PurchaseOrderResource extends JsonResource
             'arrivalAt' => $this->resource->arrival_at,
             'qty' => $this->resource->qty,
             'state' => $this->resource->state,
-            'wh' => [
-                'id' => $this->resource->warehouse->id,
-                'code' => $this->resource->warehouse->code,
-            ],
+            'whId' => $this->resource->wh_id,
+            'wh' => $this->whenLoaded('warehouse', function ($warehouse) {
+                return $warehouse->code;
+            }),
             'details' => $this->whenLoaded('products', function ($details) {
                 return collect($details)->map(fn($x) => ['prdId' => $x->id, 'cat' => $x->cat, 'qty' => $x->pivot->qty, 'location' => $x->pivot->location, 'comment' => $x->pivot->comment]);
             }),
