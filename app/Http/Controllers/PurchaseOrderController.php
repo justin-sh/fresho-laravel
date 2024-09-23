@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PurchaseOrderApproved;
 use App\Http\Resources\PurchaseOrderResource;
 use App\Models\PurchaseOrder;
 use App\Models\Warehouse;
@@ -96,6 +97,8 @@ class PurchaseOrderController extends Controller
 
             $purchaseOrder->state = PurchaseStatus::APPROVE;
             $purchaseOrder->update();
+
+            PurchaseOrderApproved::dispatch($purchaseOrder);
         }
 
         return ['ok' => true];
