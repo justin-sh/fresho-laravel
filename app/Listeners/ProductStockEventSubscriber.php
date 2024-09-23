@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class ProductStockEventSubscriber
 {
 
-    public function handlePurchaseApproved(): void
+    public function handlePurchaseApproved(PurchaseOrderApproved $event): void
     {
         Log::debug('processing product stock adjustment');
     }
