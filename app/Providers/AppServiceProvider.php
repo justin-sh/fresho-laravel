@@ -31,8 +31,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventSilentlyDiscardingAttributes($this->app->isLocal());
 
-        Event::subscribe(ProductStockEventSubscriber::class);
-
         Http::globalRequestMiddleware(function (RequestInterface $request) {
             return $request->withHeader('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36')
                 ->withHeader('Accept', 'application/json, text/javascript, */*; q=0.01')

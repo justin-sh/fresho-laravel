@@ -17,8 +17,9 @@ use Ramsey\Uuid\Uuid;
  * @property string $title
  * @property Carbon $arrival_at
  * @property int $qty
- * @property Uuid $wh_id
+ * @property string $wh_id
  * @property PurchaseStatus $state
+ * @property Product[] $products
  */
 class PurchaseOrder extends Model
 {

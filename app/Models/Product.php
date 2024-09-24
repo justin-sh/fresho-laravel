@@ -36,7 +36,7 @@ class Product extends Model
     public function warehouses(): BelongsToMany
     {
         return $this->belongsToMany(Warehouse::class)
-            ->withPivot(['onhand_qty', 'free_qty']);
+            ->withPivot(['onhand_qty', 'free_qty'])->withTimestamps();
     }
 
     public function saleOrder(): BelongsToMany
