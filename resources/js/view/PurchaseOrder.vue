@@ -72,12 +72,6 @@
             </BRow>
         </BForm>
 
-        <!--        <BTable id="po-list" class="mt-2" striped hover :fields="fields" :items="po.details">-->
-        <!--            <template #cell(rowNo)="row">-->
-        <!--                {{ row.index + 1 }}-->
-        <!--            </template>-->
-        <!--        </BTable>-->
-
         <table class="w-100 mt-4">
             <thead>
             <tr>
@@ -120,7 +114,7 @@
 
 <script lang="ts" setup>
 import {approvePo, getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, savePo, updatePo} from "../api";
-import {computed, onMounted, ref, shallowRef, watchEffect} from "vue";
+import {computed, onMounted, ref, shallowRef, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
 
@@ -159,7 +153,7 @@ const save = async function () {
                 await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
             }
         } else {
-            (await updatePo(po.value)).data
+            const rv = (await updatePo(po.value)).data
         }
     } finally {
         processing.value = false
@@ -173,6 +167,7 @@ const approve = async function () {
         const rv = (await approvePo(params)).data
         if (rv.ok == true) {
             po.value.state = 'APPROVE';
+            pageTitle.value = "View"
         }
     } finally {
         processing.value = false
@@ -195,7 +190,7 @@ const updateQty = function () {
 }
 
 const isView = computed(function () {
-    return po.value.id && po.value?.state === 'APPROVE';
+    return !isNew.value && po.value?.state === 'APPROVE';
 });
 
 const isNew = computed(function () {
@@ -203,13 +198,39 @@ const isNew = computed(function () {
 });
 
 watchEffect(() => {
-    po.value.title = `${(po.value.arrivalAt ?? '').toString().replace(/-/g, '')} po`
+    po.value.id = route.params.id ?? ''
+
+    if (isNew.value) {
+        pageTitle.value = 'New'
+
+        po.value = {
+            title: formatInTimeZone(new Date(), localTZ, "yyyyMMdd") + ' po',
+            arrivalAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
+            qty: 0,
+            state: 'INIT',
+            whId: warehouses.value.find((x) => x.code === 'HoC')?.id,
+            details: [{qty: 0}]
+        }
+    } else if (isView.value) {
+        pageTitle.value = "View"
+    } else {
+        pageTitle.value = "Update"
+    }
+});
+
+watch(() => po.value.arrivalAt, (newArrivalAt, oldArrivalAt) => {
+
+    if (!newArrivalAt) return;
+
+    const ymd = po.value.arrivalAt.toString().replace(/-/g, '')
+    if (oldArrivalAt) {
+        po.value.title = po.value.title.replace(oldArrivalAt.replace(/-/g, ''), ymd)
+    }
 });
 
 onMounted(async function () {
 
-    const data = (await getWarehousesWithFilters()).data.data
-    warehouses.value = data
+    warehouses.value = (await getWarehousesWithFilters()).data.data
 
     const prds = (await getAllProducts()).data.data
     prds.forEach(function (x) {
@@ -218,27 +239,8 @@ onMounted(async function () {
 
     products_list.value = prds
 
-    if ('purchaseOrderNew' == route.name) {
-        pageTitle.value = 'New'
-
-        po.value = {
-            arrivalAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
-            qty: 0,
-            state: 'INIT',
-            whId: data.find((x) => x.code === 'HoC')?.id,
-            details: [{qty: 0}]
-        }
-    } else {
-        po.value.id = route.params.id
-
-        const po2 = (await getPo(po.value.id)).data.data
-        po.value = po2
-
-        if ('APPROVE' == po2.state) {
-            pageTitle.value = "View"
-        } else {
-            pageTitle.value = "Update"
-        }
+    if (po.value.id) {
+        po.value = (await getPo(po.value.id)).data.data
     }
 
 })
