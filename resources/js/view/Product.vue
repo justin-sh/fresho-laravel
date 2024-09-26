@@ -55,10 +55,14 @@
         </template>
         <template #footer>
             <BPagination v-model="currentPage" :total-rows="products.length" :per-page="page_size" limit="7"
-                         @update:model-value="goTableHead" aria-controls="ordertable"></BPagination>
+                         @update:model-value="goTableHead" aria-controls="product-table"></BPagination>
         </template>
 
-        <BTable id="ordertable" striped hover :current-page="currentPage" :per-page="page_size" :items="products"
+        <BTable id="product-table" striped hover
+                :busy="data_loading"
+                :current-page="currentPage"
+                :per-page="page_size"
+                :items="products"
                 :fields="fields">
             <template #cell(rowNo)="row">
                 {{ row.index + 1 }}
