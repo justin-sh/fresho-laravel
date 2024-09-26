@@ -31,7 +31,8 @@ class PurchaseOrder extends Model
     {
         return $this->belongsToMany(Product::class, 'purchase_order_details', 'po_id', 'prd_id')
             ->withPivot(['qty', 'location', 'comment'])
-            ->withTimestamps();
+            ->withTimestamps()
+            ->orderByPivot('row_no');
     }
 
     public function warehouse(): BelongsTo
