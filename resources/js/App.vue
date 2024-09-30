@@ -14,8 +14,8 @@
                         <BNavItem :to="{name:'orders'}">
                             Orders
                         </BNavItem>
-                        <BNavItem :to="{name:'salesOrders'}">
-                            Sales Orders
+                        <BNavItem :to="{name:'saleOrders'}">
+                            Sale Orders
                         </BNavItem>
                         <BNavItem :to="{name:'purchaseOrders'}">
                             Purchase Orders
@@ -30,8 +30,8 @@
                             <template #button-content>
                                 New +
                             </template>
-                            <BDropdownItem href="#">
-                                new Sales Order
+                            <BDropdownItem :to="{name:'saleOrderNew'}">
+                                new Sale Order
                             </BDropdownItem>
                             <BDropdownItem :to="{name:'purchaseOrderNew'}">
                                 new Purchase Order

@@ -3,7 +3,7 @@
     <BCard>
         <template #header>
             <div class="col align-content-center">
-                <span class="fw-bold fs-4">Purchase Orders</span>
+                <span class="fw-bold fs-4">Sale Orders</span>
                 <span class="ms-2">{{ pageTitle }}</span>
             </div>
         </template>
@@ -31,7 +31,7 @@
                     <label for="title">Title</label>
                 </BCol>
                 <BCol sm="4">
-                    <BFormInput id="title" v-model="po.title" :disabled="isView"/>
+                    <BFormInput id="title" v-model="so.title" :disabled="isView"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -39,7 +39,7 @@
                     <label for="arrive-at">Arrive At</label>
                 </BCol>
                 <BCol sm="2">
-                    <BFormInput id="arrive-at" type="date" v-model="po.arrivalAt" :disabled="isView"/>
+                    <BFormInput id="arrive-at" type="date" v-model="so.pickupAt" :disabled="isView"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -47,7 +47,7 @@
                     <label for="qty">Qty</label>
                 </BCol>
                 <BCol sm="2">
-                    {{ po.qty }}
+                    {{ so.qty }}
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -55,7 +55,7 @@
                     <label for="status">Status</label>
                 </BCol>
                 <BCol sm="2">
-                    {{ po.state }}
+                    {{ so.state }}
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -63,7 +63,7 @@
                     <label for="status">Warehouse</label>
                 </BCol>
                 <BCol sm="6">
-                    <BFormRadioGroup v-model="po.whId" name="wh-radio">
+                    <BFormRadioGroup v-model="so.whId" name="wh-radio">
                         <BFormRadio :value="w.id" v-for="w in warehouses" :disabled="isView">
                             {{ w.name }}
                         </BFormRadio>
@@ -79,31 +79,31 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(d, idx) in po.details">
+            <tr v-for="(d, idx) in so.details">
                 <td>{{ idx + 1 }}</td>
                 <td class="col-1">{{ d.cat }}</td>
                 <td class="col-4 px-2">
 
-                    <v-select v-model="po.details[idx].prdId"
+                    <v-select v-model="so.details[idx].prdId"
                               :options="products_list"
                               label="name"
                               :disabled="isView"
-                              @option:selected="(o)=>po.details[idx].cat=o.cat"
+                              @option:selected="(o)=>so.details[idx].cat=o.cat"
                               :reduce="prd => prd.id"/>
                 </td>
                 <td class="col-1 ms-2">
                     <BFormInput type="number" required="required"
-                                v-model="po.details[idx].qty"
+                                v-model="so.details[idx].qty"
                                 :min="0"
                                 :disabled="isView"
                                 @change="updateQty"
                     />
                 </td>
                 <td class="col-2 px-2">
-                    <BFormInput v-model="po.details[idx].location" :disabled="isView"/>
+                    <BFormInput v-model="so.details[idx].location" :disabled="isView"/>
                 </td>
                 <td>
-                    <BFormInput v-model="po.details[idx].comment" :disabled="isView"/>
+                    <BFormInput v-model="so.details[idx].comment" :disabled="isView"/>
                 </td>
             </tr>
             </tbody>
@@ -113,7 +113,16 @@
 </template>
 
 <script lang="ts" setup>
-import {approvePo, getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, savePo, updatePo} from "../api";
+import {
+    approvePo, approveSo,
+    getAllProducts,
+    getPo,
+    getWarehousesWithFilters,
+    type PurchaseOrder,
+    savePo,
+    saveSo,
+    updatePo, updateSo
+} from "../api";
 import {computed, onMounted, ref, shallowRef, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
@@ -130,7 +139,7 @@ let products = {}
 const products_list = shallowRef([])
 const nrow = shallowRef('1')
 
-const po = ref<PurchaseOrder>({});
+const so = ref<PurchaseOrder>({});
 const processing = shallowRef(false)
 
 const fields = [
@@ -147,13 +156,13 @@ const save = async function () {
 
     try {
         if (isNew.value) {
-            const rv = (await savePo(po.value)).data
+            const rv = (await saveSo(so.value)).data
 
             if (rv.ok) {
                 await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
             }
         } else {
-            const rv = (await updatePo(po.value)).data
+            const rv = (await updateSo(so.value)).data
         }
     } finally {
         processing.value = false
@@ -163,10 +172,10 @@ const save = async function () {
 const approve = async function () {
     processing.value = true
     try {
-        const params = {id: po.value.id};
-        const rv = (await approvePo(params)).data
+        const params = {id: so.value.id};
+        const rv = (await approveSo(params)).data
         if (rv.ok == true) {
-            po.value.state = 'APPROVE';
+            so.value.state = 'APPROVE';
             pageTitle.value = "View"
         }
     } finally {
@@ -176,35 +185,35 @@ const approve = async function () {
 
 const addNRow = function () {
     [...Array(parseInt(nrow.value)).keys()].forEach(function (x) {
-        po.value.details.push({qty: 1})
+        so.value.details.push({qty: 1})
     });
 }
 
 const updateQty = function () {
-    po.value.qty = 0;
-    po.value.details.forEach(function (x) {
+    so.value.qty = 0;
+    so.value.details.forEach(function (x) {
         if (x.qty && x.prdId) {
-            po.value.qty += parseInt(x.qty)
+            so.value.qty += parseInt(x.qty)
         }
     })
 }
 
 const isView = computed(function () {
-    return !isNew.value && po.value?.state === 'APPROVE';
+    return !isNew.value && so.value?.state === 'APPROVE';
 });
 
 const isNew = computed(function () {
-    return !po.value.id;
+    return !so.value.id;
 });
 
 watchEffect(() => {
-    po.value.id = route.params.id ?? ''
+    so.value.id = route.params.id ?? ''
 
     if (isNew.value) {
         pageTitle.value = 'New'
 
-        po.value = {
-            title: formatInTimeZone(new Date(), localTZ, "yyyyMMdd") + ' po',
+        so.value = {
+            title: formatInTimeZone(new Date(), localTZ, "yyyyMMdd") + ' so',
             pickupAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
             qty: 0,
             state: 'INIT',
@@ -218,13 +227,13 @@ watchEffect(() => {
     }
 });
 
-watch(() => po.value.arrivalAt, (newArrivalAt, oldArrivalAt) => {
+watch(() => so.value.pickupAt, (newArrivalAt, oldArrivalAt) => {
 
     if (!newArrivalAt) return;
 
-    const ymd = po.value.arrivalAt.toString().replace(/-/g, '')
+    const ymd = so.value.pickupAt.toString().replace(/-/g, '')
     if (oldArrivalAt) {
-        po.value.title = po.value.title.replace(oldArrivalAt.replace(/-/g, ''), ymd)
+        so.value.title = so.value.title.replace(oldArrivalAt.replace(/-/g, ''), ymd)
     }
 });
 
@@ -239,8 +248,8 @@ onMounted(async function () {
 
     products_list.value = prds
 
-    if (po.value.id) {
-        po.value = (await getPo(po.value.id)).data.data
+    if (so.value.id) {
+        so.value = (await getPo(so.value.id)).data.data
     }
 
 })

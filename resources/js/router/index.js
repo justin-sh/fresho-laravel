@@ -5,6 +5,8 @@ import Order from "@/view/Order.vue";
 import Product from "@/view/Product.vue";
 import PurchaseOrderList from "@/view/PurchaseOrderList.vue";
 import PurchaseOrder from "@/view/PurchaseOrder.vue";
+import SaleOrderList from "@/view/SaleOrderList.vue";
+import SaleOrder from "@/view/SaleOrder.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,9 +27,19 @@ const router = createRouter({
             component: Home
         },
         {
-            path: '/sales-orders',
-            name: 'salesOrders',
-            component: Home
+            path: '/sale-orders',
+            name: 'saleOrders',
+            component: SaleOrderList
+        },
+        {
+            path: '/sale-orders/new',
+            name: 'saleOrderNew',
+            component: SaleOrder,
+        },
+        {
+            path: '/sale-orders/:id',
+            name: 'saleOrder',
+            component: SaleOrder,
         },
         {
             path: '/purchase-orders',
