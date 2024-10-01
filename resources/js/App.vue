@@ -64,4 +64,16 @@
     </footer>
 </template>
 
+<script setup>
 
+import {getWarehousesWithFilters} from "@/api/index";
+import {onMounted} from "vue";
+console.log('app.vue 00')
+onMounted(async function () {
+    console.log('app.vue 11')
+    const wh = (await getWarehousesWithFilters()).data.data
+
+    console.log(wh)
+})
+
+</script>

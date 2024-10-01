@@ -118,7 +118,7 @@ import {computed, onMounted, ref, shallowRef, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
 
-
+console.log('po.vue 000')
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const route = useRoute()

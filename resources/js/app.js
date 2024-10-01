@@ -10,11 +10,13 @@ import App from "./App.vue"
 
 import router from './router'
 
-import VueSelect  from "vue-select";
+import VueSelect from "vue-select";
+import pinia from "@/store/index";
 
 const app = createApp(App)
 app.use(createBootstrap())
 app.component("v-select", VueSelect)
 app.use(router)
+app.use(pinia)
 
 app.mount('#app')
