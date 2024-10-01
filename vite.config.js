@@ -22,11 +22,24 @@ export default defineConfig({
         }),
         Components({
             resolvers: [BootstrapVueNextResolver()]
-        }),
+        })
     ],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
+        }
+    },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: function (id, meta) {
+                    if(id.includes('/node_modules/')){
+                        return 'vendor';
+                    }
+                    // console.log(id)
+                }
+
+            }
         }
     }
 });
