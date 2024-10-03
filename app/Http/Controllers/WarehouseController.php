@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Cache;
 
 class WarehouseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResource
+    public function index(): JsonResponse
     {
-        $data = Warehouse::query()->get();
+        $cacheKey = 'wh:all';
+        $data = Cache::remember($cacheKey, 3600, function () {
+            return Warehouse::query()->get();
+        });
 
-        return WarehouseResource::collection($data);
+        return WarehouseResource::collection($data)
+            ->response()
+            ->header('Cache-Control', 'max-age=3600');
     }
 
     /**
