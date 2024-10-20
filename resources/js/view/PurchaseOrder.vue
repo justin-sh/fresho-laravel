@@ -114,7 +114,7 @@
 
 <script lang="ts" setup>
 import {approvePo, getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, savePo, updatePo} from "../api";
-import {computed, onMounted, ref, shallowRef, watch, watchEffect} from "vue";
+import {computed, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
 
@@ -243,6 +243,42 @@ onMounted(async function () {
         po.value = (await getPo(po.value.id)).data.data
     }
 
+})
+
+
+const channels = []
+
+onMounted(() => {
+    const channel = window.Echo.channel('HoC.Stock');
+    channels.push(channel)
+    console.log(channel.name);
+
+    channel.listen('.PoApproved', (s) => {
+        console.log('---.PoApproved-------')
+        console.log(s)
+    })
+    const channel2 = window.Echo.private('HoC.Stock2');
+    channels.push(channel2)
+    console.log(channel2.name);
+
+    channel2
+        .subscribed(function () {
+            console.log('subscribed To private Channel')
+        })
+        .listenToAll(function () {
+            console.log('listening to private channel')
+        })
+        .listen('.PoApproved', (s) => {
+            console.log('--private-.PoApproved-------')
+            console.log(s)
+        })
+})
+
+onUnmounted(() => {
+    channels.forEach((e) => {
+        console.log("leaveChannel=>" + e.name)
+        window.Echo.leaveChannel(e.name)
+    })
 })
 </script>
 
