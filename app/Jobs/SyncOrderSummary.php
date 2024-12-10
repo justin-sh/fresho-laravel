@@ -53,6 +53,9 @@ class SyncOrderSummary implements ShouldQueue
 
             $data = [];
             collect($resp['supplier_orders'])->each(function ($order) use (&$data) {
+
+                Log::debug("delivery_instructions=". $order['delivery_instructions']);
+
                 $data[] = [
                     'id' => $order['id'],
                     'order_number' => $order['order_number'],
@@ -74,6 +77,14 @@ class SyncOrderSummary implements ShouldQueue
                     'placed_by_name' => $order['placed_by_name'],
                     'parent_order_id' => $order['parent_order_id'],
                 ];
+
+
+                if(count($data) >= 10){
+                    Order::upsert($data, ['id'], ['delivery_date', 'additional_notes', 'delivery_instructions', 'formatted_cached_payable_total', 'payable_total_in_cents', 'submitted_at', 'state', 'placed_by_name']);
+
+                    $data = [];
+                }
+                Log::debug("length of data: " . count($data));
 
             });
 
