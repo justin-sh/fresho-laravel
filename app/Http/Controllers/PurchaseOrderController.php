@@ -101,6 +101,8 @@ class PurchaseOrderController extends Controller
             PurchaseOrderApproved::dispatch($purchaseOrder);
         }
 
+        PurchaseOrderApproved::dispatch($purchaseOrder);
+
         return ['ok' => true];
     }
 

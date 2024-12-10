@@ -13,6 +13,11 @@ import router from './router'
 import VueSelect from "vue-select";
 import pinia from "@/store/index";
 
+
+/////
+import "./echo";
+
+
 const app = createApp(App)
 app.use(createBootstrap())
 app.component("v-select", VueSelect)
