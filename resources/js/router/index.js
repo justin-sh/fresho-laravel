@@ -7,6 +7,7 @@ import PurchaseOrderList from "@/view/PurchaseOrderList.vue";
 import PurchaseOrder from "@/view/PurchaseOrder.vue";
 import SaleOrderList from "@/view/SaleOrderList.vue";
 import SaleOrder from "@/view/SaleOrder.vue";
+import DeptReport from "@/view/DeptReport.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,7 +25,7 @@ const router = createRouter({
         {
             path: '/report/dept',
             name: 'deptReport',
-            component: Home
+            component: DeptReport
         },
         {
             path: '/sale-orders',

@@ -28,6 +28,23 @@
                     <BNavbarNav>
                         <BNavItemDropdown>
                             <template #button-content>
+                                Reports
+                            </template>
+                            <BDropdownItem :to="{name:'deptReport'}">
+                                Dept Report + Picking Slip
+                            </BDropdownItem>
+                            <!-- <BDropdownItem :to="{name:'purchaseOrderNew'}">
+                                new Purchase Order
+                            </BDropdownItem>
+                            <BDropdownItem :to="{name:'purchaseOrderNew'}">
+                                new Product
+                            </BDropdownItem> -->
+                        </BNavItemDropdown>
+                    </BNavbarNav>
+
+                    <BNavbarNav>
+                        <BNavItemDropdown>
+                            <template #button-content>
                                 New +
                             </template>
                             <BDropdownItem :to="{name:'saleOrderNew'}">
