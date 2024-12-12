@@ -73,7 +73,7 @@
         </div>
     </header>
 
-    <div class="container">
+    <div class="container vh90">
         <RouterView/>
     </div>
     <footer>
@@ -94,3 +94,8 @@ onMounted(async function () {
 })
 
 </script>
+<style>
+.vh90 {
+    min-height: calc(100vh - 105px);
+}
+</style>
