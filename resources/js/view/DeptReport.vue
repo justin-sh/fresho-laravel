@@ -20,7 +20,7 @@
                     <label for="arrive-at">Date</label>
                 </BCol>
                 <BCol sm="2">
-                    <BFormInput id="arrive-at" type="date" v-model="so.pickupAt"/>
+                    <BFormInput id="arrive-at" type="date" v-model="reportDate"/>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -118,23 +118,14 @@ const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 const route = useRoute()
 const router = useRouter()
 
+const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 const status = shallowRef(['accepted'])
 const order_run = shallowRef(['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
 const prdGroups = shallowRef(['bandsaw', 'boning', 'frozen', 'hotpot', 'slicing_beef', 'slicing_pork'])
 const prdStatus = shallowRef(['topicked', 'supplied'])
 const reportType = shallowRef('operational-product-totals-by-customer');
 
-const so = ref<PurchaseOrder>({pickupAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd")});
 const processing = shallowRef(false)
-
-const fields = [
-    {key: 'rowNo', label: '#'},
-    {key: 'cat', label: 'Category'},
-    {key: 'name', label: 'Product'},
-    {key: 'qty', label: 'Qty'},
-    {key: 'location', label: 'Location(04L1F1)'},
-    {key: 'comment', label: 'Comment'},
-]
 
 const save = async function () {
     // processing.value = true
