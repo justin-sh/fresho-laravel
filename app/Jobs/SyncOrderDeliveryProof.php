@@ -70,12 +70,23 @@ class SyncOrderDeliveryProof implements ShouldQueue
 
 //        Log::debug(json_encode($deliveredInfos));
 
-        DB::transaction(function () use ($deliveredInfos) {
-            $deliveredInfos->each(function ($info, $orderNo) {
-                Order::query()
-                    ->where('order_number', $orderNo)
-                    ->update($info);
-            });
+        DB::beginTransaction();
+        $i = 0;
+        // DB::transaction(function () use ($deliveredInfos) {
+        $deliveredInfos->each(function ($info, $orderNo) use( $i) {
+            Order::query()
+                ->where('order_number', $orderNo)
+                ->update($info);
+
+            $i = $i + 1;
+            if($i >= 10){
+                Log::debug("commit while the count reaches 10");
+                DB::commit();
+
+                $i = 0;
+            }
         });
+        // });
+        DB::commit();
     }
 }
