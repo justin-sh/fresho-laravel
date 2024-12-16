@@ -60,3 +60,13 @@ export interface SaleOrder {
 export interface OptionConfig {
     signal?: GenericAbortSignal
 }
+
+
+export interface ReportParams {
+    reportDate: Date
+    orderRuns: Array<string>
+    orderStatus: Array<string>
+    prdGroups: Array<string>
+    prdStatus: Array<string>
+    reportType: string
+}

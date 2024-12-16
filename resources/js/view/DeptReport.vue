@@ -9,7 +9,7 @@
         <template #footer>
             <BRow>
                 <BCol sm="12" class="d-flex justify-content-center">
-                    <BButton variant="outline-primary" :loading="processing" @click="save">Generate Report</BButton>
+                    <BButton variant="outline-primary" :loading="processing" @click="generateReport">Generate Report</BButton>
                 </BCol>
             </BRow>
         </template>
@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import {approveSo, getAllProducts, getPo, getWarehousesWithFilters, type PurchaseOrder, saveSo, updateSo} from "../api";
+import {type ReportParams, deptReport} from "../api";
 import {computed, onMounted, ref, shallowRef, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
@@ -127,7 +127,17 @@ const reportType = shallowRef('operational-product-totals-by-customer');
 
 const processing = shallowRef(false)
 
-const save = async function () {
+const generateReport = async function () {
+    const rptParams = {
+        reportDate: reportDate.value, 
+        orderRuns: order_run.value, 
+        orderStatus: status.value,
+        prdGroups: prdGroups.value,
+        prdStatus: prdStatus.value,
+        reportType: reportType.value
+    }
+    console.log(rptParams)
+
     // processing.value = true
     //
     // try {
