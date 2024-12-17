@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DeptReportController extends Controller
 {
@@ -19,7 +20,9 @@ class DeptReportController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rptParams  = $request->json()->all();
+        Log::debug(json_encode($rptParams));
+        return ['ok'=>true, 'data'=>''];
     }
 
     /**

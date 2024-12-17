@@ -63,7 +63,7 @@ export interface OptionConfig {
 
 
 export interface ReportParams {
-    reportDate: Date
+    reportDate: string
     orderRuns: Array<string>
     orderStatus: Array<string>
     prdGroups: Array<string>

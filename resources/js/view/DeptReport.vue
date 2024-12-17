@@ -128,15 +128,19 @@ const reportType = shallowRef('operational-product-totals-by-customer');
 const processing = shallowRef(false)
 
 const generateReport = async function () {
-    const rptParams = {
-        reportDate: reportDate.value, 
-        orderRuns: order_run.value, 
+
+    const rptParams: ReportParams = {
+        reportDate: reportDate.value,
+        orderRuns: order_run.value,
         orderStatus: status.value,
         prdGroups: prdGroups.value,
         prdStatus: prdStatus.value,
         reportType: reportType.value
     }
     console.log(rptParams)
+
+    const rv = (await deptReport(rptParams)).data
+    console.log(rv)
 
     // processing.value = true
     //

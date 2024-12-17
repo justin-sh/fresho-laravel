@@ -26,4 +26,4 @@ export const updateSo = (params: SaleOrder) => axios.put(`/api/sale-orders/${par
 export const approveSo = (params: SaleOrder) => axios.put(`/api/sale-orders/${params.id}/approve`)
 
 
-export const deptReport = (params: ReportParams) => axios.post(`/api//report/dept`, params)
+export const deptReport = (params: ReportParams) => axios.post(`/api/report/dept`, params)
