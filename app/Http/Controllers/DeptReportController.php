@@ -30,18 +30,19 @@ class DeptReportController extends Controller
         Log::debug(json_encode($rptParams));
 
 
-        $client = Http::buildClient();
         $cookieJar = new CookieJar();
+        $client = Http::withOptions(['cookies' => $cookieJar]);
 
         $tokenUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/product_groups/filtered_by_date_range?start_date='.$rptParams['reportDate'].'&end_date='.$rptParams['reportDate'];
-        $rv = Http::setClient($client)->withOptions(['cookies' => $cookieJar])->get($tokenUrl);
+        $rv = $client->get($tokenUrl);
         Log::debug(json_encode( $rv->headers() ));
         Log::debug('------------');
         Log::debug(json_encode( $rv->header('Set-Cookie') ));
-        Log::debug(json_encode( $rv->header('Set-Cookie') ));
-        Log::debug(json_encode( $rv->header('Set-Cookie') ));
+//        Log::debug(json_encode( $rv->header('Set-Cookie') ));
+//        Log::debug(json_encode( $rv->header('Set-Cookie') ));
         Log::debug('------cookies------');
-        Log::debug(json_encode( $rv->cookies() ));
+        Log::debug(json_encode( $rv->cookies));
+        Log::debug(json_encode( $cookieJar));
 //        Log::debug($rv->cookies()->getCookieByName("fresho-app-csrf-token"));
         Log::debug($rv->body());
 
