@@ -129,6 +129,7 @@ const processing = shallowRef(false)
 
 const generateReport = async function () {
 
+    processing.value = true
     const rptParams: ReportParams = {
         reportDate: reportDate.value,
         orderRuns: order_run.value,
@@ -141,6 +142,7 @@ const generateReport = async function () {
 
     const rv = (await deptReport(rptParams)).data
     console.log(rv)
+    processing.value = false
 
     // processing.value = true
     //
