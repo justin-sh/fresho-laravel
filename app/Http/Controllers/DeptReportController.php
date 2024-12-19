@@ -6,8 +6,11 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Sleep;
+use Illuminate\Support\Facades\Storage;
 
 class DeptReportController extends Controller
 {
@@ -29,63 +32,76 @@ class DeptReportController extends Controller
         $rptParams = $request->json()->all();
         Log::debug(json_encode($rptParams));
 
-
-        $cookieJar = new CookieJar();
-        $client = Http::withOptions(['cookies' => $cookieJar]);
-
         $tokenUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/product_groups/filtered_by_date_range?start_date='.$rptParams['reportDate'].'&end_date='.$rptParams['reportDate'];
-        $rv = $client->get($tokenUrl);
-        Log::debug(json_encode( $rv->headers() ));
+        // $rv = $client->get($tokenUrl);
+        $rv = Http::get($tokenUrl);
+        $csrfToken = $rv->cookies()->getCookieByName('fresho-app-csrf-token')->getValue();
+        
+        Log::debug( 'csrfToken=' . $csrfToken);
         Log::debug('------------');
-        Log::debug(json_encode( $rv->header('Set-Cookie') ));
-//        Log::debug(json_encode( $rv->header('Set-Cookie') ));
-//        Log::debug(json_encode( $rv->header('Set-Cookie') ));
-        Log::debug('------cookies------');
-        Log::debug(json_encode( $rv->cookies));
-        Log::debug(json_encode( $cookieJar));
-//        Log::debug($rv->cookies()->getCookieByName("fresho-app-csrf-token"));
-        Log::debug($rv->body());
 
-//        $rptUrl = 'https://app.fresho.com/ordering/api/v1/companies/9d10a274-72c3-43a6-92b3-87cde4703ea4/selling/operational_reports';
-//        $params = [
-//            ['name' => 'start_date', 'contents' => $rptParams['reportDate']],
-//            ['name' => 'end_date', 'contents' => $rptParams['reportDate']],
-//            ['name' => 'delivery_runs[]', 'contents' => 'EE'],
-//            ['name' => 'order_states[]', 'contents' => 'accepted'],
-//            ['name' => 'product_groups[]', 'contents' => 'bandsaw'],
-//            ['name' => 'product_order_statuses[]', 'contents' => 'topicked'],
-//            ['name' => 'report_type', 'contents' => $rptParams['reportType']],
-//            ['name' => 'one_product_group_per_page', 'contents' => '1'],
-//            ['name' => 'report_format', 'contents' => 'pdf'],
-////            'start_date' => $rptParams['reportDate'],
-////            'end_date' => $rptParams['reportDate'],
-////            'delivery_runs[]' => 'EE', // $rptParams['orderRuns'],
-////            'order_states[]' => 'accepted',
-////            'product_groups[]' => 'bandsaw',
-////            'product_order_statuses[]' => 'topicked',
-//////            'delivery_runs[]' => $rptParams['orderRuns'],
-//////            'order_states[]' => $rptParams['orderStatus'],
-//////            'product_groups[]' => $rptParams['prdGroups'],
-//////            'product_order_statuses[]' => $rptParams['prdStatus'],
-////            'report_type' => $rptParams['reportType'],
-////            'one_product_group_per_page' => '1',
-////            'report_format' => 'pdf',
-//        ];
-//
-//        Log::debug(json_encode($params));
-//
-//        $rv = Http::get('https://app.fresho.com/api/v1/public/jobs/89cbd6a54110b6668f907f83')->json();
-//        Log::debug(json_encode($rv));
-//        Log::debug('-----------');
-//        Log::debug('-----------');
-//        Log::debug('-----------');
-//        Log::debug('-----------');
-//        Log::debug('-----------');
-//        Log::debug('-----------');
-//        $rv = Http::asMultipart()->post($rptUrl, $params)->body();
-//        Log::debug(json_encode($rv));
+
+        $reportType = ['PRD_TOTAL_CUS'=>'operational-product-totals-by-customer','picking-slip'=>'operational-consolidated-picking-slip', 'STICKER'=>'operational-product-stickers'];
+
+        $result = [];
+
+        $jobs = [];
+
+        Log::debug(Date::now());
+        foreach(['EE'] as $run){
+
+            $rptUrl = 'https://app.fresho.com/ordering/api/v1/companies/9d10a274-72c3-43a6-92b3-87cde4703ea4/selling/operational_reports';
+
+
+            $params = [
+                ['name' => 'start_date', 'contents' => $rptParams['reportDate']],
+                ['name' => 'end_date', 'contents' => $rptParams['reportDate']],
+                ['name' => 'delivery_runs[]', 'contents' => $run],
+                ['name' => 'order_states[]', 'contents' => 'accepted'],
+                ['name' => 'report_type', 'contents' => $reportType[$rptParams['reportType']]],
+                ['name' => 'one_product_group_per_page', 'contents' => '1'],
+                ['name' => 'report_format', 'contents' => 'pdf'],
+            ];
+
+            collect($rptParams['prdGroups'])->each(function($e) use(&$params){
+                $params[] = ['name' => 'product_groups[]', 'contents' => $e];
+            });
+
+            collect($rptParams['prdGroups'])->each(function($e) use(&$params){
+                $params[] = ['name' => 'product_groups[]', 'contents' => $e];
+            });
+
+            collect($rptParams['prdStatus'])->each(function($e) use(&$params){
+                $params[] = ['name' => 'product_order_statuses[]', 'contents' => $e];
+            });
+        
+            Log::debug(json_encode($params));
+
+            $rv = Http::asMultipart()->withHeaders(['x-csrf-token' => $csrfToken])->post($rptUrl, $params)->object();
+            
+            $jobId = $rv->job_id;
+
+            $jobs[$run] = $jobId;
+
+            Log::info('submit job for '. $run . '->' . $rptParams['reportType']);
+        }
+
+        foreach($jobs as $run => $jobId)
+        {
+            $this->checkJob($jobId);
+        }
 
         return ['ok' => true, 'data' => ''];
+    }
+
+    private function checkJob($jobId)
+    {
+        $url = 'https://app.fresho.com/api/v1/public/jobs/' . $jobId;
+        
+        // Sleep::for(800)->milliseconds();
+        $rv = Http::get($url)->object();
+
+        Storage::disk('local')->put($filename, $rv4->body());
     }
 
     /**

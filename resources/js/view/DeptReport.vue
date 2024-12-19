@@ -94,10 +94,10 @@
                 </BCol>
                 <BCol sm="11">
                     <BFormRadioGroup v-model="reportType">
-                        <BFormRadio value="operational-product-totals-by-customer" switch>Product Totals By Customer</BFormRadio>
-                        <BFormRadio value="operational-product-totals" switch>Product Totals</BFormRadio>
-                        <BFormRadio value="operational-consolidated-picking-slip" switch>Consolidated Picking Slip</BFormRadio>
-                        <BFormRadio value="operational-product-stickers" switch>Product Stickers</BFormRadio>
+                        <BFormRadio value="PRD_TOTAL_CUS" switch>Product Totals By Customer</BFormRadio>
+                        <!-- <BFormRadio value="operational-product-totals" switch>Product Totals</BFormRadio> -->
+                        <BFormRadio value="picking-slip" switch>Picking Slip</BFormRadio>
+                        <BFormRadio value="STICKER" switch>Product Stickers</BFormRadio>
                     </BFormRadioGroup>
                 </BCol>
             </BRow>
