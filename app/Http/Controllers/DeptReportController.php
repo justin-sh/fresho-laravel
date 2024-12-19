@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Sleep;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
 
 class DeptReportController extends Controller
 {
@@ -32,76 +32,96 @@ class DeptReportController extends Controller
         $rptParams = $request->json()->all();
         Log::debug(json_encode($rptParams));
 
-        $tokenUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/product_groups/filtered_by_date_range?start_date='.$rptParams['reportDate'].'&end_date='.$rptParams['reportDate'];
+        $tokenUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/product_groups/filtered_by_date_range?start_date=' . $rptParams['reportDate'] . '&end_date=' . $rptParams['reportDate'];
         // $rv = $client->get($tokenUrl);
         $rv = Http::get($tokenUrl);
         $csrfToken = $rv->cookies()->getCookieByName('fresho-app-csrf-token')->getValue();
-        
-        Log::debug( 'csrfToken=' . $csrfToken);
+
+//        Log::debug('csrfToken=' . $csrfToken);
         Log::debug('------------');
 
-
-        $reportType = ['PRD_TOTAL_CUS'=>'operational-product-totals-by-customer','picking-slip'=>'operational-consolidated-picking-slip', 'STICKER'=>'operational-product-stickers'];
-
-        $result = [];
+        $reportType = ['dept-report' => 'operational-product-totals-by-customer', 'picking-slip' => 'operational-consolidated-picking-slip', 'sticker' => 'operational-product-stickers'];
 
         $jobs = [];
 
         Log::debug(Date::now());
-        foreach(['EE'] as $run){
+        foreach (['EE', 'RM1'] as $run) {
 
-            $rptUrl = 'https://app.fresho.com/ordering/api/v1/companies/9d10a274-72c3-43a6-92b3-87cde4703ea4/selling/operational_reports';
-
+            $rptUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/operational_reports';
 
             $params = [
                 ['name' => 'start_date', 'contents' => $rptParams['reportDate']],
                 ['name' => 'end_date', 'contents' => $rptParams['reportDate']],
                 ['name' => 'delivery_runs[]', 'contents' => $run],
-                ['name' => 'order_states[]', 'contents' => 'accepted'],
                 ['name' => 'report_type', 'contents' => $reportType[$rptParams['reportType']]],
                 ['name' => 'one_product_group_per_page', 'contents' => '1'],
                 ['name' => 'report_format', 'contents' => 'pdf'],
             ];
 
-            collect($rptParams['prdGroups'])->each(function($e) use(&$params){
+            collect($rptParams['orderStatus'])->each(function ($e) use (&$params) {
+                $params[] = ['name' => 'order_states[]', 'contents' => $e];
+            });
+
+            collect($rptParams['prdGroups'])->each(function ($e) use (&$params) {
                 $params[] = ['name' => 'product_groups[]', 'contents' => $e];
             });
 
-            collect($rptParams['prdGroups'])->each(function($e) use(&$params){
-                $params[] = ['name' => 'product_groups[]', 'contents' => $e];
-            });
-
-            collect($rptParams['prdStatus'])->each(function($e) use(&$params){
+            collect($rptParams['prdStatus'])->each(function ($e) use (&$params) {
                 $params[] = ['name' => 'product_order_statuses[]', 'contents' => $e];
             });
-        
+
             Log::debug(json_encode($params));
 
             $rv = Http::asMultipart()->withHeaders(['x-csrf-token' => $csrfToken])->post($rptUrl, $params)->object();
-            
+
             $jobId = $rv->job_id;
 
             $jobs[$run] = $jobId;
 
-            Log::info('submit job for '. $run . '->' . $rptParams['reportType']);
+            Log::info('submit job for ' . $run . '->' . $rptParams['reportType']);
         }
 
-        foreach($jobs as $run => $jobId)
-        {
-            $this->checkJob($jobId);
+        $result = [];
+        $reportDir = 'dept-report-picking-slip/' . $rptParams['reportDate'] . '/';
+        foreach ($jobs as $run => $jobId) {
+            $filename = $reportDir . $run . '-' . $rptParams['reportType'] . '-' . Date::now()->rawFormat('his') . '.pdf';
+            $this->downloadReportFile($filename, $jobId);
+            $result[] = [$filename => 'downloaded'];
+        }
+
+        // print pdf file
+        foreach ($result as $filename) {
+            $prv = Process::run('ls -al /Users/Amber/Herd/fresho/storage/app/dept-report-picking-slip/2024-12-19');
+            Log::debug('print job:' . $prv->exitCode());
+            Log::debug('print job:' . $prv->output());
         }
 
         return ['ok' => true, 'data' => ''];
     }
 
-    private function checkJob($jobId)
+    /**
+     * @throws ConnectionException
+     */
+    private function downloadReportFile($filename, $jobId)
     {
+        Log::debug('save to file:' . $filename . ' JobId:' . $jobId);
         $url = 'https://app.fresho.com/api/v1/public/jobs/' . $jobId;
-        
-        // Sleep::for(800)->milliseconds();
-        $rv = Http::get($url)->object();
 
-        Storage::disk('local')->put($filename, $rv4->body());
+        $i = 1;
+        $fileDownloadUrl = '';
+        while ($i < 100) {
+            Log::debug("try to download file:" . $i);
+            $rv = Http::get($url)->object();
+            if ($rv->status == 'complete') {
+                $fileDownloadUrl = $rv->result->result_data->report->temporary_url;
+                break;
+            }
+            $i += 1;
+            Sleep::for(50)->milliseconds();
+        }
+        $rv = Http::get($fileDownloadUrl);
+
+        Storage::disk('local')->put($filename, $rv->getBody()->getContents());
     }
 
     /**

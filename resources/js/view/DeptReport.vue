@@ -63,14 +63,14 @@
                 </BCol>
                 <BCol sm="11">
                     <BFormCheckboxGroup v-model="prdGroups">
-                        <BFormCheckbox value="bandsaw" switch>Band Saw</BFormCheckbox>
-                        <BFormCheckbox value="boning" switch>Boning</BFormCheckbox>
-                        <BFormCheckbox value="frozen" switch>Frozen</BFormCheckbox>
-                        <BFormCheckbox value="hotpot" switch>Hot Pot</BFormCheckbox>
-                        <BFormCheckbox value="mince" switch>Mince</BFormCheckbox>
-                        <BFormCheckbox value="slicer" switch>Slicer</BFormCheckbox>
-                        <BFormCheckbox value="slicing_beef" switch>Slicing Beef</BFormCheckbox>
-                        <BFormCheckbox value="slicing_pork" switch>Slicing Pork</BFormCheckbox>
+                        <BFormCheckbox value="Band Saw" switch>Band Saw</BFormCheckbox>
+                        <BFormCheckbox value="Boning" switch>Boning</BFormCheckbox>
+                        <BFormCheckbox value="Frozen Products" switch>Frozen</BFormCheckbox>
+                        <BFormCheckbox value="Hot Pot" switch>Hot Pot</BFormCheckbox>
+                        <BFormCheckbox value="Mince" switch>Mince</BFormCheckbox>
+                        <BFormCheckbox value="Slicer" switch>Slicer</BFormCheckbox>
+                        <BFormCheckbox value="Slicing Beef" switch>Slicing Beef</BFormCheckbox>
+                        <BFormCheckbox value="Slicing Chicken" switch>Slicing Chicken</BFormCheckbox>
                     </BFormCheckboxGroup>
                 </BCol>
             </BRow>
@@ -94,10 +94,10 @@
                 </BCol>
                 <BCol sm="11">
                     <BFormRadioGroup v-model="reportType">
-                        <BFormRadio value="PRD_TOTAL_CUS" switch>Product Totals By Customer</BFormRadio>
+                        <BFormRadio value="dept-report" switch>Product Totals By Customer</BFormRadio>
                         <!-- <BFormRadio value="operational-product-totals" switch>Product Totals</BFormRadio> -->
                         <BFormRadio value="picking-slip" switch>Picking Slip</BFormRadio>
-                        <BFormRadio value="STICKER" switch>Product Stickers</BFormRadio>
+                        <BFormRadio value="sticker" switch>Product Stickers</BFormRadio>
                     </BFormRadioGroup>
                 </BCol>
             </BRow>
@@ -121,9 +121,9 @@ const router = useRouter()
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 const status = shallowRef(['accepted'])
 const order_run = shallowRef(['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
-const prdGroups = shallowRef(['bandsaw', 'boning', 'frozen', 'hotpot', 'slicing_beef', 'slicing_pork'])
+const prdGroups = shallowRef(['Band Saw', 'Boning', 'Frozen Products', 'Hot Pot', 'Slicing Beef', 'Slicing Chicken'])
 const prdStatus = shallowRef(['topicked', 'supplied'])
-const reportType = shallowRef('operational-product-totals-by-customer');
+const reportType = shallowRef('dept-report');
 
 const processing = shallowRef(false)
 
