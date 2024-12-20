@@ -30,7 +30,7 @@ class DeptReportController extends Controller
     public function store(Request $request)
     {
         $rptParams = $request->json()->all();
-        Log::debug(json_encode($rptParams));
+        // Log::debug(json_encode($rptParams));
 
         $tokenUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/product_groups/filtered_by_date_range?start_date=' . $rptParams['reportDate'] . '&end_date=' . $rptParams['reportDate'];
         // $rv = $client->get($tokenUrl);
@@ -44,8 +44,8 @@ class DeptReportController extends Controller
 
         $jobs = [];
 
-        Log::debug(Date::now());
-        foreach (['EE', 'RM1'] as $run) {
+        // Log::debug(Date::now());
+        foreach ($rptParams['orderRuns'] as $run) {
 
             $rptUrl = 'https://app.fresho.com/ordering/api/v1/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/operational_reports';
 
@@ -70,7 +70,7 @@ class DeptReportController extends Controller
                 $params[] = ['name' => 'product_order_statuses[]', 'contents' => $e];
             });
 
-            Log::debug(json_encode($params));
+            // Log::debug(json_encode($params));
 
             $rv = Http::asMultipart()->withHeaders(['x-csrf-token' => $csrfToken])->post($rptUrl, $params)->object();
 
@@ -85,24 +85,24 @@ class DeptReportController extends Controller
         $reportDir = 'dept-report-picking-slip/' . $rptParams['reportDate'] . '/';
         foreach ($jobs as $run => $jobId) {
             $filename = $reportDir . $run . '-' . $rptParams['reportType'] . '-' . Date::now()->rawFormat('his') . '.pdf';
-            $this->downloadReportFile($filename, $jobId);
-            $result[] = [$filename => 'downloaded'];
+            $fz = $this->downloadReportFile($filename, $jobId);
+            $result[] = [$filename => ['status'=>'downloaded', 'size'=>$fz]];
         }
 
-        // print pdf file
-        foreach ($result as $filename) {
-            $prv = Process::run('ls -al /Users/Amber/Herd/fresho/storage/app/dept-report-picking-slip/2024-12-19');
-            Log::debug('print job:' . $prv->exitCode());
-            Log::debug('print job:' . $prv->output());
-        }
+        // // print pdf file
+        // foreach ($result as $filename) {
+        //     $prv = Process::run('ls -al /Users/Amber/Herd/fresho/storage/app/dept-report-picking-slip/2024-12-19');
+        //     Log::debug('print job:' . $prv->exitCode());
+        //     Log::debug('print job:' . $prv->output());
+        // }
 
-        return ['ok' => true, 'data' => ''];
+        return ['ok' => true, 'data' => $result];
     }
 
     /**
      * @throws ConnectionException
      */
-    private function downloadReportFile($filename, $jobId)
+    private function downloadReportFile($filename, $jobId) :int
     {
         Log::debug('save to file:' . $filename . ' JobId:' . $jobId);
         $url = 'https://app.fresho.com/api/v1/public/jobs/' . $jobId;
@@ -110,9 +110,10 @@ class DeptReportController extends Controller
         $i = 1;
         $fileDownloadUrl = '';
         while ($i < 100) {
-            Log::debug("try to download file:" . $i);
+            // Log::debug("try to download file:" . $i);
             $rv = Http::get($url)->object();
             if ($rv->status == 'complete') {
+                // Log::debug(json_encode($rv));
                 $fileDownloadUrl = $rv->result->result_data->report->temporary_url;
                 break;
             }
@@ -121,7 +122,14 @@ class DeptReportController extends Controller
         }
         $rv = Http::get($fileDownloadUrl);
 
+        $fz = $rv->getBody()->getSize();
+        Log::debug('size of '. $filename . ": ". $fz);
         Storage::disk('local')->put($filename, $rv->getBody()->getContents());
+        if( $rv->getBody()->getSize() < 10240){
+            Log::info("file size is too small, maybe empty.") ;
+        }
+
+        return $fz;
     }
 
     /**
