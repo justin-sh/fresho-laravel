@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Str;
 
 class DeptReportController extends Controller
 {
@@ -86,15 +87,34 @@ class DeptReportController extends Controller
         foreach ($jobs as $run => $jobId) {
             $filename = $reportDir . $run . '-' . $rptParams['reportType'] . '-' . Date::now()->rawFormat('his') . '.pdf';
             $fz = $this->downloadReportFile($filename, $jobId);
-            $result[] = [$filename => ['status'=>'downloaded', 'size'=>$fz]];
+            $result[$filename] = ['status' => 'downloaded', 'size' => $fz];
         }
 
-        // // print pdf file
-        // foreach ($result as $filename) {
-        //     $prv = Process::run('ls -al /Users/Amber/Herd/fresho/storage/app/dept-report-picking-slip/2024-12-19');
-        //     Log::debug('print job:' . $prv->exitCode());
-        //     Log::debug('print job:' . $prv->output());
-        // }
+        // print pdf file
+        $printCmd = env('PDF_PRINT_CMD', '');
+        if (Str::length($printCmd) > 0) {
+
+            if (env('PDF_PRINT_BATCH', false)) {
+                Log::debug("print pdf file in batch...");
+            } else {
+                Log::info("print pdf file one by one...");
+
+                foreach ($result as $filename => $v) {
+
+                    $absPath = Storage::path($filename);
+                    $fz = Storage::size($filename);
+
+                    if($fz < 10240){
+                        Log::info("Print file:" . $absPath . ' is too small(' . $fz . 'bytes) and maybe empty. NO PRINT.');
+                    }else{
+                        $prv = Process::run($printCmd . ' ' . $absPath);
+                        Log::info("Print file:" . $absPath);
+                        Log::info('    ExitCode:' . $prv->exitCode());
+                        Log::info('    Output  :' . $prv->output());
+                    }
+                }
+            }
+        }
 
         return ['ok' => true, 'data' => $result];
     }
@@ -102,7 +122,7 @@ class DeptReportController extends Controller
     /**
      * @throws ConnectionException
      */
-    private function downloadReportFile($filename, $jobId) :int
+    private function downloadReportFile($filename, $jobId): int
     {
         Log::debug('save to file:' . $filename . ' JobId:' . $jobId);
         $url = 'https://app.fresho.com/api/v1/public/jobs/' . $jobId;
@@ -123,11 +143,11 @@ class DeptReportController extends Controller
         $rv = Http::get($fileDownloadUrl);
 
         $fz = $rv->getBody()->getSize();
-        Log::debug('size of '. $filename . ": ". $fz);
+        Log::debug('size of ' . $filename . ": " . $fz);
         Storage::disk('local')->put($filename, $rv->getBody()->getContents());
-        if( $rv->getBody()->getSize() < 10240){
-            Log::info("file size is too small, maybe empty.") ;
-        }
+//        if ($rv->getBody()->getSize() < 10240) {
+//            Log::info($filename . " size is too small, maybe empty.");
+//        }
 
         return $fz;
     }
