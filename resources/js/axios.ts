@@ -13,7 +13,8 @@ const instance: AxiosInstance = axiosFactory.create({
     paramsSerializer: params => stringify(params, {arrayFormat: 'brackets', skipNulls: true})
 })
 
-export const axios = setupCache(instance, {debug:console.log});
+// export const axios = setupCache(instance, {debug:console.log});
+export const axios = instance
 
 axios.interceptors.response.use((resp) => resp, (error) => {
     if(error instanceof AxiosError){
