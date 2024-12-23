@@ -54,7 +54,7 @@ class SyncOrderSummary implements ShouldQueue
             $data = [];
             collect($resp['supplier_orders'])->each(function ($order) use (&$data) {
 
-                Log::debug("delivery_instructions=". $order['delivery_instructions']);
+//                Log::debug("delivery_instructions=". $order['delivery_instructions']);
 
                 $data[] = [
                     'id' => $order['id'],
@@ -84,7 +84,7 @@ class SyncOrderSummary implements ShouldQueue
 
                     $data = [];
                 }
-                Log::debug("length of data: " . count($data));
+//                Log::debug("length of data: " . count($data));
 
             });
 

@@ -64,7 +64,7 @@ class OrderController extends Controller
         $delivery_date = $request->str('delivery_date');
         Log::debug("sync order data for $delivery_date");
 
-        SyncOrderSummary::dispatchAfterResponse($delivery_date);
+        SyncOrderSummary::dispatchSync($delivery_date);
 
         return json_encode(['ok' => true]);
     }
@@ -74,14 +74,14 @@ class OrderController extends Controller
         $delivery_date = $request->str('delivery_date');
         Log::debug("sync order detail data for $delivery_date");
         $ids = Order::query()->where('delivery_date', $delivery_date)->get('id')->pluck('id');
-        SyncOrderDetail::dispatchAfterResponse($ids);
+        SyncOrderDetail::dispatchSync($ids);
 
         return json_encode(['ok' => true]);
     }
 
     public function syncDeliveryProof(Request $request): string
     {
-        SyncOrderDeliveryProof::dispatchAfterResponse();
+        SyncOrderDeliveryProof::dispatchSync();
 
         return json_encode(['ok' => true]);
     }
