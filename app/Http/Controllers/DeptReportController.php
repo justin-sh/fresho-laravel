@@ -104,13 +104,15 @@ class DeptReportController extends Controller
                     $absPath = Storage::path($filename);
                     $fz = Storage::size($filename);
 
-                    if($fz < 10240){
+                    if ($fz < 10240) {
                         Log::info("Print file:" . $absPath . ' is too small(' . $fz . 'bytes) and maybe empty. NO PRINT.');
-                    }else{
-                        $prv = Process::run($printCmd . ' ' . $absPath);
-                        Log::info("Print file:" . $absPath);
-                        Log::info('    ExitCode:' . $prv->exitCode());
-                        Log::info('    Output  :' . $prv->output());
+                    } else {
+                        $cmd = Str::replace('%FILENAME%', $absPath, $printCmd);
+//                        Log::debug($cmd);
+                        $prv = Process::run($cmd);
+                        Log::info("Print file:" . $absPath . ($prv->exitCode() ?? -1 ? ' fail' : ' success'));
+//                        Log::info('    ExitCode:' . $prv->exitCode());
+//                        Log::info('    Output  :' . $prv->output());
                     }
                 }
             }
