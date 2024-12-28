@@ -33,10 +33,10 @@
                             <BDropdownItem :to="{name:'deptReport'}">
                                 Dept Report + Picking Slip
                             </BDropdownItem>
-                            <!-- <BDropdownItem :to="{name:'purchaseOrderNew'}">
-                                new Purchase Order
+                            <BDropdownItem :to="{name:'dailyMorningReport'}">
+                                Daily Morning Report
                             </BDropdownItem>
-                            <BDropdownItem :to="{name:'purchaseOrderNew'}">
+                            <!-- <BDropdownItem :to="{name:'purchaseOrderNew'}">
                                 new Product
                             </BDropdownItem> -->
                         </BNavItemDropdown>
@@ -85,12 +85,11 @@
 
 import {getWarehousesWithFilters} from "@/api/index";
 import {onMounted} from "vue";
-console.log('app.vue 00')
+// console.log('app.vue 00')
 onMounted(async function () {
-    console.log('app.vue 11')
+    // console.log('app.vue 11')
     const wh = (await getWarehousesWithFilters()).data.data
-
-    console.log(wh)
+    // console.log(wh)
 })
 
 </script>

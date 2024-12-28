@@ -8,6 +8,7 @@ import PurchaseOrder from "@/view/PurchaseOrder.vue";
 import SaleOrderList from "@/view/SaleOrderList.vue";
 import SaleOrder from "@/view/SaleOrder.vue";
 import DeptReport from "@/view/DeptReport.vue";
+import DailyMorningReport from "@/view/DailyMorningReport.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
             path: '/report/dept',
             name: 'deptReport',
             component: DeptReport
+        },
+        {
+            path: '/report/daily-morning',
+            name: 'dailyMorningReport',
+            component: DailyMorningReport
         },
         {
             path: '/sale-orders',
