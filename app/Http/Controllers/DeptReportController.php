@@ -39,7 +39,7 @@ class DeptReportController extends Controller
         $csrfToken = $rv->cookies()->getCookieByName('fresho-app-csrf-token')->getValue();
 
 //        Log::debug('csrfToken=' . $csrfToken);
-        Log::debug('------------');
+//        Log::debug('------------');
 
         $reportType = ['dept-report' => 'operational-product-totals-by-customer', 'picking-slip' => 'operational-consolidated-picking-slip', 'sticker' => 'operational-product-stickers'];
 
@@ -55,7 +55,6 @@ class DeptReportController extends Controller
                 ['name' => 'end_date', 'contents' => $rptParams['reportDate']],
                 ['name' => 'delivery_runs[]', 'contents' => $run],
                 ['name' => 'report_type', 'contents' => $reportType[$rptParams['reportType']]],
-                ['name' => 'one_product_group_per_page', 'contents' => '1'],
                 ['name' => 'report_format', 'contents' => 'pdf'],
             ];
 
@@ -63,9 +62,12 @@ class DeptReportController extends Controller
                 $params[] = ['name' => 'order_states[]', 'contents' => $e];
             });
 
-            collect($rptParams['prdGroups'])->each(function ($e) use (&$params) {
-                $params[] = ['name' => 'product_groups[]', 'contents' => $e];
-            });
+            if ('dept-report' == $rptParams['reportType']) {
+                collect($rptParams['prdGroups'])->each(function ($e) use (&$params) {
+                    $params[] = ['name' => 'product_groups[]', 'contents' => $e];
+                });
+                $params[] = ['name' => 'one_product_group_per_page', 'contents' => '1'];
+            }
 
             collect($rptParams['prdStatus'])->each(function ($e) use (&$params) {
                 $params[] = ['name' => 'product_order_statuses[]', 'contents' => $e];
@@ -79,7 +81,7 @@ class DeptReportController extends Controller
 
             $jobs[$run] = $jobId;
 
-            Log::info('submit job for ' . $run . '->' . $rptParams['reportType']);
+//            Log::info('submitted job for ' . $run . '->' . $rptParams['reportType']);
         }
 
         $result = [];
@@ -87,10 +89,13 @@ class DeptReportController extends Controller
         foreach ($jobs as $run => $jobId) {
             $filename = $reportDir . $run . '-' . $rptParams['reportType'] . '-' . Date::now()->rawFormat('his') . '.pdf';
             $fz = $this->downloadReportFile($filename, $jobId);
-            $result[$filename] = ['status' => 'downloaded', 'size' => $fz];
+
+            if ($fz > 0) {
+                $result[$filename] = ['status' => 'downloaded', 'size' => $fz];
+            }
         }
 
-        $duplex_print ='operational-product-totals-by-customer'==$reportType[$rptParams['reportType']]?env('PDF_PRINT_DUPLEX_SIM'):env('PDF_PRINT_DUPLEX_DUP');
+        $duplex_print = 'dept-report' == $rptParams['reportType'] ? env('PDF_PRINT_DUPLEX_SIM') : env('PDF_PRINT_DUPLEX_DUP');
 
         // print pdf file
         $printCmd = env('PDF_PRINT_CMD', '');
@@ -111,7 +116,7 @@ class DeptReportController extends Controller
                     } else {
                         $cmd = Str::replace('%FILENAME%', $absPath, $printCmd);
                         $cmd = Str::replace('%DUPLEX%', $duplex_print, $cmd);
-                       Log::debug($cmd);
+                        Log::debug($cmd);
                         $prv = Process::run($cmd);
                         Log::info("Print file:" . $absPath . ($prv->exitCode() ?? -1 ? ' fail' : ' success'));
 //                        Log::info('    ExitCode:' . $prv->exitCode());
@@ -129,7 +134,7 @@ class DeptReportController extends Controller
      */
     private function downloadReportFile($filename, $jobId): int
     {
-        Log::debug('save to file:' . $filename . ' JobId:' . $jobId);
+//        Log::debug('save to file:' . $filename . ' JobId:' . $jobId);
         $url = 'https://app.fresho.com/api/v1/public/jobs/' . $jobId;
 
         $i = 1;
@@ -139,6 +144,13 @@ class DeptReportController extends Controller
             $rv = Http::get($url)->object();
             if ($rv->status == 'complete') {
                 // Log::debug(json_encode($rv));
+
+                if (isset($rv->result->result_data->errors)) {
+                    Log::warning("job [" . $filename ."] failed! reason:" . json_encode($rv->result->result_data->errors));
+
+                    return 0;
+                }
+
                 $fileDownloadUrl = $rv->result->result_data->report->temporary_url;
                 break;
             }
@@ -148,7 +160,7 @@ class DeptReportController extends Controller
         $rv = Http::get($fileDownloadUrl);
 
         $fz = $rv->getBody()->getSize();
-        Log::debug('size of ' . $filename . ": " . $fz);
+//        Log::debug('size of ' . $filename . ": " . $fz);
         Storage::disk('local')->put($filename, $rv->getBody()->getContents());
 //        if ($rv->getBody()->getSize() < 10240) {
 //            Log::info($filename . " size is too small, maybe empty.");
