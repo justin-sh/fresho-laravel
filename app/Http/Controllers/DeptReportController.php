@@ -90,7 +90,7 @@ class DeptReportController extends Controller
             $result[$filename] = ['status' => 'downloaded', 'size' => $fz];
         }
 
-        $dumplex_print ='operational-product-totals-by-customer'==$reportType[$rptParams['reportType']]?env('PDF_PRINT_DUPLEX_SIM'):env('PDF_PRINT_DUPLEX_DUP');
+        $duplex_print ='operational-product-totals-by-customer'==$reportType[$rptParams['reportType']]?env('PDF_PRINT_DUPLEX_SIM'):env('PDF_PRINT_DUPLEX_DUP');
 
         // print pdf file
         $printCmd = env('PDF_PRINT_CMD', '');
@@ -110,7 +110,7 @@ class DeptReportController extends Controller
                         Log::info("Print file:" . $absPath . ' is too small(' . $fz . 'bytes) and maybe empty. NO PRINT.');
                     } else {
                         $cmd = Str::replace('%FILENAME%', $absPath, $printCmd);
-                        $cmd = Str::replace('%DUPLEX%', $dumplex_print, $cmd);
+                        $cmd = Str::replace('%DUPLEX%', $duplex_print, $cmd);
                        Log::debug($cmd);
                         $prv = Process::run($cmd);
                         Log::info("Print file:" . $absPath . ($prv->exitCode() ?? -1 ? ' fail' : ' success'));

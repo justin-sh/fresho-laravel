@@ -9,7 +9,8 @@
         <template #footer>
             <BRow>
                 <BCol sm="12" class="d-flex justify-content-center">
-                    <BButton variant="outline-primary" :loading="processing" @click="generateReport">Generate Report</BButton>
+                    <BButton variant="outline-primary" :loading="processing" :disabled="processing" @click="generateReport">Generate Report
+                    </BButton>
                 </BCol>
             </BRow>
         </template>
@@ -19,7 +20,7 @@
                 <BCol sm="1">
                     <label for="arrive-at">Date</label>
                 </BCol>
-                <BCol sm="2">
+                <BCol sm="4" md="3" class="col-6">
                     <BFormInput id="arrive-at" type="date" v-model="reportDate"/>
                 </BCol>
             </BRow>
@@ -27,19 +28,14 @@
                 <BCol sm="1">
                     <label for="qty">Runs</label>
                 </BCol>
-                <BCol sm="10">
-                    <template v-for="(x, idx) in order_run">
-                        <div :id="x" class="run" draggable="true" @dragstart="startDrag($event, idx)">
-                            {{ x }}
-                        </div>
-                        <div class="drop-space"
-                             @drop="onDrop($event, idx)"
-                             @dragover.prevent
-                             @dragleave="onDragLeave($event)"
-                             @dragenter.prevent="onDragEnter($event)">
-                            &nbsp;
-                        </div>
-                    </template>
+                <BCol sm="11">
+                    <BFormCheckboxGroup v-model="orderRuns">
+                        <template v-for="(x) in orderRunLoop">
+                            <BFormCheckbox :value="x" switch>
+                                {{ x }}
+                            </BFormCheckbox>
+                        </template>
+                    </BFormCheckboxGroup>
                 </BCol>
             </BRow>
             <BRow class="mt-2">
@@ -97,7 +93,7 @@
                         <BFormRadio value="dept-report" switch>Product Totals By Customer</BFormRadio>
                         <!-- <BFormRadio value="operational-product-totals" switch>Product Totals</BFormRadio> -->
                         <BFormRadio value="picking-slip" switch>Picking Slip</BFormRadio>
-                        <BFormRadio value="sticker" switch>Product Stickers</BFormRadio>
+                        <!--                        <BFormRadio value="sticker" switch>Product Stickers</BFormRadio>-->
                     </BFormRadioGroup>
                 </BCol>
             </BRow>
@@ -107,10 +103,11 @@
 </template>
 
 <script lang="ts" setup>
-import {type ReportParams, deptReport} from "../api";
-import {computed, onMounted, ref, shallowRef, watch, watchEffect} from "vue";
+import {deptReport, type ReportParams} from "../api";
+import {onMounted, ref, shallowRef, toRaw, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
+import {parse, isTuesday, isThursday} from "date-fns"
 
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -119,8 +116,10 @@ const route = useRoute()
 const router = useRouter()
 
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
+
 const status = shallowRef(['accepted'])
-const order_run = shallowRef(['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
+const orderRuns = ref(['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA']);
+const orderRunLoop = ref(['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
 const prdGroups = shallowRef(['Band Saw', 'Boning', 'Frozen Products', 'Hot Pot', 'Slicing Beef', 'Slicing Chicken'])
 const prdStatus = shallowRef(['topicked', 'supplied'])
 const reportType = shallowRef('dept-report');
@@ -130,85 +129,40 @@ const processing = shallowRef(false)
 const generateReport = async function () {
 
     processing.value = true
+
+    const oRuns = toRaw(orderRuns.value)
+    const runs = toRaw(orderRunLoop.value).filter(x=>oRuns.includes(x))
+
     const rptParams: ReportParams = {
         reportDate: reportDate.value,
-        orderRuns: order_run.value,
+        orderRuns: runs,
         orderStatus: status.value,
         prdGroups: prdGroups.value,
         prdStatus: prdStatus.value,
         reportType: reportType.value
     }
-    console.log(rptParams)
 
-    const rv = (await deptReport(rptParams)).data
-    console.log(rv)
-    processing.value = false
-
-    // processing.value = true
-    //
-    // try {
-    //     if (isNew.value) {
-    //         const rv = (await saveSo(so.value)).data
-    //
-    //         if (rv.ok) {
-    //             await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
-    //         }
-    //     } else {
-    //         const rv = (await updateSo(so.value)).data
-    //     }
-    // } finally {
-    //     processing.value = false
-    // }
-}
-
-
-
-const startDrag = function (evt, idx) {
-    evt.dataTransfer.dropEffect = 'move'
-    evt.dataTransfer.effectAllowed = 'move'
-    evt.dataTransfer.setData('idx', idx)
-}
-
-const onDrop = function (evt, toIdx) {
-    if (evt.target.classList.contains("drop-space")) {
-        evt.target.classList.remove("dragover");
-    }
-
-    const fromIdx = evt.dataTransfer.getData('idx')
-    if (fromIdx === toIdx) return;
-
-    const fromEl = order_run.value.at(fromIdx)
-    console.log(`move item:${fromEl} from ${fromIdx} to ${toIdx}`)
-    const newRun = order_run.value.toSpliced(toIdx + 1, 0, fromEl)
-    console.log(newRun)
-    const delIdx = fromIdx > toIdx ? fromIdx + 1 : fromIdx;
-    order_run.value = newRun.toSpliced(delIdx, 1)
-}
-
-const onDragEnter = function (evt){
-    evt.target.classList.add("dragover");
-}
-
-const onDragLeave = function (evt){
-    if (evt.target.classList.contains("drop-space")) {
-        evt.target.classList.remove("dragover");
+    try{
+        (await deptReport(rptParams)).data
+    }finally {
+        processing.value = false
     }
 }
+
+
 
 watchEffect(() => {
-    // so.value.id = route.params.id ?? ''
-    //
-    // if (isNew.value) {
-    //     pageTitle.value = 'New'
-    //
-    //     so.value = {
-    //         pickupAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
-    //     }
-    // } else if (isView.value) {
-    //     pageTitle.value = "View"
-    // } else {
-    //     pageTitle.value = "Update"
-    // }
+
+    const curDate = parse(reportDate.value, 'yyyy-MM-dd', new Date())
+    const tueOrThur = isTuesday(curDate) || isThursday(curDate);
+    if(tueOrThur){
+        orderRunLoop.value[3] = 'CT'
+        orderRunLoop.value[4] = 'S'
+    }else{
+        orderRunLoop.value[3] = 'S'
+        orderRunLoop.value[4] = 'CT'
+    }
+
 });
 
 
