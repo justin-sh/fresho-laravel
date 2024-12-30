@@ -18,12 +18,12 @@
 
         <BTableSimple bordered class="fss text-center">
             <BThead head-variant="dark" class="fsn">
-                <BTr>
+                <BTr class="align-middle">
                     <BTh class="prd-cat">Plan</BTh>
                     <BTh class="prd-item-name">Item</BTh>
-                    <BTh colspan="4" class="prd-order">Order</BTh>
+                    <BTh class="prd-order">Order</BTh>
                     <BTh class="prd-stock">Stock</BTh>
-                    <BTh class="prd-produced">Prod</BTh>
+                    <BTh class="prd-produced">Produce</BTh>
                     <BTh>&nbsp;</BTh>
                     <BTd class="text-start prd-ex-item-name">Side: -</BTd>
                     <BTd class="text-start prd-ex-item-v">F/QTR: -</BTd>
@@ -36,9 +36,6 @@
                     <BTd rowspan="7" class="text-center fw-bolder fsn">Pork
                     </BTd>
                     <BTd class="text-start">Belly</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd>1</BTd>
                     <BTd></BTd>
                     <BTd>1000</BTd>
@@ -53,9 +50,6 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Meaty Ribs</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#22 Thigh s/off</BTd>
@@ -63,9 +57,6 @@
                 </BTr>
                 <BTr>
                     <BTd class="text-start">Belly B/IN</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -79,9 +70,6 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Meaty Riblets</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#16 Thigh s/ON</BTd>
@@ -89,9 +77,6 @@
                 </BTr>
                 <BTr>
                     <BTd class="text-start">Leg</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -105,18 +90,12 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Meaty Neck Bone</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#28 Thigh s/ON</BTd>
                     <BTd></BTd>
                 </BTr>
                 <BTr>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -127,16 +106,13 @@
                     <BTd>2</BTd>
                 </BTr>
                 <BTr>
-                    <BTd colspan="14"></BTd>
+                    <BTd colspan="11"></BTd>
                 </BTr>
                 <BTr>
                     <BTd rowspan="10" class="align-middle text-center fw-bolder fsn">CK</BTd>
                     <BTd class="text-start">Breast</BTd>
                     <BTd>1</BTd>
                     <BTd>2</BTd>
-                    <BTd>3</BTd>
-                    <BTd>4</BTd>
-                    <BTd>5</BTd>
                     <BTd>6</BTd>
                     <BTd rowspan="10"></BTd>
                     <BTd class="text-start">EX-Meaty Leg Bone</BTd>
@@ -150,9 +126,6 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">EX-Meaty Neck Bone</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#16 Kiev Cut s/ON</BTd>
@@ -160,9 +133,6 @@
                 </BTr>
                 <BTr>
                     <BTd class="text-start">ML s/ON</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -176,9 +146,6 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Loin Rind ON</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">Butt</BTd>
@@ -186,9 +153,6 @@
                 </BTr>
                 <BTr>
                     <BTd class="text-start">Thigh s/ON</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -202,9 +166,6 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Shoulder Rind ON</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -212,9 +173,6 @@
                 </BTr>
                 <BTr>
                     <BTd class="text-start">Bone IN</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -230,9 +188,6 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Legette r/ON</BTd>
                     <BTd></BTd>
                 </BTr>
@@ -243,17 +198,11 @@
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd class="text-start">Drumsticks</BTd>
                     <BTd></BTd>
                 </BTr>
                 <BTr>
                     <BTd class="text-start">Mid-Wingettes</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -412,7 +361,7 @@ table td {
 }
 
 .prd-order {
-    width: 20%;
+    width: 15%;
 }
 
 .prd-stock {
@@ -420,8 +369,8 @@ table td {
     min-width: 55px;
 }
 .prd-produced {
-    width: 5%;
-    min-width: 55px;
+    width: 10%;
+    min-width: 105px;
 }
 
 .prd-ex-item-name {
