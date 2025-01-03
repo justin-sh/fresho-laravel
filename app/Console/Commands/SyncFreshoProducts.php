@@ -52,16 +52,23 @@ class SyncFreshoProducts extends Command
 
             $data = [];
             foreach ($rv['data'] as $prd) {
-                $nt = explode(' ○ ', $prd['name'], 2);
+                $idx = strrpos($prd['name'], ' ○ ');
+                if ($idx !== false) {
+                    $name = substr($prd['name'], 0, $idx);
+                    $qty_type = substr($prd['name'], $idx + strlen(' ○ '));
+                } else {
+                    $name = $prd['name'];
+                    $qty_type = '';
+                }
 
                 $data[] = [
                     'id' => $prd['id'],
                     'code' => $prd['code'],
-                    'name' => $nt[0],
+                    'name' => $name,
                     'cost' => floatval($prd['cost_price']['price']) * 100,
                     'price_text' => $prd['edit_prices_link_text'],
                     'product_id' => $prd['product_id'],
-                    'qty_type' => $nt[1],
+                    'qty_type' => $qty_type,
                 ];
 
                 if (count($data) >= 10) {
