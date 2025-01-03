@@ -27,3 +27,4 @@ export const approveSo = (params: SaleOrder) => axios.put(`/api/sale-orders/${pa
 
 
 export const deptReport = (params: ReportParams) => axios.post(`/api/report/dept`, params)
+export const dailyReport = (reportDate: string) => axios.get(`/api/report/daily/${reportDate}`)

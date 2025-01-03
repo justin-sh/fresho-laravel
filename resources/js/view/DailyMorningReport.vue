@@ -11,7 +11,12 @@
                     <BFormInput id="arrive-at" type="date" v-model="reportDate"/>
                 </div>
                 <div class="col-auto">
-                    <BButton variant="outline-primary">Refresh Data</BButton>
+                    <BButton variant="outline-primary"
+                             @click="generateReport"
+                             :loading="processing"
+                             :disabled="processing">
+                        Refresh Data
+                    </BButton>
                 </div>
             </div>
         </template>
@@ -217,7 +222,7 @@
 </template>
 
 <script lang="ts" setup>
-import {deptReport, type ReportParams} from "../api";
+import {dailyReport, deptReport, type ReportParams} from "../api";
 import {onMounted, shallowRef, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
@@ -240,69 +245,14 @@ const processing = shallowRef(false)
 const generateReport = async function () {
 
     processing.value = true
-    const rptParams: ReportParams = {
-        reportDate: reportDate.value,
-        orderRuns: order_run.value,
-        orderStatus: status.value,
-        prdGroups: prdGroups.value,
-        prdStatus: prdStatus.value,
-        reportType: reportType.value
-    }
-    console.log(rptParams)
+    console.log(reportDate.value)
 
-    const rv = (await deptReport(rptParams)).data
+    const rv = (await dailyReport(reportDate.value)).data
     console.log(rv)
     processing.value = false
-
-    // processing.value = true
-    //
-    // try {
-    //     if (isNew.value) {
-    //         const rv = (await saveSo(so.value)).data
-    //
-    //         if (rv.ok) {
-    //             await router.push({'name': 'purchaseOrder', params: {id: rv.data.id}})
-    //         }
-    //     } else {
-    //         const rv = (await updateSo(so.value)).data
-    //     }
-    // } finally {
-    //     processing.value = false
-    // }
 }
 
 
-const startDrag = function (evt, idx) {
-    evt.dataTransfer.dropEffect = 'move'
-    evt.dataTransfer.effectAllowed = 'move'
-    evt.dataTransfer.setData('idx', idx)
-}
-
-const onDrop = function (evt, toIdx) {
-    if (evt.target.classList.contains("drop-space")) {
-        evt.target.classList.remove("dragover");
-    }
-
-    const fromIdx = evt.dataTransfer.getData('idx')
-    if (fromIdx === toIdx) return;
-
-    const fromEl = order_run.value.at(fromIdx)
-    console.log(`move item:${fromEl} from ${fromIdx} to ${toIdx}`)
-    const newRun = order_run.value.toSpliced(toIdx + 1, 0, fromEl)
-    console.log(newRun)
-    const delIdx = fromIdx > toIdx ? fromIdx + 1 : fromIdx;
-    order_run.value = newRun.toSpliced(delIdx, 1)
-}
-
-const onDragEnter = function (evt) {
-    evt.target.classList.add("dragover");
-}
-
-const onDragLeave = function (evt) {
-    if (evt.target.classList.contains("drop-space")) {
-        evt.target.classList.remove("dragover");
-    }
-}
 
 watchEffect(() => {
     // so.value.id = route.params.id ?? ''
@@ -368,6 +318,7 @@ table td {
     width: 5%;
     min-width: 55px;
 }
+
 .prd-produced {
     width: 10%;
     min-width: 105px;

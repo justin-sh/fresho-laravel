@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\DailyReportController;
+use App\Http\Controllers\DeptReportController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\WarehouseController;
-use App\Http\Controllers\DeptReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,3 +40,4 @@ Route::put('/sale-orders/{sale_order}/approve', [SaleOrderController::class, 'ap
 
 // report api
 Route::apiResource('/report/dept', DeptReportController::class);
+Route::get('/report/daily/{report_date}', [DailyReportController::class, 'index']);
