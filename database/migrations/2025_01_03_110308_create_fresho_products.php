@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,9 +15,9 @@ return new class extends Migration
             $table->string('code', 32)->index();
             $table->string('name', 512)->index();
             $table->integer('cost')->default(0);
-            $table->string('price_text')->nullable();
+            $table->string('price_text', 512)->nullable();
             $table->uuid('product_id');
-            $table->string('unit');
+            $table->string('qty_type', 32);
             $table->timestamps();
         });
     }
