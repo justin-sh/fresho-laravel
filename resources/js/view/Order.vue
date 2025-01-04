@@ -189,7 +189,7 @@ const loading_data = async () => {
 
         orders.value = data.map(function (x) {
             x.detailsShowing = false
-            x.delivery_date_md = formatInTimeZone(new Date(x.deliveryDate), localTZ, "MM-dd")
+            x.delivery_date_md = formatInTimeZone(new Date(x.deliveryDate), localTZ, "yyyy-MM-dd")
             x.delivery_at_hm = x.at ? formatInTimeZone(new Date(x.at), localTZ, "HH:mm") : ''
             return x
         })
