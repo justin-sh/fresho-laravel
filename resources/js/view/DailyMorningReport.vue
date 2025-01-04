@@ -41,46 +41,54 @@
                     <BTd rowspan="7" class="text-center fw-bolder fsn">Pork
                     </BTd>
                     <BTd class="text-start">Belly</BTd>
-                    <BTd>1</BTd>
-                    <BTd></BTd>
-                    <BTd>1000</BTd>
+                    <BTd>{{ reportData.belly.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.belly.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.belly.sum - stockData.belly.sum }}</BTd>
                     <BTd rowspan="7"></BTd>
                     <BTd colspan="2" class="text-center fw-bolder fsn">Pork Special Order</BTd>
                     <BTd rowspan="7"></BTd>
                     <BTd class="text-start prd-ex-item-name">#16 Thigh s/off</BTd>
                     <BTd class="prd-ex-item-v"></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Belly R/Off</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.bellyROff.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.bellyROff.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.bellyROff.sum - stockData.bellyROff.sum }}</BTd>
                     <BTd class="text-start">Meaty Ribs</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#22 Thigh s/off</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Belly B/IN</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.bellyBoneIn.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.bellyBoneIn.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.bellyBoneIn.sum - stockData.bellyBoneIn.sum }}</BTd>
                     <BTd class="text-start">Cutlet</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#28 Thigh s/off</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">BBQ</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.bbq.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.bbq.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.bbq.sum - stockData.bbq.sum }}</BTd>
                     <BTd class="text-start">Meaty Riblets</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#16 Thigh s/ON</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Leg</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -90,7 +98,7 @@
                     <BTd class="text-start">#22 Thigh s/ON</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Loin</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
@@ -100,11 +108,11 @@
                     <BTd class="text-start">#28 Thigh s/ON</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
-                    <BTd>1</BTd>
+                    <BTd></BTd>
                     <BTd class="text-start">EX-Meaty Ribs</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#16 Br s/ON, Tdr/off</BTd>
@@ -113,12 +121,14 @@
                 <BTr>
                     <BTd colspan="11"></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd rowspan="10" class="align-middle text-center fw-bolder fsn">CK</BTd>
                     <BTd class="text-start">Breast</BTd>
-                    <BTd>1</BTd>
-                    <BTd>2</BTd>
-                    <BTd>6</BTd>
+                    <BTd>{{ reportData.ckbr.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckbr.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckbr.sum - stockData.ckbr.sum }}</BTd>
                     <BTd rowspan="10"></BTd>
                     <BTd class="text-start">EX-Meaty Leg Bone</BTd>
                     <BTd></BTd>
@@ -126,91 +136,109 @@
                     <BTd class="text-start">Butterfly Cut</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">ML s/off</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.cksoff.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.cksoff.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.cksoff.sum - stockData.cksoff.sum }}</BTd>
                     <BTd class="text-start">EX-Meaty Neck Bone</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#16 Kiev Cut s/ON</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">ML s/ON</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.ckson.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckson.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckson.sum - stockData.ckson.sum }}</BTd>
                     <BTd class="text-start">EX-Meaty Riblets</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#15 WB s/off</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Thigh s/off</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.ckthoff.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckthoff.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckthoff.sum - stockData.ckthoff.sum }}</BTd>
                     <BTd class="text-start">Loin Rind ON</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">Butt</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Thigh s/ON</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.ckthon.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckthon.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckthon.sum - stockData.ckthon.sum }}</BTd>
                     <BTd class="text-start">Belly B/IN</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">Ribs</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Legette</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.cklegette.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.cklegette.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.cklegette.sum - stockData.cklegette.sum }}</BTd>
                     <BTd class="text-start">Shoulder Rind ON</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Bone IN</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.ckbi.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckbi.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckbi.sum - stockData.ckbi.sum }}</BTd>
                     <BTd class="text-start">Middle</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Wings</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.ckwings.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckwings.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckwings.sum - stockData.ckwings.sum }}</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd class="text-start">Legette r/ON</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Tdr</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.cktdr.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.cktdr.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.cktdr.sum - stockData.cktdr.sum }}</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd class="text-start">Drumsticks</BTd>
                     <BTd></BTd>
                 </BTr>
-                <BTr>
+                <BTr class="align-middle">
                     <BTd class="text-start">Mid-Wingettes</BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd>{{ reportData.ckwingette.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.ckwingette.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.ckwingette.sum - stockData.ckwingette.sum }}</BTd>
                     <BTd></BTd>
                     <BTd></BTd>
                     <BTd class="text-start">Chop s/ON</BTd>
@@ -222,8 +250,8 @@
 </template>
 
 <script lang="ts" setup>
-import {dailyReport, deptReport, type ReportParams} from "../api";
-import {onMounted, shallowRef, watchEffect} from "vue";
+import {dailyReport} from "../api";
+import {onMounted, ref, shallowRef, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
 
@@ -235,11 +263,123 @@ const router = useRouter()
 
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 const status = shallowRef(['accepted'])
-const order_run = shallowRef(['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
-const prdGroups = shallowRef(['Band Saw', 'Boning', 'Frozen Products', 'Hot Pot', 'Slicing Beef', 'Slicing Chicken'])
-const prdStatus = shallowRef(['topicked', 'supplied'])
-const reportType = shallowRef('dept-report');
 
+const reportData = shallowRef({
+    "belly": {
+        "sum": 0,
+        "details": []
+    },
+    "bellyROff": {
+        "sum": 0,
+        "details": []
+    },
+    "bellyBoneIn": {
+        "sum": 0,
+        "details": []
+    },
+    "bbq": {
+        "sum": 0,
+        "details": []
+    },
+    "ckbr": {
+        "sum": 0,
+        "details": []
+    },
+    "cksoff": {
+        "sum": 0,
+        "details": []
+    },
+    "ckson": {
+        "sum": 0,
+        "details": []
+    },
+    "ckbi": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthoff": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthon": {
+        "sum": 0,
+        "details": []
+    },
+    "cklegette": {
+        "sum": 0,
+        "details": []
+    },
+    "ckwings": {
+        "sum": 0,
+        "details": []
+    },
+    "ckwingette": {
+        "sum": 0,
+        "details": []
+    },
+    "cktdr": {
+        "sum": 0,
+        "details": []
+    }
+})
+const stockData = ref({
+    "belly": {
+        "sum": 0,
+        "details": []
+    },
+    "bellyROff": {
+        "sum": 0,
+        "details": []
+    },
+    "bellyBoneIn": {
+        "sum": 0,
+        "details": []
+    },
+    "bbq": {
+        "sum": 0,
+        "details": []
+    },
+    "ckbr": {
+        "sum": 0,
+        "details": []
+    },
+    "cksoff": {
+        "sum": 0,
+        "details": []
+    },
+    "ckson": {
+        "sum": 0,
+        "details": []
+    },
+    "ckbi": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthoff": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthon": {
+        "sum": 0,
+        "details": []
+    },
+    "cklegette": {
+        "sum": 0,
+        "details": []
+    },
+    "ckwings": {
+        "sum": 0,
+        "details": []
+    },
+    "ckwingette": {
+        "sum": 0,
+        "details": []
+    },
+    "cktdr": {
+        "sum": 0,
+        "details": []
+    }
+})
 const processing = shallowRef(false)
 
 const generateReport = async function () {
@@ -249,9 +389,9 @@ const generateReport = async function () {
 
     const rv = (await dailyReport(reportDate.value)).data
     console.log(rv)
+    reportData.value = rv.data
     processing.value = false
 }
-
 
 
 watchEffect(() => {
@@ -311,11 +451,11 @@ table td {
 }
 
 .prd-order {
-    width: 15%;
+    width: 10%;
 }
 
 .prd-stock {
-    width: 5%;
+    width: 10%;
     min-width: 55px;
 }
 
