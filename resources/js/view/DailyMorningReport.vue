@@ -109,10 +109,12 @@
                     <BTd></BTd>
                 </BTr>
                 <BTr class="align-middle">
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
-                    <BTd></BTd>
+                    <BTd class="text-start">Ribs</BTd>
+                    <BTd>{{ reportData.pribs.sum }}</BTd>
+                    <BTd>
+                        <BFormInput size="sm" type="number" v-model="stockData.pribs.sum"></BFormInput>
+                    </BTd>
+                    <BTd>{{ reportData.pribs.sum - stockData.pribs.sum }}</BTd>
                     <BTd class="text-start">EX-Meaty Ribs</BTd>
                     <BTd></BTd>
                     <BTd class="text-start">#16 Br s/ON, Tdr/off</BTd>
@@ -265,120 +267,152 @@ const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"
 const status = shallowRef(['accepted'])
 
 const reportData = shallowRef({
-    "belly": {
-        "sum": 0,
-        "details": []
-    },
-    "bellyROff": {
-        "sum": 0,
-        "details": []
-    },
-    "bellyBoneIn": {
-        "sum": 0,
-        "details": []
-    },
-    "bbq": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbr": {
-        "sum": 0,
-        "details": []
-    },
-    "cksoff": {
-        "sum": 0,
-        "details": []
-    },
-    "ckson": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbi": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthoff": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthon": {
-        "sum": 0,
-        "details": []
-    },
-    "cklegette": {
-        "sum": 0,
-        "details": []
-    },
-    "ckwings": {
-        "sum": 0,
-        "details": []
-    },
-    "ckwingette": {
-        "sum": 0,
-        "details": []
-    },
-    "cktdr": {
-        "sum": 0,
-        "details": []
-    }
+  "belly": {
+    "sum": 0,
+    "details": []
+  },
+  "bellyROff": {
+    "sum": 0,
+    "details": []
+  },
+  "bellyBoneIn": {
+    "sum": 0,
+    "details": []
+  },
+  "bbq": {
+    "sum": 0,
+    "details": []
+  },
+  "pribs": {
+    "sum": 0,
+    "details": []
+  },
+  "pmeatyribs": {
+    "sum": 0,
+    "details": []
+  },
+  "pexmeatyribs": {
+    "sum": 0,
+    "details": []
+  },
+  "pfrzribs": {
+    "sum": 0,
+    "details": []
+  },
+  "ckbr": {
+    "sum": 0,
+    "details": []
+  },
+  "cksoff": {
+    "sum": 0,
+    "details": []
+  },
+  "ckson": {
+    "sum": 0,
+    "details": []
+  },
+  "ckbi": {
+    "sum": 0,
+    "details": []
+  },
+  "ckthoff": {
+    "sum": 0,
+    "details": []
+  },
+  "ckthon": {
+    "sum": 0,
+    "details": []
+  },
+  "cklegette": {
+    "sum": 0,
+    "details": []
+  },
+  "ckwings": {
+    "sum": 0,
+    "details": []
+  },
+  "ckwingette": {
+    "sum": 0,
+    "details": []
+  },
+  "cktdr": {
+    "sum": 0,
+    "details": []
+  }
 })
 const stockData = ref({
-    "belly": {
-        "sum": 0,
-        "details": []
-    },
-    "bellyROff": {
-        "sum": 0,
-        "details": []
-    },
-    "bellyBoneIn": {
-        "sum": 0,
-        "details": []
-    },
-    "bbq": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbr": {
-        "sum": 0,
-        "details": []
-    },
-    "cksoff": {
-        "sum": 0,
-        "details": []
-    },
-    "ckson": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbi": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthoff": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthon": {
-        "sum": 0,
-        "details": []
-    },
-    "cklegette": {
-        "sum": 0,
-        "details": []
-    },
-    "ckwings": {
-        "sum": 0,
-        "details": []
-    },
-    "ckwingette": {
-        "sum": 0,
-        "details": []
-    },
-    "cktdr": {
-        "sum": 0,
-        "details": []
-    }
+  "belly": {
+    "sum": 0,
+    "details": []
+  },
+  "bellyROff": {
+    "sum": 0,
+    "details": []
+  },
+  "bellyBoneIn": {
+    "sum": 0,
+    "details": []
+  },
+  "bbq": {
+    "sum": 0,
+    "details": []
+  },
+  "pribs": {
+    "sum": 0,
+    "details": []
+  },
+  "pmeatyribs": {
+    "sum": 0,
+    "details": []
+  },
+  "pexmeatyribs": {
+    "sum": 0,
+    "details": []
+  },
+  "pfrzribs": {
+    "sum": 0,
+    "details": []
+  },
+  "ckbr": {
+    "sum": 0,
+    "details": []
+  },
+  "cksoff": {
+    "sum": 0,
+    "details": []
+  },
+  "ckson": {
+    "sum": 0,
+    "details": []
+  },
+  "ckbi": {
+    "sum": 0,
+    "details": []
+  },
+  "ckthoff": {
+    "sum": 0,
+    "details": []
+  },
+  "ckthon": {
+    "sum": 0,
+    "details": []
+  },
+  "cklegette": {
+    "sum": 0,
+    "details": []
+  },
+  "ckwings": {
+    "sum": 0,
+    "details": []
+  },
+  "ckwingette": {
+    "sum": 0,
+    "details": []
+  },
+  "cktdr": {
+    "sum": 0,
+    "details": []
+  }
 })
 const processing = shallowRef(false)
 
