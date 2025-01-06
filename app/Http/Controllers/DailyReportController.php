@@ -67,6 +67,11 @@ class DailyReportController extends Controller
         ];
 
         //REPORT_DAILY_PORK_BELLY_RON_BI_EXCLUDED
+        $envNameMap = [
+            'REPORT_DAILY_PORK_BELLY_RON_BI_NAME' => 'bellyBoneIn',
+            'REPORT_DAILY_CK_TH_OFF_NAME' => 'ckthoff',
+            'REPORT_DAILY_CK_LEGETTE_NAME' => 'cklegette',
+        ];
 
         $codePrdMap = [];
         foreach ($envPrdMap as $k => $v) {
@@ -75,6 +80,12 @@ class DailyReportController extends Controller
             });
         }
 
+        $namePrdMap = [];
+        foreach ($envNameMap as $k => $v) {
+            collect(explode(',', env($k, '')))->each(function ($name) use ($v, &$namePrdMap) {
+                $namePrdMap[$name] = $v;
+            });
+        }
 
         foreach ($orders as $odr) {
             foreach ($odr->details as $d) {
@@ -90,6 +101,20 @@ class DailyReportController extends Controller
                         'supplier_notes' => $d->supplier_notes ?? '',
                     ];
                 }
+
+
+                if (array_key_exists($d->prd_name, $namePrdMap)) {
+                    $prd = $namePrdMap[$d->prd_name];
+
+                    $rv[$prd]['sum'] += $d->qty;
+                    $rv[$prd]['details'][] = [
+                        'customer' => $odr->receiving_company_name,
+                        'qty' => $d->qty,
+                        'customer_notes' => $d->customer_notes ?? '',
+                        'supplier_notes' => $d->supplier_notes ?? '',
+                    ];
+                }
+
             }
         }
 
