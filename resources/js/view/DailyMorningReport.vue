@@ -157,10 +157,10 @@ const porkSpecial = {
 }
 
 const ckSpecial = {
-    '#16 Thigh s/off': 'na',
-    '#22 Thigh s/off': 'pexmeatyribs',
-    '#28 Thigh s/off': 'na',
-    '#16 Thigh s/ON': 'na',
+    '#16 Thigh s/off': 'ckthoff16',
+    '#22 Thigh s/off': 'ckthoff22',
+    '#28 Thigh s/off': 'ckthoff28',
+    '#16 Thigh s/ON': 'ckthon16',
     '#22 Thigh s/ON': 'na',
     '#28 Thigh s/ON': 'na',
     '#16 Br s/ON, Tdr/off': 'na',
@@ -240,7 +240,23 @@ const reportData = shallowRef({
         "sum": 0,
         "details": []
     },
+    "ckthoff16": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthoff22": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthoff28": {
+        "sum": 0,
+        "details": []
+    },
     "ckthon": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthon16": {
         "sum": 0,
         "details": []
     },
@@ -316,7 +332,23 @@ const stockData = ref({
         "sum": 0,
         "details": []
     },
+    "ckthoff16": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthoff22": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthoff28": {
+        "sum": 0,
+        "details": []
+    },
     "ckthon": {
+        "sum": 0,
+        "details": []
+    },
+    "ckthon16": {
         "sum": 0,
         "details": []
     },

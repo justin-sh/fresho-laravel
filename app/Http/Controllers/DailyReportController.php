@@ -32,7 +32,11 @@ class DailyReportController extends Controller
             'ckson',
             'ckbi',
             'ckthoff',
+            'ckthoff16',
+            'ckthoff22',
+            'ckthoff28',
             'ckthon',
+            'ckthon16',
             'cklegette',
             'ckwings',
             'ckwingette',
@@ -90,6 +94,46 @@ class DailyReportController extends Controller
         foreach ($orders as $odr) {
             foreach ($odr->details as $d) {
 
+                // special rules
+                if(str_contains($d->supplier_notes, "用16号鸡切 鸡上腿肉")){
+
+                    $rv['ckthon16']['sum'] += $d->qty;
+                    $rv['ckthon16']['details'][] = [
+                        'customer' => $odr->receiving_company_name,
+                        'qty' => $d->qty,
+                        'customer_notes' => $d->customer_notes ?? '',
+                        'supplier_notes' => $d->supplier_notes ?? '',
+                    ];
+
+                    continue;
+                }
+                if('3023' == $d->prd_code){
+
+                    if( str_contains($d->supplier_notes, "size22")){
+                        $rv['ckthoff22']['sum'] += $d->qty;
+                        $rv['ckthoff22']['details'][] = [
+                            'customer' => $odr->receiving_company_name,
+                            'qty' => $d->qty,
+                            'customer_notes' => $d->customer_notes ?? '',
+                            'supplier_notes' => $d->supplier_notes ?? '',
+                        ];
+
+                        continue;
+                    }
+                    if (str_contains($d->supplier_notes, "USE SZE 28 ONLY")){
+
+                        $rv['ckthoff28']['sum'] += $d->qty;
+                        $rv['ckthoff28']['details'][] = [
+                            'customer' => $odr->receiving_company_name,
+                            'qty' => $d->qty,
+                            'customer_notes' => $d->customer_notes ?? '',
+                            'supplier_notes' => $d->supplier_notes ?? '',
+                        ];
+                        continue;
+                    }
+
+                }
+
                 if (array_key_exists($d->prd_code, $codePrdMap)) {
                     $prd = $codePrdMap[$d->prd_code];
 
@@ -100,6 +144,8 @@ class DailyReportController extends Controller
                         'customer_notes' => $d->customer_notes ?? '',
                         'supplier_notes' => $d->supplier_notes ?? '',
                     ];
+
+                    continue;
                 }
 
 
@@ -113,6 +159,8 @@ class DailyReportController extends Controller
                         'customer_notes' => $d->customer_notes ?? '',
                         'supplier_notes' => $d->supplier_notes ?? '',
                     ];
+
+                    continue;
                 }
 
             }
