@@ -145,15 +145,15 @@ const porkKV = {
 const porkSpecial = {
     'Meaty Ribs': 'pmeatyribs',
     'EX-Meaty Ribs': 'pexmeatyribs',
-    'Cutlet': 'na',
-    'Meaty Riblets': 'na',
-    'Meaty Leg Bone': 'na',
-    'EX-Meaty Leg Bone': 'na',
-    'Meaty Neck Bone': 'na',
-    'EX-Meaty Neck Bone': 'na',
-    'Loin Rind ON': 'na',
-    'Shoulder Rind ON': 'na',
-    'Middle': 'na',
+    'Cutlet': 'pcutlets',
+    'Meaty Riblets': 'pmeatyriblet',
+    'Meaty Leg Bone': 'pmeatylegbone',
+    'EX-Meaty Leg Bone': 'pexmeatylegbone',
+    'Meaty Neck Bone': 'pmeatyneckbone',
+    'EX-Meaty Neck Bone': 'pexmeatyneckbone',
+    'Loin Rind ON': 'ploinrindon',
+    'Shoulder Rind ON': 'pshrindon',
+    'Middle': 'pmiddle',
 }
 
 const ckSpecial = {
@@ -167,11 +167,11 @@ const ckSpecial = {
     'Butterfly Cut': 'na',
     '#16 Kiev Cut s/ON': 'na',
     '#15 WB s/off': 'na',
-    'Butt': 'na',
-    'Ribs': 'na',
-    'Legette r/ON': 'na',
-    'Drumsticks': 'na',
-    'Chop s/ON	': 'na',
+    'Butt': 'ckbutt',
+    'Ribs': 'ckrib',
+    'Legette r/ON': 'cklegetteon',
+    'Drumsticks': 'ckdrumstick',
+    'Chop s/ON	': 'ckchopon',
 }
 
 const ckKV = {
@@ -275,6 +275,14 @@ const reportData = shallowRef({
     "cktdr": {
         "sum": 0,
         "details": []
+    },
+    "ckrib": {
+        "sum": 0,
+        "details": []
+    },
+    "ckbutt": {
+        "sum": 0,
+        "details": []
     }
 })
 
@@ -365,6 +373,14 @@ const stockData = ref({
         "details": []
     },
     "cktdr": {
+        "sum": 0,
+        "details": []
+    },
+    "ckrib": {
+        "sum": 0,
+        "details": []
+    },
+    "ckbutt": {
         "sum": 0,
         "details": []
     }

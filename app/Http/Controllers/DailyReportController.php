@@ -26,6 +26,15 @@ class DailyReportController extends Controller
             'pmeatyribs',
             'pexmeatyribs',
             'pfrzribs',
+            'pcutlets',
+            'pmeatyriblet',
+            'pmeatylegbone',
+            'pexmeatylegbone',
+            'pmeatyneckbone',
+            'pexmeatyneckbone',
+            'ploinrindon',
+            'pshrindon',
+            'pmiddle',
 
             'ckbr',
             'cksoff',
@@ -41,6 +50,11 @@ class DailyReportController extends Controller
             'ckwings',
             'ckwingette',
             'cktdr',
+            'ckrib',
+            'ckbutt',
+            'cklegetteon',
+            'ckdrumstick',
+            'ckchopon',
         ];
 
         $rv = [];
@@ -57,6 +71,15 @@ class DailyReportController extends Controller
             'REPORT_DAILY_PORK_RIBS_MEATY' => 'pmeatyribs',
             'REPORT_DAILY_PORK_RIBS_EX_MEATY' => 'pexmeatyribs',
             'REPORT_DAILY_PORK_RIBS_FRZ' => 'pfrzribs',
+            'REPORT_DAILY_PORK_CUTLETS' => 'pcutlets',
+            'REPORT_DAILY_PORK_RIBLET_MEATY' => 'pmeatyriblet',
+            'REPORT_DAILY_PORK_LEG_BONE_MEATY' => 'pmeatylegbone',
+            'REPORT_DAILY_PORK_LEG_BONE_EX_MEATY' => 'pexmeatylegbone',
+            'REPORT_DAILY_PORK_NECK_BONE_MEATY' => 'pmeatyneckbone',
+            'REPORT_DAILY_PORK_NECK_BONE_EX_MEATY' => 'pexmeatyneckbone',
+            'REPORT_DAILY_PORK_LOIN_RIND_ON' => 'ploinrindon',
+            'REPORT_DAILY_PORK_SHOULDER_RIND_ON' => 'pshrindon',
+            'REPORT_DAILY_PORK_MIDDLE' => 'pmiddle',
 
             'REPORT_DAILY_CK_BREAST' => 'ckbr',
             'REPORT_DAILY_CK_SOFF' => 'cksoff',
@@ -68,6 +91,10 @@ class DailyReportController extends Controller
             'REPORT_DAILY_CK_WINGS' => 'ckwings',
             'REPORT_DAILY_CK_WINGETTE' => 'ckwingette',
             'REPORT_DAILY_CK_TDR' => 'cktdr',
+            'REPORT_DAILY_CK_RIB' => 'ckrib',
+            'REPORT_DAILY_CK_BUTT' => 'ckbutt',
+            'REPORT_DAILY_CK_DRUMSTICK' => 'ckdrumstick',
+            'REPORT_DAILY_CK_CHOP_ON' => 'ckchopon',
         ];
 
         //REPORT_DAILY_PORK_BELLY_RON_BI_EXCLUDED
@@ -75,6 +102,7 @@ class DailyReportController extends Controller
             'REPORT_DAILY_PORK_BELLY_RON_BI_NAME' => 'bellyBoneIn',
             'REPORT_DAILY_CK_TH_OFF_NAME' => 'ckthoff',
             'REPORT_DAILY_CK_LEGETTE_NAME' => 'cklegette',
+            'REPORT_DAILY_CK_LEGETTE_ON_NAME' => 'cklegetteon',
         ];
 
         $codePrdMap = [];
