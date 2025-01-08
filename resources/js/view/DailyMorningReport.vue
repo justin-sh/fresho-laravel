@@ -96,7 +96,7 @@
 
                         <BTr class="align-middle" v-for="(v,k) in porkSpecial">
                             <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
-                            <BTd>{{ reportData[v]?.sum }}</BTd>
+                            <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
                         </BTr>
                     </BTbody>
                 </BTableSimple>
@@ -111,7 +111,7 @@
                     <BTbody>
                         <BTr class="align-middle" v-for="(v,k) in ckSpecial">
                             <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
-                            <BTd>{{ reportData[v]?.sum }}</BTd>
+                            <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
                         </BTr>
                     </BTbody>
                 </BTableSimple>
@@ -166,7 +166,7 @@ const ckSpecial = {
     '#16 Br s/ON, Tdr/off': 'na',
     'Butterfly Cut': 'na',
     '#16 Kiev Cut s/ON': 'na',
-    '#15 WB s/off': 'na',
+    '#15 WB s/off': 'ckwboff15',
     'Butt': 'ckbutt',
     'Ribs': 'ckrib',
     'Legette r/ON': 'cklegetteon',
@@ -175,7 +175,6 @@ const ckSpecial = {
 }
 
 const ckKV = {
-    'Breast': 'ckbr',
     'ML s/off': 'cksoff',
     'ML s/ON': 'ckson',
     'Thigh s/off': 'ckthoff',

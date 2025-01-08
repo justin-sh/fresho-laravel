@@ -55,6 +55,9 @@ class DailyReportController extends Controller
             'cklegetteon',
             'ckdrumstick',
             'ckchopon',
+            'ckwboff15',
+
+            'others'
         ];
 
         $rv = [];
@@ -103,6 +106,7 @@ class DailyReportController extends Controller
             'REPORT_DAILY_CK_TH_OFF_NAME' => 'ckthoff',
             'REPORT_DAILY_CK_LEGETTE_NAME' => 'cklegette',
             'REPORT_DAILY_CK_LEGETTE_ON_NAME' => 'cklegetteon',
+            'REPORT_DAILY_CK_TH_OFF_NAME22' => 'ckthoff22',
         ];
 
         $codePrdMap = [];
@@ -127,6 +131,18 @@ class DailyReportController extends Controller
 
                     $rv['ckthon16']['sum'] += $d->qty;
                     $rv['ckthon16']['details'][] = [
+                        'customer' => $odr->receiving_company_name,
+                        'qty' => $d->qty,
+                        'customer_notes' => $d->customer_notes ?? '',
+                        'supplier_notes' => $d->supplier_notes ?? '',
+                    ];
+
+                    continue;
+                }
+                if(str_contains($d->supplier_notes, "Whole chicken Skinless size 14/15")){
+
+                    $rv['ckwboff15']['sum'] += $d->qty;
+                    $rv['ckwboff15']['details'][] = [
                         'customer' => $odr->receiving_company_name,
                         'qty' => $d->qty,
                         'customer_notes' => $d->customer_notes ?? '',
@@ -162,6 +178,7 @@ class DailyReportController extends Controller
 
                 }
 
+                // normal rules
                 if (array_key_exists($d->prd_code, $codePrdMap)) {
                     $prd = $codePrdMap[$d->prd_code];
 
@@ -189,6 +206,22 @@ class DailyReportController extends Controller
                     ];
 
                     continue;
+                }
+
+
+                if(!empty($d->supplier_notes)
+                    && !str_contains(env('REPORT_DAILY_UNATTENTION',''), $d->prd_code)
+                    && !str_contains($d->prd_name, 'Beef')
+                    && !str_contains($d->prd_name, 'Wagyu')
+                ){
+                    $rv['others']['details'][] = [
+                        'customer' => $odr->receiving_company_name,
+                        'prd_code' => $d->prd_code,
+                        'prd_name' => $d->prd_name,
+                        'qty' => $d->qty,
+                        'customer_notes' => $d->customer_notes ?? '',
+                        'supplier_notes' => $d->supplier_notes ?? '',
+                    ];
                 }
 
             }
