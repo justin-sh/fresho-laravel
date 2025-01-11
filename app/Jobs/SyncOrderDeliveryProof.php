@@ -36,6 +36,7 @@ class SyncOrderDeliveryProof implements ShouldQueue
 //        Log::debug('response = ' . $rv->status() . ' ' . $rv->reason());
 //        Log::debug('response = ' . $rv->getBody());
 
+//        Log::debug("SyncOrderDeliveryProof step 1");
         $html = str_get_html($rv);
         $pageUrl = $html->find('a[data-fresho-item="view-recent-pods"]', 0)?->href;
 
@@ -44,13 +45,16 @@ class SyncOrderDeliveryProof implements ShouldQueue
             return;
         }
 
+//        Log::debug("SyncOrderDeliveryProof step 2");
         //step 2: get delivery info
         $pageUrl = 'https://app.fresho.com' . $pageUrl;
         $rv2 = Http::get($pageUrl)->body();
+//        Log::debug("SyncOrderDeliveryProof step 2.5");
         $html2 = str_get_html($rv2);
         $trs = $html2->find('tr.d-lg-table-row.mb-3');
 //        Log::debug("tr.count=" . count($trs));
 
+//        Log::debug("SyncOrderDeliveryProof step 3");
         $deliveredInfos = collect();
         collect($trs)->each(function ($tr) use ($deliveredInfos) {
             $tds = $tr->find('td');
@@ -67,26 +71,16 @@ class SyncOrderDeliveryProof implements ShouldQueue
 
             $deliveredInfos->put(substr($a->innertext, 1), $info);
         });
+//        Log::debug("SyncOrderDeliveryProof step 4");
 
-//        Log::debug(json_encode($deliveredInfos));
-
-        DB::beginTransaction();
-        $i = 0;
-        // DB::transaction(function () use ($deliveredInfos) {
-        $deliveredInfos->each(function ($info, $orderNo) use( &$i) {
-            Order::query()
-                ->where('order_number', $orderNo)
-                ->update($info);
-
-            $i = $i + 1;
-            if($i >= 10){
-                Log::debug("commit while the count reaches 10");
-                DB::commit();
-
-                $i = 0;
-            }
+        DB::transaction(function () use ($deliveredInfos) {
+            $deliveredInfos->each(function ($info, $orderNo) use (&$i) {
+                Order::query()
+                    ->where('order_number', $orderNo)
+                    ->where('delivery_date', $info['delivery_at']->toDateString())
+                    ->update($info);
+            });
         });
-        // });
-        DB::commit();
+//        Log::debug("SyncOrderDeliveryProof step 5");
     }
 }
