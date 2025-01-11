@@ -76,8 +76,7 @@ class SyncOrderDeliveryProof implements ShouldQueue
         DB::transaction(function () use ($deliveredInfos) {
             $deliveredInfos->each(function ($info, $orderNo) use (&$i) {
                 Order::query()
-                    ->where('order_number', $orderNo)
-                    ->where('delivery_date', $info['delivery_at']->toDateString())
+                    ->where('order_number', strval($orderNo))
                     ->update($info);
             });
         });
