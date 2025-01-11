@@ -117,6 +117,30 @@
                 </BTableSimple>
             </BCol>
         </BRow>
+
+        <BTableSimple small caption-top bordered v-if="reportData.others.details.length>0">
+            <caption>Details - Others</caption>
+            <BThead>
+                <BTr>
+                    <BTh>Customer</BTh>
+                    <BTh>Product</BTh>
+                    <BTh>Supplier Note</BTh>
+                </BTr>
+            </BThead>
+            <BTbody>
+                <BTr v-for="d in reportData.others.details">
+                    <BTd>
+                        {{ d.customer.substring(0, 20) }}
+                    </BTd>
+                    <BTd>
+                        {{ '(' + d.prd_code + ') ' + d.prd_name }}
+                    </BTd>
+                    <BTd>
+                        {{ d.supplier_notes }}
+                    </BTd>
+                </BTr>
+            </BTbody>
+        </BTableSimple>
     </BCard>
 </template>
 
@@ -280,6 +304,10 @@ const reportData = shallowRef({
         "details": []
     },
     "ckbutt": {
+        "sum": 0,
+        "details": []
+    },
+    "others": {
         "sum": 0,
         "details": []
     }

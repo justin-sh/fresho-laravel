@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FreshoProduct;
 use App\Models\Order;
 use Illuminate\Support\Facades\Log;
 
@@ -123,11 +124,32 @@ class DailyReportController extends Controller
             });
         }
 
+        $products = FreshoProduct::query()->get(['code', 'name', 'mkt_cat']);
+        $freshoPrdMap = [];
+
+        $products->each(function ($p) use (&$freshoPrdMap){
+            $freshoPrdMap[$p->code]  = $p;
+        });
+
+//        $freshoPrdMap = $products->map(function ($p) {
+//            return [$p->code => $p];
+//        })->all();
+
+        Log::info(json_encode($freshoPrdMap));
+
         foreach ($orders as $odr) {
             foreach ($odr->details as $d) {
 
+                // not chicken and not pork then skip
+                Log::debug($d->prd_code . ' -> ' . (array_key_exists($d->prd_code, $freshoPrdMap)?'yes':'no'));
+                Log::debug($d->prd_code . ' -> ' . json_encode($freshoPrdMap[$d->prd_code]));
+                if (array_key_exists($d->prd_code, $freshoPrdMap)
+                    && !in_array($freshoPrdMap[$d->prd_code]->mkt_cat, ['PORK', 'CHICKEN'])) {
+                    continue;
+                }
+
                 // special rules
-                if(str_contains($d->supplier_notes, "用16号鸡切 鸡上腿肉")){
+                if (str_contains($d->supplier_notes, "用16号鸡切 鸡上腿肉")) {
 
                     $rv['ckthon16']['sum'] += $d->qty;
                     $rv['ckthon16']['details'][] = [
@@ -139,7 +161,7 @@ class DailyReportController extends Controller
 
                     continue;
                 }
-                if(str_contains($d->supplier_notes, "Whole chicken Skinless size 14/15")){
+                if (str_contains($d->supplier_notes, "Whole chicken Skinless size 14/15")) {
 
                     $rv['ckwboff15']['sum'] += $d->qty;
                     $rv['ckwboff15']['details'][] = [
@@ -151,9 +173,9 @@ class DailyReportController extends Controller
 
                     continue;
                 }
-                if('3023' == $d->prd_code){
+                if ('3023' == $d->prd_code) {
 
-                    if( str_contains($d->supplier_notes, "size22")){
+                    if (str_contains($d->supplier_notes, "size22")) {
                         $rv['ckthoff22']['sum'] += $d->qty;
                         $rv['ckthoff22']['details'][] = [
                             'customer' => $odr->receiving_company_name,
@@ -164,7 +186,7 @@ class DailyReportController extends Controller
 
                         continue;
                     }
-                    if (str_contains($d->supplier_notes, "USE SZE 28 ONLY")){
+                    if (str_contains($d->supplier_notes, "USE SZE 28 ONLY")) {
 
                         $rv['ckthoff28']['sum'] += $d->qty;
                         $rv['ckthoff28']['details'][] = [
@@ -209,11 +231,11 @@ class DailyReportController extends Controller
                 }
 
 
-                if(!empty($d->supplier_notes)
-                    && !str_contains(env('REPORT_DAILY_UNATTENTION',''), $d->prd_code)
+                if (!empty($d->supplier_notes)
+                    && !str_contains(env('REPORT_DAILY_UNATTENTION', ''), $d->prd_code)
                     && !str_contains($d->prd_name, 'Beef')
                     && !str_contains($d->prd_name, 'Wagyu')
-                ){
+                ) {
                     $rv['others']['details'][] = [
                         'customer' => $odr->receiving_company_name,
                         'prd_code' => $d->prd_code,
