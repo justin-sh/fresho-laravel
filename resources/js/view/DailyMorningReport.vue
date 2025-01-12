@@ -35,7 +35,7 @@
                     </BThead>
 
                     <BTbody>
-                        <BTr class="align-middle">
+                        <BTr class="align-middle" id="order-Belly" @click="showDetail('belly', 'Belly')">
                             <BTd :rowspan="Object.keys(porkKV).length + 1" class="text-center fw-bolder fsn">Pork
                             </BTd>
                             <BTd class="text-start">Belly</BTd>
@@ -46,7 +46,7 @@
                             <BTd>{{ stockData.belly.sum - reportData.belly.sum }}</BTd>
                         </BTr>
 
-                        <BTr class="align-middle" v-for="(v,k) in porkKV">
+                        <BTr class="align-middle" v-for="(v,k) in porkKV" @click="showDetail(v, k)">
                             <BTd class="text-start">{{ k }}</BTd>
                             <BTd>{{ reportData[v].sum }}</BTd>
                             <BTd>
@@ -58,7 +58,7 @@
                         <BTr>
                             <BTd colspan="11"></BTd>
                         </BTr>
-                        <BTr class="align-middle">
+                        <BTr class="align-middle" @click="showDetail('ckbr', 'Breast')">
                             <BTd :rowspan="Object.keys(ckKV).length + 1" class="align-middle text-center fw-bolder fsn">
                                 CK
                             </BTd>
@@ -70,7 +70,7 @@
                             <BTd>{{ stockData.ckbr.sum - reportData.ckbr.sum }}</BTd>
                         </BTr>
 
-                        <BTr class="align-middle" v-for="(v,k) in ckKV">
+                        <BTr class="align-middle" v-for="(v,k) in ckKV" @click="showDetail(v, k)">
                             <BTd class="text-start">{{ k }}</BTd>
                             <BTd>{{ reportData[v].sum }}</BTd>
                             <BTd>
@@ -94,7 +94,7 @@
                             <BTd colspan="2" class="text-center fw-bolder fsn prd-ex-item-name">Pork Special Order</BTd>
                         </BTr>
 
-                        <BTr class="align-middle" v-for="(v,k) in porkSpecial">
+                        <BTr class="align-middle" v-for="(v,k) in porkSpecial" @click="showDetail(v, k)">
                             <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
                             <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
                         </BTr>
@@ -109,7 +109,7 @@
                         </BTr>
                     </BThead>
                     <BTbody>
-                        <BTr class="align-middle" v-for="(v,k) in ckSpecial">
+                        <BTr class="align-middle" v-for="(v,k) in ckSpecial" @click="showDetail(v, k)">
                             <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
                             <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
                         </BTr>
@@ -117,13 +117,41 @@
                 </BTableSimple>
             </BCol>
         </BRow>
-
+        <BModal id="popover-m" v-model="modalShow" scrollable :title="modalTitle" ok-only size="xl">
+            <BTableSimple bordered>
+                <BThead>
+                    <BTr>
+                        <BTh>Customer</BTh>
+                        <BTh>Qty</BTh>
+                        <BTh>Supplier Notes</BTh>
+                        <BTh>Customer Notes</BTh>
+                    </BTr>
+                </BThead>
+                <BTbody>
+                    <BTr v-for="d in modelData">
+                        <BTd>
+                            {{ d.customer.substring(0, 20) }}
+                        </BTd>
+                        <BTd>
+                            {{ d.qty }}
+                        </BTd>
+                        <BTd>
+                            {{ d.supplier_notes }}
+                        </BTd>
+                        <BTd>
+                            {{ d.customer_notes }}
+                        </BTd>
+                    </BTr>
+                </BTbody>
+            </BTableSimple>
+        </BModal>
         <BTableSimple small caption-top bordered v-if="reportData.others.details.length>0">
             <caption>Details - Others</caption>
             <BThead>
                 <BTr>
                     <BTh>Customer</BTh>
                     <BTh>Product</BTh>
+                    <BTh>Qty</BTh>
                     <BTh>Supplier Note</BTh>
                 </BTr>
             </BThead>
@@ -133,7 +161,10 @@
                         {{ d.customer.substring(0, 20) }}
                     </BTd>
                     <BTd>
-                        {{ '(' + d.prd_code + ') ' + d.prd_name }}
+                        {{ ('(' + d.prd_code + ') ' + d.prd_name).substring(0, 50) }}
+                    </BTd>
+                    <BTd>
+                        {{ d.qty }}
                     </BTd>
                     <BTd>
                         {{ d.supplier_notes }}
@@ -417,14 +448,30 @@ const processing = shallowRef(false)
 const generateReport = async function () {
 
     processing.value = true
-    console.log(reportDate.value)
+    // console.log(reportDate.value)
 
     const rv = (await dailyReport(reportDate.value)).data
-    console.log(rv)
+    // console.log(rv)
     reportData.value = rv.data
     processing.value = false
 }
 
+const modalTitle = ref('')
+const modalShow = ref(false)
+const modelData = ref([])
+const showDetail = function (id, name) {
+
+    modalTitle.value = name + ' Detail'
+
+    try {
+        modelData.value = reportData.value[id]['details']
+    } catch (e) {
+        console.log("No Details for '" + name + "'")
+        console.log(e)
+    }
+
+    modalShow.value = !modalShow.value
+}
 
 watchEffect(() => {
     // so.value.id = route.params.id ?? ''
