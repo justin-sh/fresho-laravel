@@ -41,19 +41,21 @@ class AppServiceProvider extends ServiceProvider
                 ->withHeader('cookie', config('app.fresho.cookie'));
         });
 
+//        Log::debug(config('app.fresho.cookie'));
+
         DB::listen(function (QueryExecuted $query) {
-            Log::debug(Str::padRight('sql', 20) . $query->sql);
-            Log::debug(Str::padRight('bindings', 10) . json_encode($query->bindings));
-            Log::debug(Str::padRight('elapsed time', 20) . $query->time);
+//            Log::debug(Str::padRight('sql', 20) . $query->sql);
+//            Log::debug(Str::padRight('bindings', 10) . json_encode($query->bindings));
+//            Log::debug(Str::padRight('elapsed time', 20) . $query->time);
         });
 
         DB::whenQueryingForLongerThan(500, function (Connection $conn, QueryExecuted $q){
-            Log::warning("------- Long sql than 1000ms --------");
-            Log::warning(Str::padRight('conn name', 15) . ':' . $conn->getName());
-            Log::warning(Str::padRight('sql text', 15) . ':' . $q->sql);
-            Log::warning(Str::padRight('sql bindings', 15) . ':' . json_encode($q->bindings));
-            Log::warning(Str::padRight('sql time', 15) . ':' . $q->time . 'milliseconds');
-            Log::warning("------- Long sql than 1000ms --------");
+//            Log::warning("------- Long sql than 1000ms --------");
+//            Log::warning(Str::padRight('conn name', 15) . ':' . $conn->getName());
+//            Log::warning(Str::padRight('sql text', 15) . ':' . $q->sql);
+//            Log::warning(Str::padRight('sql bindings', 15) . ':' . json_encode($q->bindings));
+//            Log::warning(Str::padRight('sql time', 15) . ':' . $q->time . 'milliseconds');
+//            Log::warning("------- Long sql than 1000ms --------");
         });
     }
 }
