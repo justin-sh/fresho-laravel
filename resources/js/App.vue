@@ -8,21 +8,21 @@
 
                 <BCollapse id="nav-collapse" is-nav>
                     <BNavbarNav>
-                        <BNavItem :to="{name:'home'}">
+                        <BNavItem :to="{name:'orders'}">
                             Home
                         </BNavItem>
                         <BNavItem :to="{name:'orders'}">
                             Orders
                         </BNavItem>
-                        <BNavItem :to="{name:'saleOrders'}">
-                            Sale Orders
-                        </BNavItem>
-                        <BNavItem :to="{name:'purchaseOrders'}">
-                            Purchase Orders
-                        </BNavItem>
-                        <BNavItem :to="{name:'products'}">
-                            Products
-                        </BNavItem>
+<!--                        <BNavItem :to="{name:'saleOrders'}">-->
+<!--                            Sale Orders-->
+<!--                        </BNavItem>-->
+<!--                        <BNavItem :to="{name:'purchaseOrders'}">-->
+<!--                            Purchase Orders-->
+<!--                        </BNavItem>-->
+<!--                        <BNavItem :to="{name:'products'}">-->
+<!--                            Products-->
+<!--                        </BNavItem>-->
                     </BNavbarNav>
 
                     <BNavbarNav>
@@ -42,22 +42,22 @@
                         </BNavItemDropdown>
                     </BNavbarNav>
 
-                    <BNavbarNav>
-                        <BNavItemDropdown>
-                            <template #button-content>
-                                New +
-                            </template>
-                            <BDropdownItem :to="{name:'saleOrderNew'}">
-                                new Sale Order
-                            </BDropdownItem>
-                            <BDropdownItem :to="{name:'purchaseOrderNew'}">
-                                new Purchase Order
-                            </BDropdownItem>
-                            <BDropdownItem :to="{name:'purchaseOrderNew'}">
-                                new Product
-                            </BDropdownItem>
-                        </BNavItemDropdown>
-                    </BNavbarNav>
+<!--                    <BNavbarNav>-->
+<!--                        <BNavItemDropdown>-->
+<!--                            <template #button-content>-->
+<!--                                New +-->
+<!--                            </template>-->
+<!--                            <BDropdownItem :to="{name:'saleOrderNew'}">-->
+<!--                                new Sale Order-->
+<!--                            </BDropdownItem>-->
+<!--                            <BDropdownItem :to="{name:'purchaseOrderNew'}">-->
+<!--                                new Purchase Order-->
+<!--                            </BDropdownItem>-->
+<!--                            <BDropdownItem :to="{name:'purchaseOrderNew'}">-->
+<!--                                new Product-->
+<!--                            </BDropdownItem>-->
+<!--                        </BNavItemDropdown>-->
+<!--                    </BNavbarNav>-->
 
                     <BNavbarNav class="ml-auto">
                         <BNavItemDropdown right>
@@ -88,7 +88,7 @@ import {onMounted} from "vue";
 // console.log('app.vue 00')
 onMounted(async function () {
     // console.log('app.vue 11')
-    const wh = (await getWarehousesWithFilters()).data.data
+    // const wh = (await getWarehousesWithFilters()).data.data
     // console.log(wh)
 })
 
