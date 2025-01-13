@@ -122,6 +122,7 @@
                 <BThead>
                     <BTr>
                         <BTh>Customer</BTh>
+                        <BTh>Product</BTh>
                         <BTh>Qty</BTh>
                         <BTh>Supplier Notes</BTh>
                         <BTh>Customer Notes</BTh>
@@ -131,6 +132,9 @@
                     <BTr v-for="d in modelData">
                         <BTd>
                             {{ d.customer.substring(0, 20) }}
+                        </BTd>
+                        <BTd>
+                            {{ ('(' + d.prd_code + ') ' + d.prd_name).substring(0, 40) }}
                         </BTd>
                         <BTd>
                             {{ d.qty }}
@@ -195,6 +199,7 @@ const porkKV = {
     'Belly B/IN': 'bellyBoneIn',
     'BBQ': 'bbq',
     'Ribs': 'pribs',
+    'Neck': 'pneck',
 }
 
 const porkSpecial = {
@@ -259,6 +264,10 @@ const reportData = shallowRef({
         "details": []
     },
     "pribs": {
+        "sum": 0,
+        "details": []
+    },
+    "pneck": {
         "sum": 0,
         "details": []
     },
@@ -363,6 +372,10 @@ const stockData = ref({
         "details": []
     },
     "pribs": {
+        "sum": 0,
+        "details": []
+    },
+    "pneck": {
         "sum": 0,
         "details": []
     },

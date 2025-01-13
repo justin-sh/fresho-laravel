@@ -24,6 +24,7 @@ class DailyReportController extends Controller
             'bellyBoneIn',
             'bbq',
             'pribs',
+            'pneck',
             'pmeatyribs',
             'pexmeatyribs',
             'pfrzribs',
@@ -72,6 +73,7 @@ class DailyReportController extends Controller
             'REPORT_DAILY_PORK_BELLY_RON_BI' => 'bellyBoneIn',
             'REPORT_DAILY_PORK_BBQ' => 'bbq',
             'REPORT_DAILY_PORK_RIBS' => 'pribs',
+            'REPORT_DAILY_PORK_NECK' => 'pneck',
             'REPORT_DAILY_PORK_RIBS_MEATY' => 'pmeatyribs',
             'REPORT_DAILY_PORK_RIBS_EX_MEATY' => 'pexmeatyribs',
             'REPORT_DAILY_PORK_RIBS_FRZ' => 'pfrzribs',
@@ -154,6 +156,8 @@ class DailyReportController extends Controller
                     $rv['ckthon16']['sum'] += $d->qty;
                     $rv['ckthon16']['details'][] = [
                         'customer' => $odr->receiving_company_name,
+                        'prd_code' => $d->prd_code,
+                        'prd_name' => $d->prd_name,
                         'qty' => $d->qty,
                         'customer_notes' => $d->customer_notes ?? '',
                         'supplier_notes' => $d->supplier_notes ?? '',
@@ -166,6 +170,8 @@ class DailyReportController extends Controller
                     $rv['ckwboff15']['sum'] += $d->qty;
                     $rv['ckwboff15']['details'][] = [
                         'customer' => $odr->receiving_company_name,
+                        'prd_code' => $d->prd_code,
+                        'prd_name' => $d->prd_name,
                         'qty' => $d->qty,
                         'customer_notes' => $d->customer_notes ?? '',
                         'supplier_notes' => $d->supplier_notes ?? '',
@@ -179,6 +185,8 @@ class DailyReportController extends Controller
                         $rv['ckthoff22']['sum'] += $d->qty;
                         $rv['ckthoff22']['details'][] = [
                             'customer' => $odr->receiving_company_name,
+                            'prd_code' => $d->prd_code,
+                            'prd_name' => $d->prd_name,
                             'qty' => $d->qty,
                             'customer_notes' => $d->customer_notes ?? '',
                             'supplier_notes' => $d->supplier_notes ?? '',
@@ -191,6 +199,8 @@ class DailyReportController extends Controller
                         $rv['ckthoff28']['sum'] += $d->qty;
                         $rv['ckthoff28']['details'][] = [
                             'customer' => $odr->receiving_company_name,
+                            'prd_code' => $d->prd_code,
+                            'prd_name' => $d->prd_name,
                             'qty' => $d->qty,
                             'customer_notes' => $d->customer_notes ?? '',
                             'supplier_notes' => $d->supplier_notes ?? '',
@@ -207,6 +217,8 @@ class DailyReportController extends Controller
                     $rv[$prd]['sum'] += $d->qty;
                     $rv[$prd]['details'][] = [
                         'customer' => $odr->receiving_company_name,
+                        'prd_code' => $d->prd_code,
+                        'prd_name' => $d->prd_name,
                         'qty' => $d->qty,
                         'customer_notes' => $d->customer_notes ?? '',
                         'supplier_notes' => $d->supplier_notes ?? '',
@@ -222,6 +234,8 @@ class DailyReportController extends Controller
                     $rv[$prd]['sum'] += $d->qty;
                     $rv[$prd]['details'][] = [
                         'customer' => $odr->receiving_company_name,
+                        'prd_code' => $d->prd_code,
+                        'prd_name' => $d->prd_name,
                         'qty' => $d->qty,
                         'customer_notes' => $d->customer_notes ?? '',
                         'supplier_notes' => $d->supplier_notes ?? '',
