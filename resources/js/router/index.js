@@ -9,6 +9,8 @@ import SaleOrderList from "@/view/SaleOrderList.vue";
 import SaleOrder from "@/view/SaleOrder.vue";
 import DeptReport from "@/view/DeptReport.vue";
 import DailyMorningReport from "@/view/DailyMorningReport.vue";
+import DriverTrainingS011CRM from "@/view/contract/DriverTrainingS011CRM.vue";
+import DriverTrainings from "@/view/contract/index.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -67,6 +69,21 @@ const router = createRouter({
             path: '/products',
             name: 'products',
             component: Product
+        },
+        {
+            path: '/driver-training',
+            children:[
+                {
+                    path: '',
+                    name: 'driverTrainings',
+                    component: DriverTrainings,
+                },
+                {
+                    path: 's011crm',
+                    name: 'driverTrainings.s011crm',
+                    component: DriverTrainingS011CRM,
+                }
+            ]
         },
         // {
         //     path: '/about',

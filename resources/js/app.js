@@ -12,7 +12,7 @@ import router from './router'
 
 import VueSelect from "vue-select";
 import pinia from "@/store/index";
-
+import vueEsign from 'vue-esign'
 
 /////
 import "./echo";
@@ -23,5 +23,6 @@ app.use(createBootstrap())
 app.component("v-select", VueSelect)
 app.use(router)
 app.use(pinia)
+app.use(vueEsign)
 
 app.mount('#app')
