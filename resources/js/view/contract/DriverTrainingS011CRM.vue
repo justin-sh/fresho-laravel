@@ -11,10 +11,6 @@
     <ol>
         <li>
             Fuel: <span class="fw-bolder">Petrol, #91</span>
-<!--            <ol type="a">-->
-<!--                <li>Petrol, #91</li>-->
-<!--                <li>fdaddfdasf</li>-->
-<!--            </ol>-->
         </li>
         <li>
             Turn the <span class="fw-bolder">refrigerator</span> OFF and engine OFF every time once arriving the destination
@@ -57,7 +53,7 @@
             <BButton variant="success">Confirm</BButton>
         </BCol>
         <BCol cols="2">
-            <BButton variant="outline-primary" @click="$refs.esign.reset()">Re-Sign</BButton>
+            <BButton variant="outline-primary" @click="$refs.esign.reset()">Clear</BButton>
         </BCol>
     </BRow>
 </template>
