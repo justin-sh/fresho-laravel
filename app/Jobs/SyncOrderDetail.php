@@ -43,6 +43,7 @@ class SyncOrderDetail implements ShouldQueue
 
         $order = [];
         $orderDetail = [];
+        $orderNoCodeIdex = [];
         if (($fp = fopen($absFilename, 'r')) !== false) {
             $row = 1;
             $header = true;
@@ -62,9 +63,16 @@ class SyncOrderDetail implements ShouldQueue
                 if ("'STD_FREIGHT_BOX'" == $data[1]) {
                     continue;
                 }
+                $prdCode = Str::trim($data[1], "'");
+                $ordNo = $data[12];
+
+                
+                $orderNoCodeIdex[$ordNo . $prdCode] = array_key_exists($ordNo . $prdCode, $orderNoCodeIdex)? ($orderNoCodeIdex[$ordNo . $prdCode] + 1) : 1;
+
                 $orderDetail[] = [
                     'group' => $data[0],
-                    'prd_code' => Str::trim($data[1], "'"),
+                    'prd_code' => $prdCode,
+                    'idx' => $orderNoCodeIdex[$ordNo . $prdCode],
                     'prd_name' => $data[2],
                     'qty_type' => $data[3],
                     'qty' => floatval($data[4]),
@@ -89,7 +97,7 @@ class SyncOrderDetail implements ShouldQueue
             });
 
             // did not handle the deleted product case
-            OrderDetail::upsert($orderDetail, ['order_number', 'prd_code'], ['qty_type', 'qty', 'supplier_notes', 'customer_notes', 'status']);
+            OrderDetail::upsert($orderDetail, ['order_number', 'prd_code', 'idx'], ['qty_type', 'qty', 'supplier_notes', 'customer_notes', 'status']);
 
         });
 
