@@ -23,7 +23,7 @@
 
         <BRow>
             <BCol class="col-auto">
-                <BTableSimple bordered class="fss text-center">
+                <BTableSimple hover bordered class="fss text-center">
                     <BThead head-variant="dark" class="fsn">
                         <BTr class="align-middle">
                             <BTh class="prd-cat">Plan</BTh>
@@ -82,7 +82,7 @@
                 </BTableSimple>
             </BCol>
             <BCol class="col-3">
-                <BTableSimple bordered class="fss text-center">
+                <BTableSimple hover bordered class="fss text-center">
                     <BThead head-variant="dark" class="fsn">
                         <BTr class="align-middle">
                             <BTh class="text-start col-7">Side: -</BTh>
@@ -102,7 +102,7 @@
                 </BTableSimple>
             </BCol>
             <BCol class="col-3">
-                <BTableSimple bordered class="fss text-center">
+                <BTableSimple hover bordered class="fss text-center">
                     <BThead head-variant="dark" class="fsn">
                         <BTr class="align-middle">
                             <BTh colspan="2">CK Special Order</BTh>
@@ -118,7 +118,7 @@
             </BCol>
         </BRow>
         <BModal id="popover-m" v-model="modalShow" scrollable :title="modalTitle" ok-only size="xl">
-            <BTableSimple bordered>
+            <BTableSimple bordered striped hover>
                 <BThead>
                     <BTr>
                         <BTh>Customer</BTh>
@@ -149,12 +149,12 @@
                 </BTbody>
             </BTableSimple>
         </BModal>
-        <BTableSimple small caption-top bordered v-if="Object.keys(reportData.others).length>0">
+        <BTableSimple striped hover small caption-top bordered v-if="Object.keys(reportData.others).length>0">
             <caption>Details - Others</caption>
             <BThead>
                 <BTr>
 <!--                    <BTh>Customer</BTh>-->
-                    <BTh>Product</BTh>
+                    <BTh style="width:50%">Product</BTh>
                     <BTh>Qty</BTh>
 <!--                    <BTh>Supplier Note</BTh>-->
                 </BTr>
