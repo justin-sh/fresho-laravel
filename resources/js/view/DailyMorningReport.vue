@@ -149,29 +149,23 @@
                 </BTbody>
             </BTableSimple>
         </BModal>
-        <BTableSimple small caption-top bordered v-if="reportData.others.details.length>0">
+        <BTableSimple small caption-top bordered v-if="Object.keys(reportData.others).length>0">
             <caption>Details - Others</caption>
             <BThead>
                 <BTr>
-                    <BTh>Customer</BTh>
+<!--                    <BTh>Customer</BTh>-->
                     <BTh>Product</BTh>
                     <BTh>Qty</BTh>
-                    <BTh>Supplier Note</BTh>
+<!--                    <BTh>Supplier Note</BTh>-->
                 </BTr>
             </BThead>
             <BTbody>
-                <BTr v-for="d in reportData.others.details">
+                <BTr v-for="(v,k) in reportData.others" @click="showDetailByKV(k, v)">
                     <BTd>
-                        {{ d.customer.substring(0, 20) }}
+                        {{ k }}
                     </BTd>
                     <BTd>
-                        {{ ('(' + d.prd_code + ') ' + d.prd_name).substring(0, 50) }}
-                    </BTd>
-                    <BTd>
-                        {{ d.qty }}
-                    </BTd>
-                    <BTd>
-                        {{ d.supplier_notes }}
+                        {{ v.sum }}
                     </BTd>
                 </BTr>
             </BTbody>
@@ -223,9 +217,8 @@ const ckSpecial = {
     '#16 Thigh s/ON': 'ckthon16',
     '#22 Thigh s/ON': 'na',
     '#28 Thigh s/ON': 'na',
-    '#16 Br s/ON, Tdr/off': 'na',
+    'Special Br s/ON': 'ckbron',
     'Butterfly Cut': 'na',
-    '#16 Kiev Cut s/ON': 'na',
     '#15 WB s/off': 'ckwboff15',
     'Butt': 'ckbutt',
     'Ribs': 'ckrib',
@@ -348,8 +341,6 @@ const reportData = shallowRef({
         "details": []
     },
     "others": {
-        "sum": 0,
-        "details": []
     }
 })
 
@@ -485,6 +476,19 @@ const showDetail = function (id, name) {
 
     modalShow.value = !modalShow.value
 }
+const showDetailByKV = function (name, data) {
+
+    modalTitle.value = name + ' Detail'
+
+    try {
+        modelData.value = data['details']
+    } catch (e) {
+        console.log("No Details for '" + name + "'")
+        console.log(e)
+    }
+
+    modalShow.value = !modalShow.value
+}
 
 watchEffect(() => {
     // so.value.id = route.params.id ?? ''
@@ -525,6 +529,10 @@ onMounted(async function () {
 
 .fsn {
     font-size: 1rem;
+}
+
+tbody tr{
+    cursor: pointer;
 }
 
 table td {

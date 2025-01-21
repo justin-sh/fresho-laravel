@@ -54,15 +54,16 @@ class DailyReportController extends Controller
             'cktdr',
             'ckrib',
             'ckbutt',
+            'ckbron',
             'cklegetteon',
             'ckdrumstick',
             'ckchopon',
             'ckwboff15',
 
-            'others'
+//            'others'
         ];
 
-        $rv = [];
+        $rv = ['others' => []];
         foreach ($prds as $p) {
             $rv[$p] = ['sum' => 0, 'details' => []];
         }
@@ -99,6 +100,7 @@ class DailyReportController extends Controller
             'REPORT_DAILY_CK_TDR' => 'cktdr',
             'REPORT_DAILY_CK_RIB' => 'ckrib',
             'REPORT_DAILY_CK_BUTT' => 'ckbutt',
+            'REPORT_DAILY_CK_BR_ON' => 'ckbron',
             'REPORT_DAILY_CK_DRUMSTICK' => 'ckdrumstick',
             'REPORT_DAILY_CK_CHOP_ON' => 'ckchopon',
         ];
@@ -244,30 +246,38 @@ class DailyReportController extends Controller
                     continue;
                 }
 
-
-                if (!empty($d->supplier_notes)
-                    && !str_contains(env('REPORT_DAILY_UNATTENTION', ''), $d->prd_code)
-                    && !str_contains($d->prd_name, 'Beef')
-                    && !str_contains($d->prd_name, 'Wagyu')
-                ) {
-                    $rv['others']['details'][] = [
-                        'customer' => $odr->receiving_company_name,
-                        'prd_code' => $d->prd_code,
-                        'prd_name' => $d->prd_name,
-                        'qty' => $d->qty,
-                        'customer_notes' => $d->customer_notes ?? '',
-                        'supplier_notes' => $d->supplier_notes ?? '',
-                    ];
+                if (!array_key_exists($d->prd_name, $rv['others'])) {
+                    $rv['others'][$d->prd_name] = ['sum' => 0, 'details' => []];
                 }
+
+                $rv['others'][$d->prd_name]['sum'] += $d->qty;
+                $rv['others'][$d->prd_name]['details'][] = [
+                    'customer' => $odr->receiving_company_name,
+                    'prd_code' => $d->prd_code,
+                    'prd_name' => $d->prd_name,
+                    'qty' => $d->qty,
+                    'customer_notes' => $d->customer_notes ?? '',
+                    'supplier_notes' => $d->supplier_notes ?? '',
+                ];
 
             }
         }
 
         foreach ($prds as $p) {
+            if ('others' == $p) continue;
+
             $rv[$p]['sum'] = (float)(string)($rv[$p]['sum']);
 
             usort($rv[$p]['details'], fn($x, $y) => strcmp($x['customer'], $y['customer']));
         }
+
+        foreach ($rv['others'] as $pname => $v) {
+            $rv['others'][$pname]['sum'] = (float)(string)($rv['others'][$pname]['sum']);
+
+            usort($rv['others'][$pname]['details'], fn($x, $y) => strcmp($x['customer'], $y['customer']));
+        }
+
+        ksort($rv['others']);
 
         return ['ok' => true, 'data' => $rv];
     }
