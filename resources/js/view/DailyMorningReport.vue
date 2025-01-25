@@ -8,13 +8,11 @@
                     <span class="fw-bold fs-4">Production Plan</span>
                 </div>
                 <div class="col-auto">
-                    <BFormInput id="arrive-at" type="date" v-model="reportDate"/>
+                    <BFormInput id="arrive-at" type="date" v-model="reportDate" />
                 </div>
                 <div class="col-auto">
-                    <BButton variant="outline-primary"
-                             @click="generateReport"
-                             :loading="processing"
-                             :disabled="processing">
+                    <BButton variant="outline-primary" @click="generateReport" :loading="processing"
+                        :disabled="processing">
                         Refresh Data
                     </BButton>
                 </div>
@@ -150,24 +148,37 @@
             </BTableSimple>
         </BModal>
         <BTableSimple striped hover small caption-top bordered v-if="Object.keys(reportData.others).length>0">
-            <caption>Details - Others</caption>
+            <caption>
+                Details - Others
+                <BButton @click="showAll = !showAll" variant="outline-primary">
+                    Show {{ showAll ? 'Available' : 'All' }}
+                </BButton>
+            </caption>
             <BThead>
                 <BTr>
-<!--                    <BTh>Customer</BTh>-->
+                    <!--                    <BTh>Customer</BTh>-->
                     <BTh style="width:50%">Product</BTh>
                     <BTh>Qty</BTh>
-<!--                    <BTh>Supplier Note</BTh>-->
+                    <BTh>Actions</BTh>
                 </BTr>
             </BThead>
             <BTbody>
-                <BTr v-for="(v,k) in reportData.others" @click="showDetailByKV(k, v)">
-                    <BTd>
-                        {{ k }}
-                    </BTd>
-                    <BTd>
-                        {{ v.sum }}
-                    </BTd>
-                </BTr>
+                <template v-for="(v, k) in reportData.others">
+                    <BTr v-if="showAll || !hPrds.includes(k)" @click="showDetailByKV(k, v)">
+                        <BTd>
+                            {{ k }}
+                        </BTd>
+                        <BTd>
+                            {{ v.sum }}
+                        </BTd>
+                        <BTd>
+                            <BButton @click.stop="toggleProduct(k)" variant="outline-primary">
+                                {{ hPrds.includes(k) ? 'Show' : 'Hide' }}
+                            </BButton>
+                        </BTd>
+                    </BTr>
+
+                </template>
             </BTbody>
         </BTableSimple>
     </BCard>
@@ -178,6 +189,7 @@ import {dailyReport} from "../api";
 import {onMounted, ref, shallowRef, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
+import { BButton } from "bootstrap-vue-next";
 
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -187,6 +199,7 @@ const router = useRouter()
 
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 const status = shallowRef(['accepted'])
+const showAll = shallowRef(false)
 
 const porkKV = {
     'Belly R/Off': 'bellyROff',
@@ -490,6 +503,30 @@ const showDetailByKV = function (name, data) {
     modalShow.value = !modalShow.value
 }
 
+const toggleProduct = function(product: string){
+    // const hPrds = getHidenProducts()
+    console.log(product)
+
+    // if(new Set(hPrds.value).has(product)){
+    //     return
+    // }
+
+    const idx = hPrds.value.indexOf(product)
+    if (idx === -1) {
+        hPrds.value.push(product)
+    }else{
+        hPrds.value.splice(idx, 1)
+    }
+
+    localStorage.setItem('dmrHidenPrds', JSON.stringify(hPrds.value))
+}
+
+const getHidenProducts = function(){
+    return JSON.parse(localStorage.getItem('dmrHidenPrds') ?? '[]')
+}
+
+const hPrds = ref([])
+
 watchEffect(() => {
     // so.value.id = route.params.id ?? ''
     //
@@ -508,7 +545,7 @@ watchEffect(() => {
 
 
 onMounted(async function () {
-
+    hPrds.value = getHidenProducts()
 })
 </script>
 
