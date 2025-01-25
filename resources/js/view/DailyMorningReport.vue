@@ -218,7 +218,7 @@ const ckSpecial = {
     '#22 Thigh s/ON': 'na',
     '#28 Thigh s/ON': 'na',
     'Special Br s/ON': 'ckbron',
-    'Butterfly Cut': 'na',
+    'Butterfly Cut': 'ckbrbf',
     '#15 WB s/off': 'ckwboff15',
     'Butt': 'ckbutt',
     'Ribs': 'ckrib',

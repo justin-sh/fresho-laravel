@@ -59,6 +59,7 @@ class DailyReportController extends Controller
             'ckdrumstick',
             'ckchopon',
             'ckwboff15',
+            'ckbrbf',
 
 //            'others'
         ];
@@ -103,6 +104,7 @@ class DailyReportController extends Controller
             'REPORT_DAILY_CK_BR_ON' => 'ckbron',
             'REPORT_DAILY_CK_DRUMSTICK' => 'ckdrumstick',
             'REPORT_DAILY_CK_CHOP_ON' => 'ckchopon',
+            'REPORT_DAILY_CK_BR_BUTTERFLIED' => 'ckbrbf'
         ];
 
         //REPORT_DAILY_PORK_BELLY_RON_BI_EXCLUDED
@@ -141,6 +143,8 @@ class DailyReportController extends Controller
 
 //        Log::info(json_encode($freshoPrdMap));
 
+        $ignore_mkt_cats = ['BEEF', 'ANGUS BEEF', 'DUCK', 'GOAT', 'HOT POT', 'LAMB', 'SEA FOOD', 'SEAFOOD', 'SMALL GOODS', 'WAGYU'];
+
         foreach ($orders as $odr) {
             foreach ($odr->details as $d) {
 
@@ -148,7 +152,7 @@ class DailyReportController extends Controller
 //                Log::debug($d->prd_code . ' -> ' . (array_key_exists($d->prd_code, $freshoPrdMap) ? 'yes' : 'no'));
 //                Log::debug($d->prd_code . ' -> ' . json_encode($freshoPrdMap[$d->prd_code]));
                 if (array_key_exists($d->prd_code, $freshoPrdMap)
-                    && !in_array($freshoPrdMap[$d->prd_code]->mkt_cat, ['PORK', 'CHICKEN'])) {
+                    && in_array($freshoPrdMap[$d->prd_code]->mkt_cat, $ignore_mkt_cats)) {
                     continue;
                 }
 

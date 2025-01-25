@@ -119,7 +119,7 @@ class SyncOrderDetail implements ShouldQueue
             'args' => [
                 'selected_order_ids' => $this->orderIds->all(),
                 'pagination' => true,
-                'supplied_statuses' => ['supplied'],
+                'supplied_statuses' => ['supplied', 'to_pick', 'backorder', 'substituted', 'n/a'],
                 "format" => "CSV"  # PDF CSV
             ]
         ];
