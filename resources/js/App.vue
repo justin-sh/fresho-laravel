@@ -23,9 +23,9 @@
 <!--                        <BNavItem :to="{name:'purchaseOrders'}">-->
 <!--                            Purchase Orders-->
 <!--                        </BNavItem>-->
-<!--                        <BNavItem :to="{name:'products'}">-->
-<!--                            Products-->
-<!--                        </BNavItem>-->
+                        <BNavItem :to="{name:'products'}">
+                            Products
+                        </BNavItem>
                     </BNavbarNav>
 
                     <BNavbarNav>

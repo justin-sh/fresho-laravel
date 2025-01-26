@@ -7,6 +7,7 @@ use App\Models\Warehouse;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class ProductInit extends Command
@@ -42,6 +43,7 @@ class ProductInit extends Command
         $prds = [];
         $pws = [];
         collect($products)->each(function ($prd) use (&$prds, &$pws, $hocWhId) {
+//            Log::info('name=>'. $prd->prd_name . ' qty=>'.$prd->onhand_qty);
             $pid = Uuid::uuid4();
             $prds[] = [
                 'id' => $pid,
@@ -50,12 +52,21 @@ class ProductInit extends Command
                 'cat' => $prd->cat,
                 'comment' => $prd->comment,
             ];
+//            $pws[] = [
+//                'pId' => $pid,
+//                'whId' => $hocWhId,
+//                'qty' => $prd->onhand_qty,
+//                'crat' => Carbon::now(),
+//                'upat' => Carbon::now(),
+//            ];
             $pws[] = [
-                'pId' => $pid,
-                'whId' => $hocWhId,
-                'qty' => $prd->onhand_qty,
-                'crat' => Carbon::now(),
-                'upat' => Carbon::now(),
+                $prd->prd_code,
+                'HoC',
+                $prd->onhand_qty,
+                Carbon::now(),
+                Carbon::now(),
+                $prd->onhand_qty,
+                Carbon::now(),
             ];
         });
 
@@ -67,7 +78,9 @@ class ProductInit extends Command
         // Log::debug($prdIds);
 
         DB::transaction(function () use ($prds, $pws) {
-            $sql = 'insert into product_warehouse(product_id,warehouse_id,onhand_qty,free_qty,created_at,updated_at) values (:pId,:whId,:qty,0,:crat,:upat)';
+            $sql = 'insert into product_warehouse(prd_code,wh_code,onhand_qty,free_qty,created_at,updated_at)'
+                    . ' values (?,?,?,0,?,?)'
+                    . ' ON DUPLICATE KEY UPDATE onhand_qty=?, updated_at=?';
             collect($pws)->each(function ($pw) use ($sql) {
                 DB::insert($sql, $pw);
             });

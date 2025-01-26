@@ -11,11 +11,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('product_warehouse', function (Blueprint $table) {
-            $table->uuid('product_id');
-            $table->uuid('warehouse_id');
+            $table->string('prd_code', 128);
+            $table->string('wh_code', 32);
             $table->integer('onhand_qty')->default(0);
             $table->integer('free_qty')->default(0);
-            $table->primary(['product_id', 'warehouse_id']);
+            $table->primary(['prd_code', 'wh_code']);
             $table->timestamps();
         });
     }

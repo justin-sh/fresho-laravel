@@ -24,6 +24,6 @@ class Warehouse extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class, 'product_warehouse', 'wh_code', 'prd_code', 'code', 'code');
     }
 }
