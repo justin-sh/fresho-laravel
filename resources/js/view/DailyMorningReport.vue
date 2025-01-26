@@ -150,7 +150,7 @@
         <BTableSimple striped hover small caption-top bordered v-if="Object.keys(reportData.others).length>0">
             <caption>
                 Details - Others
-                <BButton @click="showAll = !showAll" variant="outline-primary">
+                <BButton @click="showAll = !showAll" variant="primary">
                     Show {{ showAll ? 'Available' : 'All' }}
                 </BButton>
             </caption>
@@ -159,7 +159,7 @@
                     <!--                    <BTh>Customer</BTh>-->
                     <BTh style="width:50%">Product</BTh>
                     <BTh>Qty</BTh>
-                    <BTh>Actions</BTh>
+                    <BTh style="width:10%" class="text-center">Actions</BTh>
                 </BTr>
             </BThead>
             <BTbody>
@@ -171,10 +171,17 @@
                         <BTd>
                             {{ v.sum }}
                         </BTd>
-                        <BTd>
-                            <BButton @click.stop="toggleProduct(k)" variant="outline-primary">
-                                {{ hPrds.includes(k) ? 'Show' : 'Hide' }}
-                            </BButton>
+                        <BTd class="text-center">
+                            <template v-if="hPrds.includes(k)">
+                                <BButton @click.stop="toggleProduct(k)" variant="outline-info">
+                                    Show
+                                </BButton>
+                            </template>
+                            <template v-else>
+                                <BButton @click.stop="toggleProduct(k)" variant="outline-danger">
+                                    Hide
+                                </BButton>
+                            </template>
                         </BTd>
                     </BTr>
 
