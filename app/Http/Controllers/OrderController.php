@@ -21,18 +21,22 @@ class OrderController extends Controller
     public function index(Request $request): JsonResource
     {
         $delivery_date = $request->str('delivery_date', '')->value();
+        $delivery_date2 = $request->str('delivery_date2', '')->value();
         $customer = $request->str('customer', '')->value();
         $product = $request->str('product', '')->value();
         $status = $request->input('status');
         $credit = $request->boolean('credit');
 
-        if (empty($delivery_date . $customer . $product)) {
+        if (empty($delivery_date . $delivery_date2 . $customer . $product)) {
             return new OrdersResource(collect());
         }
 
         $orders = Order::query()->with('details')
             ->when($delivery_date, function (Builder $query, string $delivery_date) {
-                $query->where('delivery_date', $delivery_date);
+                $query->where('delivery_date', '>=', $delivery_date);
+            })
+            ->when($delivery_date2, function (Builder $query, string $delivery_date) {
+                $query->where('delivery_date', '<=', $delivery_date);
             })
             ->when($customer, function (Builder $query, string $customer) {
                 $query->whereLike('receiving_company_name', '%' . $customer . '%');
@@ -45,6 +49,8 @@ class OrderController extends Controller
             ->when($status, function (Builder $query, array $status) {
                 $query->whereIn('state', $status);
             })
+            ->orderByDesc('delivery_date')
+            ->orderBy('receiving_company_name')
             ->limit(300)
             ->get();
 

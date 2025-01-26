@@ -8,6 +8,7 @@ export interface User {
 
 export interface OrderFilter {
     delivery_date: string
+    delivery_date2: string
     customer: string
     product: string
     status: string[]

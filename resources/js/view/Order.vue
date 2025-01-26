@@ -2,11 +2,18 @@
     <BCard title="Filters" class="mb-2 filters">
         <BForm inline>
             <div class="row">
-                <div class="col-3">
+                <div class="col-5">
                     <label for="datepicker">Delivery date</label>
-                    <BFormInput type="date" id="datepicker" class="col-3" v-model="deliveryDate"
-                                :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
-                    </BFormInput>
+                    <div>
+                        <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="deliveryDate"
+                                    :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                        </BFormInput>
+                        ~
+                        <BFormInput type="date" id="datepicker2" class="col-1 d-inline" v-model="deliveryDate2"
+                                    :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                        </BFormInput>
+                        <BButton variant="success" size="sm" @click="setToday()" class="ms-2">Today</BButton>
+                    </div>
                 </div>
                 <div class="ml-3 align-content-center col">
                     <label for="customer" class="justify-content-start">Customer</label>
@@ -87,7 +94,12 @@
                          @update:model-value="goTableHead" aria-controls="ordertable"></BPagination>
         </template>
 
-        <BTable id="ordertable" striped hover :current-page="currentPage" :per-page="page_size" :items="orders"
+        <BTable id="ordertable" striped hover
+                :multisort="true"
+                :current-page="currentPage"
+                :sort-by="sortBy"
+                :per-page="page_size"
+                :items="orders"
                 :fields="fields">
             <template #cell(orderNo)="row">
                 <a :href="'https://app.fresho.com/supplier/orders/' + row.item.id" target="_blank">
@@ -127,6 +139,7 @@ const router = useRouter()
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const deliveryDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
+const deliveryDate2 = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
 const customer = shallowRef('')
 const product = shallowRef('')
 const status = shallowRef(['submitted', 'accepted', 'invoiced', 'paid'])
@@ -160,6 +173,7 @@ const page_size_options = [
     {item: 50, name: '50'},
     {item: 999, name: 'all'}
 ]
+const sortBy = ref([{key: 'delivery_date_md', order: 'desc'}, {key: 'customer', order: 'asc'}])
 
 
 let abortController: AbortController | null = null;
@@ -178,6 +192,7 @@ const loading_data = async () => {
 
         const data = (await getOrdersWithFilters({
                 delivery_date: deliveryDate.value,
+                delivery_date2: deliveryDate2.value,
                 customer: customer.value,
                 product: product.value,
                 status: status.value,
@@ -224,6 +239,11 @@ const syncDeliveryProofs = async () => {
     await loading_data()
 }
 
+const setToday = function () {
+    deliveryDate.value = formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd")
+    deliveryDate2.value = formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd")
+}
+
 const goDeptRepot = () => {
     router.push({name: 'dept-report'})
 }
@@ -241,19 +261,19 @@ onBeforeRouteLeave((to, before) => {
     }
 })
 
-watch([deliveryDate, customer, product, status, credit, runs], async ([deliveryDate_new, customer_new, product_new, status_new, credit_new, runs_new],
-                                                                      [deliveryDate2, customer2, product2, status2, credit2, runs_old]) => {
+watch([deliveryDate, deliveryDate2, customer, product, status, credit, runs], async ([deliveryDate_new, deliveryDate_new2, customer_new, product_new, status_new, credit_new, runs_new],
+                                                                                     [deliveryDate2, deliveryDate22, customer2, product2, status2, credit2, runs_old]) => {
     runs_old = runs_old || []
     if (runs_new.toString() !== runs_old.toString()) {
         const _s = new Date().getTime()
         let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
-        console.log("filter data in js:" + (new Date().getTime() - _s))
+        // console.log("filter data in js:" + (new Date().getTime() - _s))
         orders.value = x
-        setTimeout(() => {
-            console.log("update page:" + (new Date().getTime() - _s))
-        }, 0);
+        // setTimeout(() => {
+        //     console.log("update page:" + (new Date().getTime() - _s))
+        // }, 0);
     } else {
-        console.log('loading data')
+        // console.log('loading data')
         await loading_data()
     }
 }, {immediate: true})
@@ -270,8 +290,8 @@ tbody tr {
     cursor: pointer;
 }
 
-.text-right {
-    text-align: right;
+#datepicker, #datepicker2 {
+    width: 40%;
 }
 
 :deep(.card-header) {
