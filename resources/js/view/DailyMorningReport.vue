@@ -33,48 +33,48 @@
                     </BThead>
 
                     <BTbody>
-                        <BTr class="align-middle" id="order-Belly" @click="showDetail('belly', 'Belly')">
+                        <BTr class="align-middle" id="order-Belly">
                             <BTd :rowspan="Object.keys(porkKV).length + 1" class="text-center fw-bolder fsn">Pork
                             </BTd>
-                            <BTd class="text-start">Belly</BTd>
-                            <BTd>{{ reportData.belly.sum }}</BTd>
+                            <BTd class="text-start" @click="showDetail('belly', 'Belly')">Belly</BTd>
+                            <BTd @click="showDetail('belly', 'Belly')">{{ reportData.belly.sum }}</BTd>
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData.belly.sum"></BFormInput>
                             </BTd>
-                            <BTd>{{ stockData.belly.sum - reportData.belly.sum }}</BTd>
+                            <BTd @click="showDetail('belly', 'Belly')">{{ stockData.belly.sum - reportData.belly.sum }}</BTd>
                         </BTr>
 
-                        <BTr class="align-middle" v-for="(v,k) in porkKV" @click="showDetail(v, k)">
-                            <BTd class="text-start">{{ k }}</BTd>
-                            <BTd>{{ reportData[v].sum }}</BTd>
+                        <BTr class="align-middle" v-for="(v,k) in porkKV">
+                            <BTd class="text-start" @click="showDetail(v, k)">{{ k }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ reportData[v].sum }}</BTd>
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData[v].sum"></BFormInput>
                             </BTd>
-                            <BTd>{{ stockData[v].sum - reportData[v].sum }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ stockData[v].sum - reportData[v].sum }}</BTd>
                         </BTr>
 
                         <BTr>
                             <BTd colspan="11"></BTd>
                         </BTr>
-                        <BTr class="align-middle" @click="showDetail('ckbr', 'Breast')">
+                        <BTr class="align-middle">
                             <BTd :rowspan="Object.keys(ckKV).length + 1" class="align-middle text-center fw-bolder fsn">
                                 CK
                             </BTd>
-                            <BTd class="text-start">Breast</BTd>
-                            <BTd>{{ reportData.ckbr.sum }}</BTd>
+                            <BTd class="text-start" @click="showDetail('ckbr', 'Breast')">Breast</BTd>
+                            <BTd @click="showDetail('ckbr', 'Breast')">{{ reportData.ckbr.sum }}</BTd>
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData.ckbr.sum"></BFormInput>
                             </BTd>
-                            <BTd>{{ stockData.ckbr.sum - reportData.ckbr.sum }}</BTd>
+                            <BTd @click="showDetail('ckbr', 'Breast')">{{ stockData.ckbr.sum - reportData.ckbr.sum }}</BTd>
                         </BTr>
 
-                        <BTr class="align-middle" v-for="(v,k) in ckKV" @click="showDetail(v, k)">
-                            <BTd class="text-start">{{ k }}</BTd>
-                            <BTd>{{ reportData[v].sum }}</BTd>
+                        <BTr class="align-middle" v-for="(v,k) in ckKV">
+                            <BTd class="text-start" @click="showDetail(v, k)">{{ k }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ reportData[v].sum }}</BTd>
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData[v].sum"></BFormInput>
                             </BTd>
-                            <BTd>{{ stockData[v].sum - reportData[v].sum }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ stockData[v].sum - reportData[v].sum }}</BTd>
                         </BTr>
                     </BTbody>
                 </BTableSimple>
@@ -213,6 +213,7 @@ const porkKV = {
     'Belly B/IN': 'bellyBoneIn',
     'BBQ': 'bbq',
     'Ribs': 'pribs',
+    'Leg B/L': 'plegmeat',
     'Neck': 'pneck',
 }
 
@@ -225,9 +226,11 @@ const porkSpecial = {
     'EX-Meaty Leg Bone': 'pexmeatylegbone',
     'Meaty Neck Bone': 'pmeatyneckbone',
     'EX-Meaty Neck Bone': 'pexmeatyneckbone',
+    'Loin Rind OFF': 'ploinrindoff',
     'Loin Rind ON': 'ploinrindon',
     'Shoulder Rind ON': 'pshrindon',
     'Middle': 'pmiddle',
+    'Fat': 'pfat',
 }
 
 const ckSpecial = {
@@ -253,7 +256,7 @@ const ckKV = {
     'Thigh s/off': 'ckthoff',
     'Thigh s/ON': 'ckthon',
     'Legette': 'cklegette',
-    'Bone IN': 'ckbi',
+    // 'Bone IN': 'ckbi',
     'Wings': 'ckwings',
     'Tdr': 'cktdr',
     'Mid-Wingettes': 'ckwingette',
@@ -277,6 +280,10 @@ const reportData = shallowRef({
         "details": []
     },
     "pribs": {
+        "sum": 0,
+        "details": []
+    },
+    "plegmeat": {
         "sum": 0,
         "details": []
     },
@@ -383,6 +390,10 @@ const stockData = ref({
         "details": []
     },
     "pribs": {
+        "sum": 0,
+        "details": []
+    },
+    "plegmeat": {
         "sum": 0,
         "details": []
     },
