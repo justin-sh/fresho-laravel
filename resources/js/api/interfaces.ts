@@ -16,9 +16,10 @@ export interface OrderFilter {
 }
 
 export interface ProductFilter {
+    code?: string
     name?: string
     cat?: string[]
-    wh?: string[]
+    // wh?: string[]
     hasStock: boolean
 }
 

@@ -18,18 +18,20 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $whs = [];
+//        $whs = [];
 
-        $loadedWhs = $this->whenLoaded('warehouses');
-        collect($loadedWhs)->each(function ($w) use (&$whs) {
-            $whs[$w->code] = $w->pivot->onhand_qty;
-        });
+//        $loadedWhs = $this->whenLoaded('warehouses');
+//        collect($loadedWhs)->each(function ($w) use (&$whs) {
+//            $whs[$w->code] = $w->pivot->onhand_qty;
+//        });
 
         return [
             'id' => $this->resource->id,
-            'cat' => $this->resource->cat,
+            'code' => $this->resource->code,
+            'cat' => $this->resource->mkt_cat,
             'name' => $this->resource->name,
-            $this->merge($whs),
+            'qty_type' => $this->resource->qty_type,
+//            $this->merge($whs),
         ];
     }
 }

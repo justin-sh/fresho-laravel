@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
+use App\Models\FreshoProduct;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -16,28 +17,31 @@ class ProductController extends Controller
     public function index(Request $request): JsonResource
     {
         $cat = $request->input('cat', []);
-        $wh = $request->input('wh', []);
+//        $wh = $request->input('wh', []);
         $name = $request->str('name', '')->value();
         $hasStock = $request->boolean('hasStock', false);
 
-        $products = Product::query()
-            ->when($cat, function (Builder $query, $cat) {
-                $query->whereIn('cat', $cat);
-            })
-            ->when($name, function (Builder $query, $name) {
-                $query->whereLike('name', '%' . $name . '%');
-            })
-            ->whereRelation('warehouses', function (Builder $query) use ($wh, $hasStock) {
-                if ($wh) {
-                    $query->whereIn('warehouse_id', $wh);
-                }
-                if ($hasStock) {
-                    $query->where('onhand_qty', '>', 0);
-                }
-            })
-            ->with('warehouses')
-            ->orderBy('cat')
-            ->orderBy('name')
+//        $products = Product::query()
+//            ->when($cat, function (Builder $query, $cat) {
+//                $query->whereIn('cat', $cat);
+//            })
+//            ->when($name, function (Builder $query, $name) {
+//                $query->whereLike('name', '%' . $name . '%');
+//            })
+//            ->whereRelation('warehouses', function (Builder $query) use ( $hasStock) {
+////                if ($wh) {
+////                    $query->whereIn('warehouse_id', $wh);
+////                }
+//                if ($hasStock) {
+//                    $query->where('onhand_qty', '>', 0);
+//                }
+//            })
+//            ->with('warehouses')
+//            ->orderBy('cat')
+//            ->orderBy('name')
+//            ->get();
+
+        $products = FreshoProduct::query()
             ->get();
 
         return ProductResource::collection($products);

@@ -2,43 +2,50 @@
     <BCard title="Filters" class="mb-2 filters">
         <BForm inline>
             <div class="d-flex flex-row">
-                <div class="col">
-                    <label>Warehouse</label>
-                    <div class="d-flex">
-                        <BFormCheckboxGroup v-model="wh">
-                            <BFormCheckbox switch :value="w.id" v-for="w in warehouses">
-                                {{ w.name }}
-                            </BFormCheckbox>
-                        </BFormCheckboxGroup>
-                    </div>
+                <div class="col-2">
+                    <label>Code</label>
+                    <BFormInput id="code" size="md" v-model="code"></BFormInput>
+<!--                    <div class="d-flex">-->
+<!--                        <BFormCheckboxGroup v-model="wh">-->
+<!--                            <BFormCheckbox switch :value="w.id" v-for="w in warehouses">-->
+<!--                                {{ w.name }}-->
+<!--                            </BFormCheckbox>-->
+<!--                        </BFormCheckboxGroup>-->
+<!--                    </div>-->
                 </div>
-                <div class="col ms-3">
+                <div class="col-8 ms-3">
                     <label for="customer" class="justify-content-start">Product Name</label>
                     <BFormInput id="name" size="md" v-model="name"></BFormInput>
                 </div>
+<!--                <div class="col ms-3">-->
+<!--                    <label>Stock</label>-->
+<!--                    <div class="d-flex">-->
+<!--                        <BFormCheckbox switch v-model="hasStock">-->
+<!--                            Has Stock-->
+<!--                        </BFormCheckbox>-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
             <div class="row mt-2">
-                <div class="col-8">
+                <div class="col">
                     <label>Category</label>
                     <div class="d-flex">
                         <BFormCheckboxGroup v-model="cat">
-                            <BFormCheckbox value="BEEF" switch>BEEF</BFormCheckbox>
-                            <BFormCheckbox value="LAMB" switch>LAMB</BFormCheckbox>
-                            <BFormCheckbox value="PORK" switch>PORK</BFormCheckbox>
-                            <BFormCheckbox value="CHICKEN" switch>CHICKEN</BFormCheckbox>
-                            <BFormCheckbox value="DUCK" switch>DUCK</BFormCheckbox>
-                            <BFormCheckbox value="OTHERS" switch>OTHERS</BFormCheckbox>
+                            <BFormCheckbox value="ANGUS BEEF" switch>ANGUS</BFormCheckbox>
+                            <BFormCheckbox value="BEEF" switch>B</BFormCheckbox>
+                            <BFormCheckbox value="CHICKEN" switch>CK</BFormCheckbox>
+                            <BFormCheckbox value="DUCK" switch>D</BFormCheckbox>
+                            <BFormCheckbox value="GAME" switch>GAME</BFormCheckbox>
+                            <BFormCheckbox value="GOAT" switch>GOAT</BFormCheckbox>
+                            <BFormCheckbox value="HOT POT" switch>HOTPOT</BFormCheckbox>
+                            <BFormCheckbox value="LAMB" switch>L</BFormCheckbox>
+                            <BFormCheckbox value="PORK" switch>P</BFormCheckbox>
+                            <BFormCheckbox value="SEAFOOD" switch>SEAFOOD</BFormCheckbox>
+                            <BFormCheckbox value="WAGYU" switch>WAGYU</BFormCheckbox>
                         </BFormCheckboxGroup>
                     </div>
                 </div>
-                <div class="col-auto">
-                    <label>Stock</label>
-                    <div class="d-flex">
-                        <BFormCheckbox switch v-model="hasStock">
-                            Has Stock
-                        </BFormCheckbox>
-                    </div>
-                </div>
+
             </div>
         </BForm>
     </BCard>
@@ -101,6 +108,7 @@ import {useRouter} from "vue-router";
 const router = useRouter()
 
 const name = shallowRef('')
+const code = shallowRef('')
 const product = shallowRef('')
 const cat = shallowRef()
 const wh = shallowRef<string[]>([])
@@ -112,8 +120,9 @@ let products_backup = []
 const fields_base = [
     {key: 'rowNo', label: '#'},
     {key: 'cat', label: 'Category', sortable: true},
+    {key: 'code', label: 'Code', sortable: true},
     {key: 'name', label: 'Name', sortable: true},
-    {key: 'comment', label: 'Comment'},
+    {key: 'qty_type', label: 'Qyt Type'},
 ]
 const fields = shallowRef([])
 
@@ -144,7 +153,7 @@ const loading_data = async () => {
         abortController = new AbortController()
 
         const data = (await getProductsWithFilters(
-            {wh: wh.value, name: name.value, cat: cat.value, hasStock: hasStock.value},
+            {name: name.value, cat: cat.value, hasStock: hasStock.value},
             {signal: abortController.signal}
         )).data.data
 
@@ -161,12 +170,12 @@ const loading_data = async () => {
 }
 
 onMounted(async () => {
-    const data = (await getWarehousesWithFilters()).data.data
-    warehouses.value = data
+    // const data = (await getWarehousesWithFilters()).data.data
+    // warehouses.value = data
 
-    fields_base.push(...data.map(function (x) {
-        return {key: x.code, sortable: true}
-    }))
+    // fields_base.push(...data.map(function (x) {
+    //     return {key: x.code, sortable: true}
+    // }))
 
     fields.value = [...fields_base]
 
