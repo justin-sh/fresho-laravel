@@ -50,11 +50,21 @@ class StocktakeDaily extends Command
 
         $fileMd5Hash = File::hash($file);
 
+        $existStock = DailyStock::query()
+            ->where('stock_date', $stockDate->toDateString())
+            ->firstOrNew([
+                'stock_date' => $stockDate->toDateString(),
+                'filename' => File::basename($file),
+                'hash' => $fileMd5Hash,
+            ]);
+
+        if (!empty($existStock->id) && strcmp($fileMd5Hash, $existStock->hash) === 0) {
+            return;
+        }
+
 //        Log::info('parsing stock file:' . $file);
 
         $stockArrays = Excel::toArray(new StockImporter(), $file);
-//        $this->info(count($stockArrays));
-//        $this->info(json_encode($stockArrays[0]));
         $stock = [];
         $prefix = '';
         foreach ($stockArrays[0] as $array) {
@@ -67,22 +77,7 @@ class StocktakeDaily extends Command
             $stock[$prefix . '-' . $array[0]] = $array[1];
         }
 
-//        $this->info(json_encode($stock));
-
-        DailyStock::create([
-            'stock_date' => $stockDate->toDate(),
-            'stock' => $stock,
-            'filename' => File::basename($file),
-            'hash' => $fileMd5Hash,
-        ]);
-
-//        $this->info(json_encode([
-//            'stock_date'=>$stockDate,
-//            'stock'=>$stock,
-//            'filename'=>File::basename($file),
-//            'hash'=>$fileMd5Hash,
-//        ]));
-
-//        Log::info("");
+        $existStock->stock = $stock;
+        $existStock->save();
     }
 }
