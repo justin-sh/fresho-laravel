@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DailyStock;
 use App\Models\FreshoProduct;
 use App\Models\Order;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class DailyReportController extends Controller
 {
@@ -289,6 +290,15 @@ class DailyReportController extends Controller
 
         ksort($rv['others']);
 
-        return ['ok' => true, 'data' => $rv];
+        // get stock of previous day
+        $rd = Carbon::create($report_date)->subDay();
+        if ($rd->isSunday()) {
+            $rd->subDay();
+        }
+
+//        Log::info('prev day:' . $rd->toDateString());
+        $prevDayStock = DailyStock::query()->where('stock_date', $rd->toDateString())->first();
+
+        return ['ok' => true, 'data' => $rv, 'dailyStock' => $prevDayStock?->stock ?? []];
     }
 }
