@@ -39,18 +39,20 @@
                             <BTd class="text-start" @click="showDetail('belly', 'Belly')">Belly</BTd>
                             <BTd @click="showDetail('belly', 'Belly')">{{ reportData.belly.sum }}</BTd>
                             <BTd>
-                                <BFormInput size="sm" type="number" v-model="stockData.belly.sum"></BFormInput>
+                                <BFormInput size="sm" type="number" v-model="stockData['belly']"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail('belly', 'Belly')">{{ stockData.belly.sum - reportData.belly.sum }}</BTd>
+                            <BTd @click="showDetail('belly', 'Belly')">
+                                {{ get2Decimal(stockData['belly'] - reportData.belly.sum ) }}
+                            </BTd>
                         </BTr>
 
                         <BTr class="align-middle" v-for="(v,k) in porkKV">
                             <BTd class="text-start" @click="showDetail(v, k)">{{ k }}</BTd>
                             <BTd @click="showDetail(v, k)">{{ reportData[v].sum }}</BTd>
                             <BTd>
-                                <BFormInput size="sm" type="number" v-model="stockData[v].sum"></BFormInput>
+                                <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail(v, k)">{{ stockData[v].sum - reportData[v].sum }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ get2Decimal(stockData[v] - reportData[v].sum) }}</BTd>
                         </BTr>
 
                         <BTr>
@@ -63,18 +65,18 @@
                             <BTd class="text-start" @click="showDetail('ckbr', 'Breast')">Breast</BTd>
                             <BTd @click="showDetail('ckbr', 'Breast')">{{ reportData.ckbr.sum }}</BTd>
                             <BTd>
-                                <BFormInput size="sm" type="number" v-model="stockData.ckbr.sum"></BFormInput>
+                                <BFormInput size="sm" type="number" v-model="stockData.ckbr"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail('ckbr', 'Breast')">{{ stockData.ckbr.sum - reportData.ckbr.sum }}</BTd>
+                            <BTd @click="showDetail('ckbr', 'Breast')">{{ get2Decimal(stockData.ckbr - reportData.ckbr.sum) }}</BTd>
                         </BTr>
 
                         <BTr class="align-middle" v-for="(v,k) in ckKV">
                             <BTd class="text-start" @click="showDetail(v, k)">{{ k }}</BTd>
                             <BTd @click="showDetail(v, k)">{{ reportData[v].sum }}</BTd>
                             <BTd>
-                                <BFormInput size="sm" type="number" v-model="stockData[v].sum"></BFormInput>
+                                <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail(v, k)">{{ stockData[v].sum - reportData[v].sum }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ get2Decimal(stockData[v] - reportData[v].sum) }}</BTd>
                         </BTr>
                     </BTbody>
                 </BTableSimple>
@@ -262,7 +264,7 @@ const ckKV = {
     'Mid-Wingettes': 'ckwingette',
 }
 
-const reportData = shallowRef({
+const reportData = ref({
     "belly": {
         "sum": 0,
         "details": []
@@ -373,110 +375,22 @@ const reportData = shallowRef({
 
 const zero = ref(0)
 const stockData = ref({
-    "belly": {
-        "sum": 0,
-        "details": []
-    },
-    "bellyROff": {
-        "sum": 0,
-        "details": []
-    },
-    "bellyBoneIn": {
-        "sum": 0,
-        "details": []
-    },
-    "bbq": {
-        "sum": 0,
-        "details": []
-    },
-    "pribs": {
-        "sum": 0,
-        "details": []
-    },
-    "plegmeat": {
-        "sum": 0,
-        "details": []
-    },
-    "pneck": {
-        "sum": 0,
-        "details": []
-    },
-    "pmeatyribs": {
-        "sum": 0,
-        "details": []
-    },
-    "pexmeatyribs": {
-        "sum": 0,
-        "details": []
-    },
-    "pfrzribs": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbr": {
-        "sum": 0,
-        "details": []
-    },
-    "cksoff": {
-        "sum": 0,
-        "details": []
-    },
-    "ckson": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbi": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthoff": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthoff16": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthoff22": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthoff28": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthon": {
-        "sum": 0,
-        "details": []
-    },
-    "ckthon16": {
-        "sum": 0,
-        "details": []
-    },
-    "cklegette": {
-        "sum": 0,
-        "details": []
-    },
-    "ckwings": {
-        "sum": 0,
-        "details": []
-    },
-    "ckwingette": {
-        "sum": 0,
-        "details": []
-    },
-    "cktdr": {
-        "sum": 0,
-        "details": []
-    },
-    "ckrib": {
-        "sum": 0,
-        "details": []
-    },
-    "ckbutt": {
-        "sum": 0,
-        "details": []
-    }
+    "belly": 0,
+    "bellyROff": 0,
+    "bellyBoneIn": 0,
+    "bbq": 0,
+    "plegmeat": 0,
+    "pribs": 0,
+    "pneck": 0,
+    "ckbr": 0,
+    "cksoff": 0,
+    "ckson": 0,
+    "ckthoff": 0,
+    "ckthon": 0,
+    "cklegette": 0,
+    "ckwings": 0,
+    "ckwingette": 0,
+    "cktdr": 0
 })
 const processing = shallowRef(false)
 
@@ -488,6 +402,7 @@ const generateReport = async function () {
     const rv = (await dailyReport(reportDate.value)).data
     // console.log(rv)
     reportData.value = rv.data
+    stockData.value = rv.dailyStock
     processing.value = false
 }
 
@@ -541,6 +456,10 @@ const toggleProduct = function(product: string){
 
 const getHidenProducts = function(){
     return JSON.parse(localStorage.getItem('dmrHidenPrds') ?? '[]')
+}
+
+const get2Decimal = function (num){
+    return Math.round((num + Number.EPSILON) * 100) / 100
 }
 
 const hPrds = ref([])

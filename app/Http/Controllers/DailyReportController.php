@@ -297,8 +297,37 @@ class DailyReportController extends Controller
         }
 
 //        Log::info('prev day:' . $rd->toDateString());
-        $prevDayStock = DailyStock::query()->where('stock_date', $rd->toDateString())->first();
+        $prevDayStock = DailyStock::query()->where('stock_date', $rd->toDateString())->first()?->stock ?? [];
+        $dailyStockKV = [
+            'belly' => 'Pork-Belly Rind On',
+            'bellyROff' => 'Pork-Belly Rind Off',
+            'bellyBoneIn' => 'NA',
+            'bbq' => 'Pork-BBQ',
+            'plegmeat' => 'Pork-Leg Rind Off',
+            'pribs' => 'NA',
+            'pneck' => 'Pork-Necks',
 
-        return ['ok' => true, 'data' => $rv, 'dailyStock' => $prevDayStock?->stock ?? []];
+            'ckbr' => 'Chicken-Breast',
+            'cksoff' => 'Chicken-Maryland Fillet Off',
+            'ckson' => 'Chicken-Maryland Fillet ON',
+            'ckthoff' => 'Chicken-Thing Skin Off',
+            'ckthon' => 'Chicken-Thing Skin On',
+            'cklegette' => 'Chicken-Legettes',
+            'ckwings' => 'Chicken-Wings',
+            'ckwingette' => 'NA',
+            'cktdr' => 'Chicken-Tenderloin',
+        ];
+
+        $dailyStock = [];
+        foreach ($dailyStockKV as $k=>$v){
+            if(key_exists($v, $prevDayStock)){
+                $dailyStock[$k] = $prevDayStock[$v];
+            }else{
+                $dailyStock[$k] = 0;
+            }
+        }
+
+
+        return ['ok' => true, 'data' => $rv, 'dailyStock' => $dailyStock];
     }
 }
