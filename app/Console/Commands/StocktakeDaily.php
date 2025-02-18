@@ -43,9 +43,12 @@ class StocktakeDaily extends Command
         $path = env('DAILY_STOCK_PATH');
         $file = $path . '/' . $stockDate->format('Ymd') . ' Stock check.xlsx';
         if (!File::isFile($file)) {
-            Log::warning('stock file does not exists!' . $file);
-            $this->warn('stock file does not exists!' . $file);
-            return;
+            $file = $path . '/' . $stockDate->format('Ymd') . '+Stock+check.xlsx';
+            if (!File::isFile($file)) {
+                Log::warning('stock file does not exists!' . $file);
+                $this->warn('stock file does not exists!' . $file);
+                return;
+            }
         }
 
         $fileMd5Hash = File::hash($file);
