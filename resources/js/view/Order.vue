@@ -261,26 +261,36 @@ onBeforeRouteLeave((to, before) => {
     }
 })
 
-watch([deliveryDate, deliveryDate2, customer, product, status, credit, runs], async ([deliveryDate_new, deliveryDate_new2, customer_new, product_new, status_new, credit_new, runs_new],
-                                                                                     [deliveryDate2, deliveryDate22, customer2, product2, status2, credit2, runs_old]) => {
-    runs_old = runs_old || []
-    if (runs_new.toString() !== runs_old.toString()) {
-        const _s = new Date().getTime()
-        let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
-        // console.log("filter data in js:" + (new Date().getTime() - _s))
-        orders.value = x
-        // setTimeout(() => {
-        //     console.log("update page:" + (new Date().getTime() - _s))
-        // }, 0);
-    } else {
-        // console.log('loading data')
-        await loading_data()
-    }
-}, {immediate: true})
+watch([deliveryDate, deliveryDate2, customer, product, status, credit, runs],
+    async ([deliveryDate_new, deliveryDate2_new, customer_new, product_new, status_new, credit_new, runs_new],
+           [deliveryDate_old, deliveryDate2_old, customer_old, product_old, status_old, credit_old, runs_old]) => {
+
+        // console.log(`deliveryDate ${deliveryDate_old}=>${deliveryDate_new}`)
+        // console.log(`deliveryDate2 ${deliveryDate2_old}=>${deliveryDate2_new}`)
+
+        if (deliveryDate_old && deliveryDate_old != deliveryDate_new && (deliveryDate?.value > deliveryDate2?.value)) {
+            deliveryDate2.value = deliveryDate.value
+        } else if (deliveryDate2_old && deliveryDate2_old != deliveryDate2_new && (deliveryDate2_new < deliveryDate_new)) {
+            deliveryDate.value = deliveryDate2.value
+        }
+        runs_old = runs_old || []
+        if (runs_new.toString() !== runs_old.toString()) {
+            const _s = new Date().getTime()
+            let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
+            // console.log("filter data in js:" + (new Date().getTime() - _s))
+            orders.value = x
+            // setTimeout(() => {
+            //     console.log("update page:" + (new Date().getTime() - _s))
+            // }, 0);
+        } else {
+            // console.log('loading data')
+            await loading_data()
+        }
+    }, {immediate: true})
 
 const tableHeaderRefEl = ref<HTMLElement | null>(null)
 const goTableHead = (page: number) => {
-    console.log(page)
+    // console.log(page)
     tableHeaderRefEl.value?.scrollIntoView({behavior: 'smooth'})
 }
 
