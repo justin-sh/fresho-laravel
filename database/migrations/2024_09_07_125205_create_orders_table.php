@@ -46,7 +46,7 @@ return new class extends Migration {
             $table->string('prd_code', 32);
             $table->string('prd_name', 255);
             $table->float('qty');
-            $table->string('qty_type', 32);
+            $table->string('qty_type', 255);
             $table->string('group', 32);
             $table->enum('status', array_column(OrderPrdState::cases(), 'value'));
             $table->string('customer_notes', 255);
