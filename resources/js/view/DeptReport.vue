@@ -76,7 +76,7 @@
                 </BCol>
                 <BCol sm="11">
                     <BFormCheckboxGroup v-model="prdStatus">
-                        <BFormCheckbox value="topicked" switch>To Pick</BFormCheckbox>
+                        <BFormCheckbox value="to_pick" switch>To Pick</BFormCheckbox>
                         <BFormCheckbox value="supplied" switch>Supplied</BFormCheckbox>
                         <BFormCheckbox value="na" switch>N/A</BFormCheckbox>
                         <BFormCheckbox value="backorder" switch>Back Order</BFormCheckbox>
@@ -117,11 +117,11 @@ const router = useRouter()
 
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 
-const status = shallowRef(['accepted'])
-const orderRuns = ref(['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA']);
-const orderRunLoop = ref(['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
+const status = shallowRef(['accepted', 'submitted'])
+const orderRuns = ref(['EDN', 'ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA']);
+const orderRunLoop = ref(['EDN', 'ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
 const prdGroups = shallowRef(['Band Saw', 'Boning', 'Frozen Products', 'Hot Pot', 'Slicing Beef', 'Slicing Chicken'])
-const prdStatus = shallowRef(['topicked', 'supplied'])
+const prdStatus = shallowRef(['to_pick', 'supplied'])
 const reportType = shallowRef('dept-report');
 
 const processing = shallowRef(false)
