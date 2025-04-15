@@ -118,8 +118,8 @@ const router = useRouter()
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 
 const status = shallowRef(['accepted', 'submitted'])
-const orderRuns = ref(['EDN', 'ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA']);
-const orderRunLoop = ref(['EDN', 'ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
+const orderRuns = ref(['EDN', 'EDS', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA']);
+const orderRunLoop = ref(['EDN', 'EDS', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA'])
 const prdGroups = shallowRef(['Band Saw', 'Boning', 'Frozen Products', 'Hot Pot', 'Slicing Beef', 'Slicing Chicken'])
 const prdStatus = shallowRef(['to_pick', 'supplied'])
 const reportType = shallowRef('dept-report');

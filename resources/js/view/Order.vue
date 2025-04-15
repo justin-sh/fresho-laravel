@@ -144,7 +144,7 @@ const customer = shallowRef('')
 const product = shallowRef('')
 const status = shallowRef(['submitted', 'accepted', 'invoiced', 'paid'])
 const credit = shallowRef('no')
-const order_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR']
+const order_run = ['EDN', 'EDS', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR']
 const runs = shallowRef([])
 
 const orders = shallowRef([])

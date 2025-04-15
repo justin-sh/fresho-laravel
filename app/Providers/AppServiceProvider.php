@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventSilentlyDiscardingAttributes($this->app->isLocal());
 
-        Http::globalOptions(['timeout'=>60]);
+        Http::globalOptions(['timeout'=>60, 'connect_timeout'=>30]);
 
         Http::globalRequestMiddleware(function (RequestInterface $request) {
 //            Log::debug(gettype($request));

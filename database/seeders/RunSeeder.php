@@ -46,8 +46,13 @@ class RunSeeder extends Seeder
             ],
             [
                 "id" => "6c99c449773845d984e51416c0f174c6",
-                "code" => "ED",
-                "name" => "Early Delivery",
+                "code" => "EDS",
+                "name" => "ED South",
+            ],
+            [
+                "id" => "7be4d5d4-c4ae-4064-90a7-7401d3b90c35",
+                "code" => "EDN",
+                "name" => "ED North",
             ],
             [
                 "id" => "6de261d9ab7b41bbaf91aada8be3040e",
