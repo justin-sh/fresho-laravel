@@ -156,11 +156,11 @@ watchEffect(() => {
     const curDate = parse(reportDate.value, 'yyyy-MM-dd', new Date())
     const tueOrThur = isTuesday(curDate) || isThursday(curDate);
     if(tueOrThur){
-        orderRunLoop.value[3] = 'CT'
-        orderRunLoop.value[4] = 'S'
-    }else{
-        orderRunLoop.value[3] = 'S'
         orderRunLoop.value[4] = 'CT'
+        orderRunLoop.value[5] = 'S'
+    }else{
+        orderRunLoop.value[4] = 'S'
+        orderRunLoop.value[5] = 'CT'
     }
 
 });
