@@ -42,7 +42,7 @@ class ProductController extends Controller
 //            ->get();
 
         $products = FreshoProduct::query()
-            ->get();
+            ->paginate(50);
 
         return ProductResource::collection($products);
     }

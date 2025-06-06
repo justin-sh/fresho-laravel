@@ -54,47 +54,46 @@
         <template #header>
             <div class="col align-content-center" ref="tableHeaderRefEl">
                 <span class="fw-bold fs-4">Products </span>
-                <span class="inline fw-light fs-6" v-if="!data_loading">(Total {{ products_backup.length }})</span>
+                <span class="inline fw-light fs-6" v-if="!data_loading">(Total {{ totalRows }})</span>
             </div>
-
+            <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="page_size" limit="7"
+                         @update:model-value="goTableHead"></BPagination>
             <BFormRadioGroup v-model="page_size" :options="page_size_options" class="ms-3 align-content-center"
                              value-field="item" text-field="name"/>
         </template>
         <template #footer>
-            <BPagination v-model="currentPage" :total-rows="products.length" :per-page="page_size" limit="7"
-                         @update:model-value="goTableHead" aria-controls="product-table"></BPagination>
+            <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="page_size" limit="7"
+                         @update:model-value="goTableHead"></BPagination>
         </template>
 
         <BTable id="product-table" striped hover
                 :busy="data_loading"
-                :current-page="currentPage"
-                :per-page="page_size"
                 :items="products"
                 :fields="fields">
-            <template #cell(rowNo)="row">
-                {{ row.index + 1 }}
-            </template>
+<!--            <template #cell(rowNo)="row">-->
+<!--                {{ row.id }}-->
+<!--            </template>-->
             <!--            <template #cell(orderNo)="row">-->
             <!--                <a :href="'https://app.fresho.com/supplier/orders/' + row.item.id" target="_blank">-->
             <!--                    {{ row.value }}-->
             <!--                </a>-->
             <!--            </template>-->
-            <template #cell(show_details)="row">
-                <BButton size="sm" @click="row.toggleDetails" class="mr-2" variant="light">
-                    {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
-                </BButton>
-            </template>
-            <template #row-details="row">
-                <BCard>
-                    <div class="row" v-for="p in row.item.products" :key="p.name">
-                        <div class="col-2">{{ p.group }}</div>
-                        <div class="col">{{ p.name }}</div>
-                        <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
-                        <div class="col-1">{{ p.status }}</div>
-                    </div>
-                    <div v-if="!row.item.products">No Products</div>
-                </BCard>
-            </template>
+<!--            <template #cell(show_details)="row">-->
+<!--                <BButton size="sm" @click="row.toggleDetails" class="mr-2" variant="light">-->
+<!--                    {{ row.detailsShowing ? 'Hide' : 'Show' }} Details-->
+<!--                </BButton>-->
+<!--            </template>-->
+<!--            <template #row-details="row">-->
+<!--                <BCard>-->
+<!--                    <div class="row" v-for="p in row.item.products" :key="p.name">-->
+<!--                        <div class="col-2">{{ p.group }}</div>-->
+<!--                        <div class="col">{{ p.name }}</div>-->
+<!--                        <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>-->
+<!--                        <div class="col-1">{{ p.status }}</div>-->
+<!--                    </div>-->
+<!--                    <div v-if="!row.item.products">No Products</div>-->
+<!--                </BCard>-->
+<!--            </template>-->
         </BTable>
     </BCard>
 </template>
@@ -109,13 +108,23 @@ const router = useRouter()
 
 const name = shallowRef('')
 const code = shallowRef('')
-const product = shallowRef('')
+const product = ref([])
 const cat = shallowRef()
 const wh = shallowRef<string[]>([])
 const hasStock = shallowRef(true)
 
-const products = shallowRef([])
-let products_backup = []
+const products = ref([{
+    "cat":"BEEF",
+    "code":"2166",
+    "name":"Beef Chuck Tender Diced ",
+    "qty_type":"KG",
+}])
+let products_backup = [{
+    "cat":"BEEF",
+    "code":"2166",
+    "name":"Beef Chuck Tender Diced ",
+    "qty_type":"KG",
+}]
 
 const fields_base = [
     {key: 'rowNo', label: '#'},
@@ -129,6 +138,7 @@ const fields = shallowRef([])
 const data_loading = shallowRef(false)
 
 const currentPage = shallowRef(1)
+const totalRows = shallowRef(1)
 const page_size = shallowRef(50)
 const page_size_options = [
     {item: 50, name: '50'},
@@ -140,11 +150,11 @@ const warehouses = shallowRef([])
 
 let abortController: AbortController | null = null;
 
-const loading_data = async () => {
+const loading_data = async (page=1) => {
 
     data_loading.value = true
-    products.value = []
-    products_backup = products.value
+    // products.value = []
+    // products_backup = products.value
     if (abortController != null) {
         abortController.abort()
     }
@@ -153,11 +163,22 @@ const loading_data = async () => {
         abortController = new AbortController()
 
         const data = (await getProductsWithFilters(
-            {name: name.value, cat: cat.value, hasStock: hasStock.value},
+            {name: name.value, cat: cat.value, hasStock: hasStock.value, page},
             {signal: abortController.signal}
-        )).data.data
+        )).data
 
-        products_backup = products.value = data
+        fields.value = [...fields_base]
+        totalRows.value = data.meta.total
+        console.log(totalRows.value)
+        products.value = data.data
+        // products.value.push({
+        //     "cat":"BEEF",
+        //     "code":"2166",
+        //     "name":"Beef Chuck Tender Diced ",
+        //     "qty_type":"KG",
+        // })
+        console.log(products.value)
+        console.log(fields.value)
 
     } catch (e) {
         if (!(e instanceof CanceledError)) {
@@ -179,7 +200,7 @@ onMounted(async () => {
 
     fields.value = [...fields_base]
 
-    await loading_data();
+    await loading_data(1);
 })
 
 // onBeforeRouteLeave((to, before) => {
@@ -205,9 +226,19 @@ watch([name, cat, wh, hasStock],
 
 const tableHeaderRefEl = ref<HTMLElement | null>(null)
 
-const goTableHead = (page: number) => {
-    // console.log(page)
+const goTableHead = async (page: number) => {
+    console.log(page)
+
     tableHeaderRefEl.value?.scrollIntoView({behavior: 'smooth'})
+
+    await loading_data(page)
+    // products.value.push({
+    //     "cat":"BEEF",
+    //     "code":"2166",
+    //     "name":"Beef Chuck Tender Diced ",
+    //     "qty_type":"KG",
+    // })
+    // console.log(products.value)
 }
 
 </script>

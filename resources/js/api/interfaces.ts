@@ -18,6 +18,7 @@ export interface OrderFilter {
 export interface ProductFilter {
     code?: string
     name?: string
+    page?: number
     cat?: string[]
     // wh?: string[]
     hasStock: boolean
