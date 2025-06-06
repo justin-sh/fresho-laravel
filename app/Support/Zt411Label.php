@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Storage;
+
 function px2in($px): float
 {
     return $px*0.0104166667;
@@ -78,7 +80,7 @@ class Zt411Label
 
         $this->pdf->setX($this->topOfCustomer);
 //        $this->pdf->Image("h.png", $this->widthOfCustomer, $this->topOfCustomer, mm2in(23), mm2in(9));
-        $this->pdf->Image("/Users/Amber/Herd/fresho/h.png", $this->widthOfCustomer, $this->topOfCustomer, mm2in(23), mm2in(9));
+        $this->pdf->Image(Storage::path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, mm2in(23), mm2in(9));
         $this->pdf->setY($this->topOfCustomer, false);
         $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,iconv("utf-8","gbk",$cusName));
 
