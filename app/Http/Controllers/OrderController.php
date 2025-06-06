@@ -8,6 +8,7 @@ use App\Jobs\SyncOrderDeliveryProof;
 use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
+use App\Support\Zt411Label;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -63,6 +64,36 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         //
+    }
+
+    public function printLabel(Request $request)
+    {
+        $data = $request->json()->all();
+
+        $data = [
+            ['cus' => "Nammi Vietnamese (Richmond Road) 83",
+                "prd" => "Pork Belly Boneless Rind On (Fem宋烟如你注意到体ale)",
+                "qty" => "31.94 <Kg>",
+                "pd" => "20/05/2025",
+                "bbd" => "27/05/2025",
+                "orderNo" => "F40431677",
+                "run" => "CT",
+            ],
+            ['cus' => "Nammi Vietnamese (Richmond Road) 83",
+                "prd" => "Pork Belly Boneless Rind On (Fem宋烟如你注意到体ale)",
+                "qty" => "31.94 <Kg>",
+                "pd" => "20/05/2025",
+                "bbd" => "27/05/2025",
+                "orderNo" => "F40431676",
+                "run" => "LE",
+            ],
+        ];
+
+        $label = new Zt411Label();
+        foreach ($data as $item) {
+            $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
+        }
+        $label->print();
     }
 
     public function syncSummary(Request $request): string

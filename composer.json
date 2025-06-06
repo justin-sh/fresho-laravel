@@ -9,6 +9,7 @@
         "ext-dom": "*",
         "ably/ably-php": "^1.1",
         "ably/laravel-broadcaster": "*",
+        "fpdf/fpdf": "^1.86",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1"
