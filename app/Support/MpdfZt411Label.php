@@ -63,7 +63,7 @@ class MpdfZt411Label
         $this->pdf = new Mpdf(
             [
                 'fontDir' => array_merge($defaultConfig['fontDir'], [
-                    '/Users/Amber/Downloads/msjh',
+                    base_path('font'),
                 ]),
                 'fontdata' => $defaultFontConfig['fontdata'] + [ // lowercase letters only in font key
                         'msyh' => [
