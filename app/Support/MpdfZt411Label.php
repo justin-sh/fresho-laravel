@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
@@ -76,6 +77,7 @@ class MpdfZt411Label
                 'orientation' => 'L'
             ]
         );
+        $this->pdf->setLogger(Log::getLogger());
         $this->pdf->SetAutoPageBreak(false);
         $this->pdf->useSubstitutions = false;
         $this->pdf->simpleTables = true;
@@ -128,8 +130,8 @@ class MpdfZt411Label
         $this->pdf->Cell($this->widthOfRun, $this->lineHeight,  "RUN: " . $run);
     }
 
-    function print(): void
+    function print($name = '', $dest = ''): ?string
     {
-        $this->pdf->Output();
+        return $this->pdf->Output($name, $dest);
     }
 }

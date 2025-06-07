@@ -117,7 +117,7 @@ class Zt411Label
         $this->pdf->Cell($this->widthOfRun, $this->lineHeight,iconv("utf-8","gbk", "RUN: " . $run),0);
     }
 
-    function print(){
-        $this->pdf->Output();
+    function print($dest='', $name='', $isUTF8=false){
+        return $this->pdf->Output($dest, $name, $isUTF8);
     }
 }

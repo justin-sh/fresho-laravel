@@ -8,10 +8,12 @@ use App\Jobs\SyncOrderDeliveryProof;
 use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
+use App\Support\MpdfZt411Label;
 use App\Support\Zt411Label;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
@@ -66,7 +68,7 @@ class OrderController extends Controller
         //
     }
 
-    public function printLabel(Request $request)
+    public function printLabel(Request $request, Response $response)
     {
         $data = $request->json()->all();
 
@@ -89,11 +91,18 @@ class OrderController extends Controller
             ],
         ];
 
-        $label = new Zt411Label();
+        $label = new MpdfZt411Label();
+//        $label = new Zt411Label();
         foreach ($data as $item) {
             $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
         }
-        $label->print();
+//        return $response->setContent() $label->print('', 'I');
+        return $response->setContent($label->print(dest: 'S'))
+            ->withHeaders([
+                'Content-Type' => 'application/pdf',
+                'Cache-Control' => 'private, max-age=0, must-revalidate',
+                'Pragma' => 'public',
+            ]);
     }
 
     public function syncSummary(Request $request): string
