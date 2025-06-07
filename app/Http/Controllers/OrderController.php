@@ -9,6 +9,7 @@ use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
 use App\Support\MpdfZt411Label;
+use App\Support\TcpdfZt411Label;
 use App\Support\Zt411Label;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -91,8 +92,9 @@ class OrderController extends Controller
             ],
         ];
 
-        $label = new MpdfZt411Label();
-//        $label = new Zt411Label();
+       // $label = new MpdfZt411Label();
+       // $label = new Zt411Label();
+        $label = new TcpdfZt411Label();
         foreach ($data as $item) {
             $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
         }
