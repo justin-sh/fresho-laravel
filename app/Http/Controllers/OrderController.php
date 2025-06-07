@@ -71,8 +71,8 @@ class OrderController extends Controller
         $data = $request->json()->all();
 
         $data = [
-            ['cus' => "Nammi Vietnamese (Richmond Road) 83",
-                "prd" => "Pork Belly Boneless Rind On (Fem宋烟如你注意到体ale)",
+            ['cus' => "Nammi Vietnamese 宋烟如你注意到 83",
+                "prd" => "Pork Belly Boneless Rind On (Fem宋烟 如你注ale)",
                 "qty" => "31.94 <Kg>",
                 "pd" => "20/05/2025",
                 "bbd" => "27/05/2025",
