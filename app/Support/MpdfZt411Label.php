@@ -28,7 +28,7 @@ function mm2in($mm): float
     return $mm * 0.0393701;
 }
 
-class Zt411Label
+class MpdfZt411Label
 {
     protected int $fs = 12; // unit 12 pt
     protected int $pageWidth = 80; // mm
