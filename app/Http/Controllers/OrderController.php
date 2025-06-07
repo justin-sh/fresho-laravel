@@ -92,9 +92,9 @@ class OrderController extends Controller
             ],
         ];
 
-       // $label = new MpdfZt411Label();
+       $label = new MpdfZt411Label();
        // $label = new Zt411Label();
-        $label = new TcpdfZt411Label();
+        // $label = new TcpdfZt411Label();
         foreach ($data as $item) {
             $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
         }
