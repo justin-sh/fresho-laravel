@@ -8,5 +8,6 @@ Route::get('/', function () {
 });
 
 Route::get('/orders/label', [OrderController::class, 'printLabel']);
+Route::post('/orders/label', [OrderController::class, 'printLabel']);
 
 Route::fallback(fn() => view('index'));

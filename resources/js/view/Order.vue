@@ -108,7 +108,14 @@
             </template>
             <template #cell(show_details)="row">
                 <BButton size="sm" @click="row.toggleDetails" class="mr-2" variant="light">
-                    {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+                    {{ row.detailsShowing ? 'Hide' : 'Show' }}
+                </BButton>
+                <BButton size="sm" @click="printLabel(row.item)" class="mr-2 ms-2" variant="light">
+                    Label
+                    <form action="/orders/label" method="post" target="_blank" :id="row.item.id">
+                        <input type="hidden" name="data" value="">
+                        <input type="hidden" name="_token" value="">
+                    </form>
                 </BButton>
             </template>
             <template #row-details="row">
@@ -117,7 +124,7 @@
                         <div class="col-2">{{ p.group }}</div>
                         <div class="col">{{ p.name }}</div>
                         <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
-                        <div class="col-1">{{ p.status }}</div>
+                        <div class="col-2">{{ p.status }}</div>
                     </div>
                     <div v-if="!row.item.products">No Products</div>
                 </BCard>
@@ -131,7 +138,7 @@ import {ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
 import {getOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetails} from '../api'
 
-import {formatInTimeZone, toDate} from "date-fns-tz";
+import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
 
 const router = useRouter()
@@ -292,6 +299,44 @@ const tableHeaderRefEl = ref<HTMLElement | null>(null)
 const goTableHead = (page: number) => {
     // console.log(page)
     tableHeaderRefEl.value?.scrollIntoView({behavior: 'smooth'})
+}
+
+const printLabel = async function (row){
+    // console.log(row)
+
+    const f = document.forms[row.id];
+    f.querySelector('input[name="_token"]').value = getCsrfToken();
+    const prds = [];
+    row.products.forEach(p=>{
+
+        if(!['backorder','n/a'].includes(p.status)) {
+            var x = toDate(row.deliveryDate);
+            if (p.group?.includes('Frozen') || p.group?.includes('Hot')) {
+                x.setDate(x.getDate() + 365)
+            } else {
+                x.setDate(x.getDate() + 7)
+            }
+
+            prds.push({
+                'cus': row.customer,
+                'prd': p.name,
+                'qty': p.qty + " " + p.qtyType,
+                'pd': row.deliveryDate,
+                'bbd': format(x, 'yyyy-MM-dd'),
+                'orderNo': 'F' + row.orderNo,
+                'run': row.run,
+            });
+        }
+    })
+
+    f.querySelector('input[name="data"]').value = JSON.stringify(prds);
+
+    f.submit();
+    // await printZt411Label(row)
+}
+
+const getCsrfToken = ()=>{
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
 
 </script>

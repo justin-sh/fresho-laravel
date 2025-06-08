@@ -69,29 +69,39 @@ class OrderController extends Controller
         //
     }
 
-    public function printLabel(Request $request, Response $response)
+    public function printLabel(Request $request, Response $response): Response
     {
-        $data = $request->json()->all();
+        $prds = $request->input('data');
 
-        $data = [
-            ['cus' => "Nammi Vietnamese 宋烟如你注意到 83",
-                "prd" => "Pork Belly Boneless Rind On (Fem宋烟 如你注ale)",
-                "qty" => "31.94 <Kg>",
-                "pd" => "20/05/2025",
-                "bbd" => "27/05/2025",
-                "orderNo" => "F40431677",
-                "run" => "CT",
-            ],
-            ['cus' => "Nammi Vietnamese (Richmond Road) 83",
-                "prd" => "Pork Belly Boneless Rind On (Fem宋烟如你注意到体ale)",
-                "qty" => "31.94 <Kg>",
-                "pd" => "20/05/2025",
-                "bbd" => "27/05/2025",
-                "orderNo" => "F40431676",
-                "run" => "LE",
-            ],
-        ];
+//        $data = request()->all();
 
+        $data = json_decode($prds, true);
+//        foreach ($json['products'] as )
+
+//        $data = [];
+        Log::debug(json_encode($data));
+        if(empty($data)){
+//            //for test
+            $data = [
+                ['cus' => "Nammi Vietnamese 宋烟如你注意到 83",
+                    "prd" => "Pork Belly Boneless Rind On (Fem宋烟 如你注ale)",
+                    "qty" => "31.94 <Kg>",
+                    "pd" => "20/05/2025",
+                    "bbd" => "27/05/2025",
+                    "orderNo" => "F40431677",
+                    "run" => "CT",
+                ],
+                ['cus' => "Nammi Vietnamese (Richmond Road) 83",
+                    "prd" => "Pork Belly Boneless Rind On (Fem宋烟如你注意到体ale)",
+                    "qty" => "31.94 <Kg>",
+                    "pd" => "20/05/2025",
+                    "bbd" => "27/05/2025",
+                    "orderNo" => "F40431676",
+                    "run" => "LE",
+                ],
+            ];
+        }
+//
        $label = new MpdfZt411Label();
        // $label = new Zt411Label();
         // $label = new TcpdfZt411Label();
@@ -105,6 +115,8 @@ class OrderController extends Controller
                 'Cache-Control' => 'private, max-age=0, must-revalidate',
                 'Pragma' => 'public',
             ]);
+
+//        return $response->setContent("OK");
     }
 
     public function syncSummary(Request $request): string
