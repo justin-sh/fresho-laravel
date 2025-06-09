@@ -48,16 +48,11 @@ class Zt411Label
      */
     function __construct(){
 
-        $this->font = "msjh";
+        $this->font = "simhei";
 
         $this->pdf=new PdfChinese("L", "in", array(mm2in($this->pageWidth), mm2in($this->pageHeight)));
         $this->pdf->SetAutoPageBreak(false);
         $this->pdf->AddGBFont($this->font, $this->font);
-
-        $this->fs = 12;
-        $this->pageWidth = 80;
-        $this->pageHeight = 60;
-        $this->marginXY = 4;
 
         $this->lineHeight = pt2in($this->fs) + px2in(1);
         $this->leftMargin = mm2in($this->marginXY);
@@ -93,7 +88,7 @@ class Zt411Label
         $this->pdf->setX($this->leftMargin);
         $this->pdf->setY($this->topOfQty, false);
         $this->pdf->SetFont($this->font, 'B', $this->fs);
-        $this->pdf->Cell(mm2in(22), $this->lineHeight,iconv("utf-8","gbk","Qty:"),0);
+        $this->pdf->Cell(mm2in(20), $this->lineHeight,iconv("utf-8","gbk","Qty:"),0);
         $this->pdf->Cell(mm2in(36), $this->lineHeight,iconv("utf-8","gbk",$qty),0);
         // $this->pdf->Ln();
 
@@ -101,13 +96,13 @@ class Zt411Label
         $this->pdf->setX($this->leftMargin);
         $this->pdf->setY($this->topOfLabelPD, false);
         $this->pdf->SetFont($this->font, '', $this->fs -1);
-        $this->pdf->Cell(mm2in(25), $this->lineHeight,iconv("utf-8","gbk","Pack Date:"),0);
+        $this->pdf->Cell(mm2in(20), $this->lineHeight,iconv("utf-8","gbk","Pack Date:"),0);
         $this->pdf->Cell(mm2in(36), $this->lineHeight,iconv("utf-8","gbk",$pDate),0);
         // $this->pdf->Ln();
 
         $this->pdf->setX($this->leftMargin);
         $this->pdf->setY($this->topOfLabelBBD, false);
-        $this->pdf->Cell(mm2in(25), $this->lineHeight,iconv("utf-8","gbk","Best Before:"),0);
+        $this->pdf->Cell(mm2in(20), $this->lineHeight,iconv("utf-8","gbk","Best Before:"),0);
         $this->pdf->Cell(mm2in(36), $this->lineHeight,iconv("utf-8","gbk",$bbDate),0);
         // $this->pdf->Ln();
 
