@@ -41,7 +41,7 @@ class MpdfZt411Label
     protected $topOfCustomer;
     protected $widthOfCustomer;
     protected $topOfProduct;
-    protected $widthOfProduct;
+    protected $widthOfWholeRow;
     protected $topOfQty;
     protected $topOfLabelPD;
     protected $topOfLabelBBD;
@@ -82,17 +82,12 @@ class MpdfZt411Label
         $this->pdf->useSubstitutions = false;
         $this->pdf->simpleTables = true;
 
-        $this->fs = 12;
-        $this->pageWidth = 80;
-        $this->pageHeight = 60;
-        $this->marginXY = 4;
-
         $this->lineHeight = pt2mm($this->fs) + 1;
         $this->leftMargin = $this->marginXY;
         $this->topOfCustomer = $this->marginXY;
         $this->widthOfCustomer = 52;
         $this->topOfProduct = 18;
-        $this->widthOfProduct = $this->pageWidth - $this->marginXY - $this->marginXY;
+        $this->widthOfWholeRow = $this->pageWidth - $this->marginXY - $this->marginXY;
         $this->topOfQty = $this->topOfProduct + 12;
         $this->topOfLabelPD = $this->topOfQty + 8;
         $this->topOfLabelBBD = $this->topOfLabelPD + 6;
@@ -107,23 +102,21 @@ class MpdfZt411Label
         $this->pdf->SetFont($this->font, 'B');
 
         $this->pdf->Image(Storage::path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
-        $this->pdf->setXY($this->topOfCustomer, $this->topOfCustomer);
+        $this->pdf->setXY($this->leftMargin, $this->topOfCustomer);
         $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,  $cusName);
 
-
-        $this->pdf->SetFont($this->font, '');
-        $this->pdf->SetFontSize( 10);
+        $this->pdf->SetFont($this->font, '', 10);
         $this->pdf->setXY($this->leftMargin, $this->topOfProduct);
-        $this->pdf->MultiCell(72, $this->lineHeight, $prdName);
+        $this->pdf->MultiCell($this->widthOfWholeRow, $this->lineHeight, $prdName);
 
         $this->pdf->setXY($this->leftMargin, $this->topOfQty);
-        $this->pdf->Cell(72, $this->lineHeight, "Qty: " . $qty);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Qty: " . $qty);
 
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelPD);
-        $this->pdf->Cell(72, $this->lineHeight, "Pack Date: " . $pDate);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Pack Date: " . $pDate);
 
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelBBD);
-        $this->pdf->Cell(72, $this->lineHeight, "Best Date: " . $bbDate);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Best Date: " . $bbDate);
 
         $this->pdf->SetXY($this->leftMargin, $this->topOfOrderNo);
         $this->pdf->Cell($this->widthOfOrderNo, $this->lineHeight,  $orderNo);
