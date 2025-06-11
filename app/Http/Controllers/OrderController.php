@@ -102,8 +102,8 @@ class OrderController extends Controller
             ];
         }
 //
-//       $label = new MpdfZt411Label();
-        $label = new Zt411Label();
+      $label = new MpdfZt411Label();
+        // $label = new Zt411Label();
         // $label = new TcpdfZt411Label();
         foreach ($data as $item) {
             $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
@@ -153,6 +153,14 @@ class OrderController extends Controller
     public function show(Order $order): JsonResource
     {
         return new OrderResource(Order::query()->findOrFail($order->id));
+    }
+
+
+    public function searchFreshoOrders(Request $request)
+    {
+        $delivery_date = $request->str('delivery_date', '')->value();
+        SyncOrderSummary::dispatchSync($delivery_date);
+        return $this->index($request);
     }
 
     /**

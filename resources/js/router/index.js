@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from "vue-router";
 
 import Home from "@/view/Home.vue";
 import Order from "@/view/Order.vue";
+import FreshoOrder from "@/view/FreshoOrder.vue";
 import Product from "@/view/Product.vue";
 import PurchaseOrderList from "@/view/PurchaseOrderList.vue";
 import PurchaseOrder from "@/view/PurchaseOrder.vue";
@@ -24,6 +25,11 @@ const router = createRouter({
             path: '/orders',
             name: 'orders',
             component: Order
+        },
+        {
+            path: '/fresho-order',
+            name: 'freshoOrder',
+            component: FreshoOrder
         },
         {
             path: '/report/dept',

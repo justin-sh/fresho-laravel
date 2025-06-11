@@ -14,8 +14,11 @@
                         <BNavItem :to="{name:'orders'}">
                             Orders
                         </BNavItem>
-                        <BNavItem :to="{name:'driverTrainings'}">
-                            Training Docs
+<!--                        <BNavItem :to="{name:'driverTrainings'}">-->
+<!--                            Training Docs-->
+<!--                        </BNavItem>-->
+                        <BNavItem :to="{name:'freshoOrder'}">
+                            Fresho Orders
                         </BNavItem>
 <!--                        <BNavItem :to="{name:'saleOrders'}">-->
 <!--                            Sale Orders-->
