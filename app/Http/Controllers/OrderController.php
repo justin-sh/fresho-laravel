@@ -159,7 +159,11 @@ class OrderController extends Controller
     public function searchFreshoOrders(Request $request)
     {
         $delivery_date = $request->str('delivery_date', '')->value();
-        SyncOrderSummary::dispatchSync($delivery_date);
+        $customer = $request->str('customer', '')->value();
+        $product = $request->str('product', '')->value();
+        if(empty($customer) && empty($product)){ // init data
+            SyncOrderSummary::dispatchSync($delivery_date);
+        }
         return $this->index($request);
     }
 
