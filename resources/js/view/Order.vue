@@ -83,7 +83,7 @@
         <template #header>
             <div class="col align-content-center" ref="tableHeaderRefEl">
                 <span class="fw-bold fs-4">Orders </span>
-                <span class="inline fw-light fs-6" v-if="!data_loading">(Total {{ orders_backup.length }})</span>
+                <span class="inline fw-light fs-6" v-if="!data_loading">(Total {{ orders.length }})</span>
             </div>
 
             <BFormRadioGroup v-model="page_size" :options="page_size_options" class="ms-3 align-content-center"
