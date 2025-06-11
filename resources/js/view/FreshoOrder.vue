@@ -53,8 +53,8 @@
         </BForm>
 
         <template #footer>
-            <div class="row clear">
-                <div class="col">
+            <div class="d-flex clear">
+                <div class="col align-content-center">
                     <BButton variant="outline-primary" size="sm" :loading="init_loading"
                              @click.stop="searchFreshoOrder">
                         S1: Search
@@ -72,6 +72,8 @@
                     </BButton>
                     -->
                 </div>
+                <BFormRadioGroup v-model="page_size" :options="page_size_options" class="ms-3 align-content-center"
+                                 value-field="item" text-field="name"/>
             </div>
         </template>
     </BCard>
@@ -83,8 +85,8 @@
                 <span class="inline fw-light fs-6" v-if="!data_loading">(Total {{ orders_backup.length }})</span>
             </div>
 
-            <BFormRadioGroup v-model="page_size" :options="page_size_options" class="ms-3 align-content-center"
-                             value-field="item" text-field="name"/>
+            <BPagination v-model="currentPage" :total-rows="orders.length" :per-page="page_size" limit="7"
+                         @update:model-value="goTableHead" aria-controls="ordertable"></BPagination>
         </template>
         <template #footer>
             <BPagination v-model="currentPage" :total-rows="orders.length" :per-page="page_size" limit="7"
