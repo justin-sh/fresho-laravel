@@ -55,16 +55,13 @@
         <template #footer>
             <div class="d-flex clear">
                 <div class="col align-content-center">
-                    <BButton variant="outline-primary" size="sm" :loading="init_loading"
+                    <BButton variant="outline-primary" size="sm" :loading="data_loading"
                              @click.stop="searchFreshoOrder">
                         S1: Search
                     </BButton>
                     <!-- <BButton variant="outline-primary" class="ms-2" size="sm" :loading="detail_syncing"
                              @click.stop="syncDetails">
                         S2: Sync Detail
-                    </BButton>
-                    <BButton variant="outline-primary" class="ms-2" size="sm" @click.stop="goDeptRepot">
-                        Dept Report
                     </BButton>
                     <BButton variant="outline-primary" class="ms-2" size="sm" :loading="syncing_del_proof"
                              @click.stop="syncDeliveryProofs">
@@ -106,7 +103,8 @@
                 </a>
             </template>
             <template #cell(show_details)="row">
-                <BButton size="sm" @click="row.toggleDetails" class="mr-2" variant="light">
+                <!-- row.toggleDetails -->
+                <BButton size="sm" @click="loadDetailForOne(row)" class="mr-2" variant="light" :loading="detail_syncing && current_order_no === row.item.orderNo">
                     {{ row.detailsShowing ? 'Hide' : 'Show' }}
                 </BButton>
                 <BButton size="sm" @click="printLabel(row.item)" class="mr-2 ms-2" variant="light">
@@ -135,7 +133,7 @@
 <script lang="ts" setup>
 import {ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
-import {searchFreshoOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetails} from '../api'
+import {searchFreshoOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
@@ -163,8 +161,8 @@ const fields = [
     {key: 'show_details', label: 'Action'},
 ]
 
-const init_loading = shallowRef(false)
 const detail_syncing = shallowRef(false)
+const current_order_no = shallowRef('')
 const syncing_del_proof = shallowRef(false)
 const data_loading = shallowRef(false)
 
@@ -223,43 +221,34 @@ const loading_data = async () => {
     }
 }
 const searchFreshoOrder = async () => {
-    init_loading.value = true
     // await initOrders(deliveryDate.value)
     await loading_data()
-    init_loading.value = false
 }
-const syncDetails = async () => {
+
+const loadDetailForOne = async (row) => {
     detail_syncing.value = true
-    await syncOrderDetails(deliveryDate.value)
+    current_order_no.value = row.item.orderNo
+    await syncOrderDetailByOrderNo(row.item.orderNo)
+    row.toggleDetails()
     detail_syncing.value = false
-    await loading_data()
-}
-const syncDeliveryProofs = async () => {
-    syncing_del_proof.value = true
-    await syncOrderDeliveryProofs()
-    syncing_del_proof.value = false
-    await loading_data()
 }
 
 const setToday = function () {
     deliveryDate.value = formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd")
 }
 
-const goDeptRepot = () => {
-    router.push({name: 'dept-report'})
-}
 
 onBeforeRouteLeave((to, before) => {
-    if (to.name == 'dept-report') {
-        to.meta.orders = orders.value
+    // if (to.name == 'dept-report') {
+    //     to.meta.orders = orders.value
 
-        const weedDay = toDate(deliveryDate.value).getDay()
-        if ([2, 4].includes(weedDay)) {
-            to.meta.ordered_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-        } else {
-            to.meta.ordered_run = ['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-        }
-    }
+    //     const weedDay = toDate(deliveryDate.value).getDay()
+    //     if ([2, 4].includes(weedDay)) {
+    //         to.meta.ordered_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
+    //     } else {
+    //         to.meta.ordered_run = ['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
+    //     }
+    // }
 })
 
 watch([deliveryDate, customer, product, status, credit, runs],

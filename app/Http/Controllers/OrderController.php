@@ -167,6 +167,13 @@ class OrderController extends Controller
         return $this->index($request);
     }
 
+    public function searchDetailByOrderNo(Request $request)
+    {
+        $delivery_date = $request->str('order_no');
+        Log::debug("sync order detail data for No:$order_no");
+        return json_encode(['ok' => true]);
+    }
+
     /**
      * Update the specified resource in storage.
      */

@@ -22,6 +22,8 @@ Route::get('/orders/sync-detail', [OrderController::class, 'syncDetail']);
 Route::get('/orders/sync-delivery-proof', [OrderController::class, 'syncDeliveryProof']);
 Route::apiResource('/orders', OrderController::class)->only(['index', 'show']);
 
+
+Route::get('/fresho-orders/sync-detail-by-order-no', [OrderController::class, 'searchDetailByOrderNo']);
 Route::get('/fresho-orders', [OrderController::class, 'searchFreshoOrders']);
 
 
