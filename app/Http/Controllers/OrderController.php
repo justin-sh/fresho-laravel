@@ -9,12 +9,11 @@ use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
 use App\Support\MpdfZt411Label;
-use App\Support\TcpdfZt411Label;
-use App\Support\Zt411Label;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
@@ -80,7 +79,7 @@ class OrderController extends Controller
 
 //        $data = [];
         Log::debug(json_encode($data));
-        if(empty($data)){
+        if (empty($data)) {
 //            //for test
             $data = [
                 ['cus' => "Nammi Vietnamese 宋烟如你注意到 83",
@@ -102,7 +101,7 @@ class OrderController extends Controller
             ];
         }
 //
-      $label = new MpdfZt411Label();
+        $label = new MpdfZt411Label();
         // $label = new Zt411Label();
         // $label = new TcpdfZt411Label();
         foreach ($data as $item) {
@@ -156,12 +155,12 @@ class OrderController extends Controller
     }
 
 
-    public function searchFreshoOrders(Request $request)
+    public function searchFreshoOrders(Request $request): JsonResource
     {
         $delivery_date = $request->str('delivery_date', '')->value();
         $customer = $request->str('customer', '')->value();
         $product = $request->str('product', '')->value();
-        if(empty($customer) && empty($product)){ // init data
+        if (empty($customer) && empty($product)) { // init data
             SyncOrderSummary::dispatchSync($delivery_date);
         }
         return $this->index($request);
@@ -169,8 +168,25 @@ class OrderController extends Controller
 
     public function searchDetailByOrderNo(Request $request)
     {
-        $delivery_date = $request->str('order_no');
+        $order_no = $request->str('order_no');
         Log::debug("sync order detail data for No:$order_no");
+
+        $order = Order::query()
+            ->with('details')
+            ->where('order_number', $order_no)
+            ->first();
+
+        if (count($order->details) == 0) {
+            //no detail and sync it from Fresho
+            $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
+
+            $rv = Http::get($url)->json();
+            $run = $rv['delivery_run_code'];
+
+        }
+
+        Log::debug(json_encode($order));
+
         return json_encode(['ok' => true]);
     }
 
