@@ -182,7 +182,7 @@ class OrderController extends Controller
 
             $rv = Http::get($url)->json();
             $run = $rv['delivery_run_code'];
-
+            $details = $rv['product_orders'];
         }
 
         Log::debug(json_encode($order));
