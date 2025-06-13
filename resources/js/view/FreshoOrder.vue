@@ -114,6 +114,9 @@
                         <input type="hidden" name="_token" value="">
                     </form>
                 </BButton>
+                <BButton size="sm" :href="'/fresho-order/' + row.item.orderNo" class="mr-2 ms-2" variant="light">
+                    Edit/View
+                </BButton>
             </template>
             <template #row-details="row">
                 <BCard>
@@ -226,11 +229,17 @@ const searchFreshoOrder = async () => {
 }
 
 const loadDetailForOne = async (row) => {
-    detail_syncing.value = true
-    current_order_no.value = row.item.orderNo
-    await syncOrderDetailByOrderNo(row.item.orderNo)
+    if(!row.detailsShowing){
+        detail_syncing.value = true
+        current_order_no.value = row.item.orderNo
+        await syncOrderDetailByOrderNo(row.item.orderNo)
+        detail_syncing.value = false
+    }
     row.toggleDetails()
-    detail_syncing.value = false
+}
+
+const goDetail = async(row)=>{
+
 }
 
 const setToday = function () {
