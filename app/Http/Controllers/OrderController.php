@@ -181,13 +181,59 @@ class OrderController extends Controller
             $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
 
             $rv = Http::get($url)->json();
-            $run = $rv['delivery_run_code'];
-            $details = $rv['product_orders'];
+            Log::debug(json_encode($rv));
+            // locked::: {"supplier_order":{"id":"0be5d6f4-451b-4e83-9c7e-9f0b05e8d63a","state":"invoiced","order_number":"40679598","prefixed_order_number":"F40679598","is_locked":true,"receiving_company_name":"Butcher on Deakin","payment_method_available":false}}
+            $isLocked = $rv['supplier_order']['is_locked'];
+            if ($isLocked) {
+                $order->is_locked = true;
+                //get detail from separate page
+                // url https://app.fresho.com/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/customer_orders/df6126c9-5540-4f81-a441-1691080b4a50
+            } else {
+                $run = $rv['supplier_order']['delivery_run_code'];
+                $picking_instructions = $rv['supplier_order']['picking_instructions'];
+                $number_of_boxes = $rv['supplier_order']['number_of_boxes'] ?? 0;
+                $state = $rv['supplier_order']['state'];
+                $delivery_run_position = $rv['supplier_order']['delivery_run_position'];
+                $freight_rule = $rv['supplier_order']['freight_rule'];
+                $is_credit_note = $rv['supplier_order']['is_credit_note'];
+                $order->state = $state;
+                $order->number_of_boxes = $number_of_boxes;
+                $order->picking_instructions = $picking_instructions;
+                $order->delivery_run = $run;
+                $order->delivery_run_position = $delivery_run_position;
+                $order->is_credit_note = $is_credit_note;
+                $order->freight_rule = $freight_rule;
+
+                $details = $rv['product_orders'];
+                $prd_orders = [];
+                foreach ($details as $idx=>$d){
+                    $prd_orders[] = [
+                        'id'=>$d['id'],
+                        'order_number'=>$order_no,
+                        'prd_code'=>$d['product_code'],
+                        'idx'=>$idx,
+                        'product_id'=>$d['product_id'],
+                        'prd_name'=>$d['product_name'],
+                        'qty'=>$d['quantity'],
+                        'qty_type'=>$d['quantity_type_name'],
+                        'original_quantity'=>$d['original_quantity'],
+                        'price_cents_per_quantity'=>$d['price_per_quantity'],
+                        'cost_cents'=>$d['cost_cents'],
+                        'group'=>$d['product_group'],
+                        'status'=>$d['supplied_status'],
+                        'customer_notes'=>$d['notes']??'',
+                        'supplier_notes'=>$d['supplier_notes']??'',
+                    ];
+                }
+
+                $order->details()->createMany($prd_orders);
+                $order->save();
+            }
 
             $order->refresh();
         }
 
-        Log::debug(json_encode($order));
+//        Log::debug(json_encode($order));
 
         return new OrderResource($order);
     }

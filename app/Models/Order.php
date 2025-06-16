@@ -21,6 +21,7 @@ use Ramsey\Uuid\Nonstandard\Uuid;
  * @property Date $delivery_at
  * @property string $delivery_by
  * @property string $delivery_proof
+ * @property boolean $is_locked
  */
 class Order extends Model
 {
