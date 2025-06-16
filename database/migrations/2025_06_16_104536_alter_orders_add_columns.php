@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->integer('delivery_run_position')->default(1)->after('delivery_run');
             $table->string('picking_instructions', 4000)->nullable()->after('delivery_instructions');
             $table->boolean('is_credit_note')->default(false)->after('parent_order_id');
-            $table->string('freight_rule', 128)->nullable()->comment("require_freight")->after('is_credit_note');
+            $table->string('freight_rule', 128)->nullable()->comment("require_freight/delivery_fee")->after('is_credit_note');
         });
     }
 
