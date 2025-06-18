@@ -1,82 +1,129 @@
 <template>
     <BOverlay :show="data_loading" rounded="sm">
-    <BCard class="mb-2 filters" v-if="order.id">
-        <template #header>
-            <div class="col align-content-center" ref="tableHeaderRefEl">
-                <span class="fs-4">Order </span>
-                <span class="inline fw-bold fs-4">{{ 'F' + route.params.id }}</span>
-                <span class="fs-4"> For </span>
-                <span class="inline fw-bold fs-4">{{ order.customer }}</span>
-            </div>
-        </template>
+        <BCard class="mb-2 filters" v-if="order.id">
+            <template #header>
+                <div class="col align-content-center" ref="tableHeaderRefEl">
+                    <span class="fs-4">Order </span>
+                    <span class="inline fw-bold fs-4">{{ 'F' + route.params.id }}</span>
+                    <span class="fs-4"> For </span>
+                    <span class="inline fw-bold fs-4">{{ order.customer }}</span>
+                </div>
+            </template>
 
-        <template #footer>
-            <div class="d-flex clear">
-                <div class="col align-content-center">
-                    <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
-                        S1: Search
-                    </BButton>
+            <template #footer>
+                <div class="d-flex clear">
+                    <div class="col align-content-center">
+                        <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
+                            Save & Close
+                        </BButton>
+                        <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
+                            Save & Print Picking Slip
+                        </BButton>
+                        <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
+                            Invoice
+                        </BButton>
+                    </div>
                 </div>
-            </div>
-        </template>
+            </template>
 
-        <div class="row">
-            <div class="col-4">
-                <span>Delivery Method:</span><span></span>
-            </div>
-            <div class="col-4">
-                <label for="datepicker">Preferred Delivery Date:</label>
-                <div>
-                    <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="order.deliveryDate"
-                                :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
-                    </BFormInput>
-                    <BButton variant="success" size="sm" @click="setToday()" class="ms-2">Today</BButton>
+            <div class="row">
+                <div class="col-4">
+                    <label for="datepicker">Delivery Method:</label>
+                    <BFormInput v-model="order.deliveryMethod" disabled class="w-50"/>
+                </div>
+                <div class="col-4">
+                    <label for="datepicker">Preferred Delivery Date:</label>
+                    <div>
+                        <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="order.deliveryDate"
+                                    :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                        </BFormInput>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label for="datepicker">Boxes:</label>
+                    <BFormInput type="number" class="w-50" v-model="order.numberOfBoxes"/>
+                </div>
+                <div class="col-2">
+                    <label for="datepicker">Delivery Run:</label>
+                    <BFormInput v-model="order.run" disabled class="w-50"/>
                 </div>
             </div>
-            <div class="col-2">
-                <label for="datepicker">Boxes:</label>
-                <span><BFormInput type="number" class="col-4 d-inline" size="20"/></span>
-            </div>
-            <div class="col-2">
-                <label for="datepicker">Delivery Run:</label>
-                <span>{{ order.deliver_run }}</span>
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col">
-                <label for="deliveryInstructions">Delivery Instructions:</label>
-                <div>
-                    <BFormTextarea id="deliveryInstructions" class="col-4 d-inline" v-model="order.deliveryInstructions">
-                    </BFormTextarea>
+            <div class="row mt-2">
+                <div class="col">
+                    <label for="deliveryInstructions">Delivery Instructions:</label>
+                    <div>
+                        <BFormTextarea id="deliveryInstructions" class="col-4 d-inline" disabled
+                                       v-model="order.deliveryInstructions">
+                        </BFormTextarea>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="pickingInstructions">Picking Instructions:</label>
+                    <div>
+                        <BFormTextarea id="pickingInstructions" class="col-4 d-inline" disabled
+                                       v-model="order.pickingInstructions">
+                        </BFormTextarea>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="additionalNotes">Additional Notes:</label>
+                    <div>
+                        <BFormTextarea id="additionalNotes" class="col-4 d-inline" v-model="order.additionalNotes">
+                        </BFormTextarea>
+                    </div>
                 </div>
             </div>
-            <div class="col">
-                <label for="pickingInstructions">Delivery Instructions:</label>
-                <div>
-                    <BFormTextarea id="pickingInstructions" class="col-4 d-inline" v-model="order.pickingInstructions">
-                    </BFormTextarea>
-                </div>
-            </div>
-            <div class="col">
-                <label for="additionalNotes">Additional Notes:</label>
-                <div>
-                    <BFormTextarea id="additionalNotes" class="col-4 d-inline" v-model="order.additionalNotes">
-                    </BFormTextarea>
-                </div>
-            </div>
-        </div>
-    </BCard>
-</BOverlay>
+
+            <table class="table table-bordered mt-4">
+                <thead class="table-secondary">
+                <tr>
+                    <th colspan="2">Product</th>
+                    <th>Status</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Price (Ex TAX)</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="p in order.products">
+                    <td style="border-right: none;">
+                        {{ p.name }}
+                    </td>
+                    <td style="border-left: none;">{{ p.group }}</td>
+                    <td>
+                        <select v-model="p.status">
+                            <option value="to_pick">To Pick</option>
+                            <option value="supplied">Supplied</option>
+                            <option value="n/a">Not available</option>
+                            <option value="backorder">Back order</option>
+                            <option value="partially_picked">Partially picked</option>
+                            <option value="substituted">Substituted</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" v-model="p.qty" style="width: 75px;"/>
+                    </td>
+                    <td>{{ p.qtyType }}</td>
+                    <td>$
+                        <input type="number" v-model="p.price" class="d-inline" style="width: 75px;"/>
+                    </td>
+                    <td>${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </BCard>
+    </BOverlay>
 </template>
 
 <script lang="ts" setup>
-import {ref, shallowRef, watch, onMounted} from "vue";
-import {CanceledError} from "axios";
-import {searchFreshoOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetailByOrderNo} from '../api'
+import {onMounted, ref, shallowRef, watch} from "vue";
+import bigDecimal from "js-big-decimal";
+import {syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
-import {onBeforeRouteLeave, useRouter, useRoute} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 
 const router = useRouter()
 const route = useRoute()
@@ -91,7 +138,7 @@ const credit = shallowRef('no')
 const order_run = ['EDN', 'EDS', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR']
 const runs = shallowRef([])
 
-const order = ref({'id':''})
+const order = ref({'id': ''})
 let orders_backup = []
 
 const fields = [
@@ -102,19 +149,7 @@ const fields = [
     {key: 'show_details', label: 'Action'},
 ]
 
-const detail_syncing = shallowRef(false)
-const current_order_no = shallowRef('')
-const syncing_del_proof = shallowRef(false)
 const data_loading = shallowRef(false)
-
-const currentPage = shallowRef(1)
-const page_size = shallowRef(30)
-const page_size_options = [
-    {item: 30, name: '30'},
-    {item: 50, name: '50'},
-    {item: 999, name: 'all'}
-]
-const sortBy = ref([{key: 'delivery_date_md', order: 'desc'}, {key: 'customer', order: 'asc'}])
 
 
 let abortController: AbortController | null = null;
@@ -169,11 +204,6 @@ const loadDetailForOne = async () => {
     data_loading.value = false
 }
 
-const setToday = function () {
-    deliveryDate.value = formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd")
-}
-
-
 onBeforeRouteLeave((to, before) => {
     // if (to.name == 'dept-report') {
     //     to.meta.orders = orders.value
@@ -187,7 +217,7 @@ onBeforeRouteLeave((to, before) => {
     // }
 })
 
-onMounted(()=>{
+onMounted(() => {
     loadDetailForOne()
 })
 
@@ -213,15 +243,15 @@ watch([deliveryDate, customer, product, status, credit, runs],
     }, {immediate: true})
 
 
-const printLabel = async function (row){
+const printLabel = async function (row) {
     // console.log(row)
 
     const f = document.forms[row.id];
     f.querySelector('input[name="_token"]').value = getCsrfToken();
     const prds = [];
-    row.products.forEach(p=>{
+    row.products.forEach(p => {
 
-        if(!['backorder','n/a'].includes(p.status)) {
+        if (!['backorder', 'n/a'].includes(p.status)) {
             var x = toDate(row.deliveryDate);
             if (p.group?.includes('Frozen') || p.group?.includes('Hot')) {
                 x.setDate(x.getDate() + 365)
@@ -247,7 +277,7 @@ const printLabel = async function (row){
     // await printZt411Label(row)
 }
 
-const getCsrfToken = ()=>{
+const getCsrfToken = () => {
     return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
 

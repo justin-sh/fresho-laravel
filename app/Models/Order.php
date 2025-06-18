@@ -17,6 +17,11 @@ use Ramsey\Uuid\Nonstandard\Uuid;
  * @property string $receiving_company_name
  * @property array $details
  * @property OrderState $state
+ * @property int $number_of_boxes
+ * @property string $delivery_method
+ * @property string $delivery_instructions
+ * @property string $picking_instructions
+ * @property string $additional_notes
  * @property string $delivery_run
  * @property Date $delivery_at
  * @property string $delivery_by

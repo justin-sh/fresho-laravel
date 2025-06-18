@@ -19,10 +19,12 @@ class OrderDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->resource->id,
             'name' => $this->resource->prd_name,
             'group' => $this->resource->group,
             'qty' => $this->resource->qty,
             'qtyType' => $this->resource->qty_type,
+            'price' => $this->resource->price_cents_per_quantity / 100,
             'status' => $this->resource->status,
         ];
     }

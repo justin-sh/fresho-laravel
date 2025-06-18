@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * @property string id
  * @property string order_number
  * @property string prd_code
  * @property string prd_name
  * @property float qty
  * @property string qty_type
+ * @property int price_cents_per_quantity
  * @property string group
  * @property OrderPrdState status
  * @property string customer_notes
