@@ -21,10 +21,10 @@
         </template>
 
         <div class="row">
-            <div class="col">
+            <div class="col-4">
                 <span>Delivery Method:</span><span></span>
             </div>
-            <div class="col">
+            <div class="col-4">
                 <label for="datepicker">Preferred Delivery Date:</label>
                 <div>
                     <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="order.deliveryDate"
@@ -33,28 +33,37 @@
                     <BButton variant="success" size="sm" @click="setToday()" class="ms-2">Today</BButton>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-2">
                 <label for="datepicker">Boxes:</label>
                 <span><BFormInput type="number" class="col-4 d-inline" size="20"/></span>
+            </div>
+            <div class="col-2">
+                <label for="datepicker">Delivery Run:</label>
+                <span>{{ order.deliver_run }}</span>
             </div>
         </div>
 
         <div class="row">
             <div class="col">
-                <span>Picking Instructions:</span><span></span>
-            </div>
-            <div class="col">
-                <label for="datepicker">Preferred Delivery Date:</label>
+                <label for="deliveryInstructions">Delivery Instructions:</label>
                 <div>
-                    <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="order.deliveryDate"
-                                :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
-                    </BFormInput>
-                    <BButton variant="success" size="sm" @click="setToday()" class="ms-2">Today</BButton>
+                    <BFormTextarea id="deliveryInstructions" class="col-4 d-inline" v-model="order.deliveryInstructions">
+                    </BFormTextarea>
                 </div>
             </div>
             <div class="col">
-                <label for="datepicker">Boxes:</label>
-                <span><BFormInput type="number" class="col-4 d-inline" size="20"/></span>
+                <label for="pickingInstructions">Delivery Instructions:</label>
+                <div>
+                    <BFormTextarea id="pickingInstructions" class="col-4 d-inline" v-model="order.pickingInstructions">
+                    </BFormTextarea>
+                </div>
+            </div>
+            <div class="col">
+                <label for="additionalNotes">Additional Notes:</label>
+                <div>
+                    <BFormTextarea id="additionalNotes" class="col-4 d-inline" v-model="order.additionalNotes">
+                    </BFormTextarea>
+                </div>
             </div>
         </div>
     </BCard>
