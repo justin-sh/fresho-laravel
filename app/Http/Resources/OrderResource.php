@@ -23,7 +23,7 @@ class OrderResource extends JsonResource
             'orderNo' => $this->resource->order_number,
             'deliveryDate' => $this->resource->delivery_date->toDateString(),
             'customer' => $this->resource->receiving_company_name,
-            'state' => $this->resource->state,
+            'state' => $this->resource->state->name,
             'deliveryMethod' => $this->resource->delivery_method,
             'deliveryInstructions' => $this->resource->delivery_instructions,
             'pickingInstructions' => $this->resource->picking_instructions,

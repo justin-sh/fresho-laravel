@@ -24,7 +24,7 @@ class OrderDetailResource extends JsonResource
             'group' => $this->resource->group,
             'qty' => $this->resource->qty,
             'qtyType' => $this->resource->qty_type,
-            'price' => $this->resource->price_cents_per_quantity / 100,
+            'price' => bcdiv($this->resource->price_cents_per_quantity, 100, 2),
             'status' => $this->resource->status,
         ];
     }

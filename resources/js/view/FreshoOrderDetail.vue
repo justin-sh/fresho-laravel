@@ -8,6 +8,9 @@
                     <span class="fs-4"> For </span>
                     <span class="inline fw-bold fs-4">{{ order.customer }}</span>
                 </div>
+                <div>
+                    <span>{{ order.state }}</span>
+                </div>
             </template>
 
             <template #footer>
@@ -103,13 +106,13 @@
                         </select>
                     </td>
                     <td>
-                        <input type="number" v-model="p.qty" style="width: 75px;"/>
+                        <input type="number" v-model="p.qty" class="text-end pe-0" style="width: 75px;"/>
                     </td>
                     <td>{{ p.qtyType }}</td>
                     <td>$
-                        <input type="number" v-model="p.price" class="d-inline" style="width: 75px;"/>
+                        <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 75px;"/>
                     </td>
-                    <td>${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
+                    <td class="text-end pe-0">${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -199,7 +202,7 @@ const loading_data = async () => {
 
 const loadDetailForOne = async () => {
     data_loading.value = true
-    order.value = (await syncOrderDetailByOrderNo(route.params.id)).data.data
+    order.value = (await syncOrderDetailByOrderNo(route.params.id, 'OrderDetailPage')).data.data
     console.log(order.value)
     data_loading.value = false
 }

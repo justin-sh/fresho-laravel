@@ -169,6 +169,8 @@ class OrderController extends Controller
     public function searchDetailByOrderNo(Request $request)
     {
         $order_no = $request->str('order_no');
+        $src = $request->str('src', '');
+        $isDetailPage = 'OrderDetailPage' == $src;
         Log::debug("sync order detail data for No:$order_no");
 
         $order = Order::query()
@@ -176,7 +178,7 @@ class OrderController extends Controller
             ->where('order_number', $order_no)
             ->first();
 
-        if (count($order->details) == 0) {
+        if (count($order->details) == 0 || $isDetailPage) {
             //no detail and sync it from Fresho
             $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
 
@@ -226,6 +228,7 @@ class OrderController extends Controller
                     ];
                 }
 
+                $order->details()->delete();
                 $order->details()->createMany($prd_orders);
                 $order->save();
             }
