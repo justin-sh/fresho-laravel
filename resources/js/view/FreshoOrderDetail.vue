@@ -9,20 +9,20 @@
                     <span class="inline fw-bold fs-4">{{ order.customer }}</span>
                 </div>
                 <div>
-                    <span>{{ order.state }}</span>
+                    <span class="bg-success text-white p-1 rounded">{{ order.state }}</span>
                 </div>
             </template>
 
             <template #footer>
-                <div class="d-flex clear">
-                    <div class="col align-content-center">
-                        <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
+                <div class="d-flex clear justify-content-end">
+                    <div>
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="loading_data">
                             Save & Close
                         </BButton>
-                        <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="loading_data">
                             Save & Print Picking Slip
                         </BButton>
-                        <BButton variant="outline-primary" size="sm" :loading="data_loading" @click.stop="loading_data">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="loading_data">
                             Invoice
                         </BButton>
                     </div>
@@ -113,6 +113,13 @@
                         <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 75px;"/>
                     </td>
                     <td class="text-end pe-0">${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <input type="text" name="search" class="w-100 rounded p-1 border-dark-subtle" placeholder="Start typing to find a product">
+                    </td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
