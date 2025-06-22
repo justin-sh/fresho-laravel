@@ -11,6 +11,25 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class OrderResource extends JsonResource
 {
+
+    private array $quantity_types = [];
+    private array $products = [];
+    private array $prices = [];
+    private array $product_items = [];
+
+    public function __construct($resource,
+                                array $quantity_types = [],
+                                array $products = [],
+                                array $prices = [],
+                                array $product_items = [])
+    {
+        parent::__construct($resource);
+        $this->quantity_types = $quantity_types;
+        $this->products = $products;
+        $this->prices = $prices;
+        $this->product_items = $product_items;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -34,6 +53,9 @@ class OrderResource extends JsonResource
             'at' => $this->resource->delivery_at,
             'proof' => $this->resource->delivery_proof,
             'products' => OrderDetailResource::collection($this->resource->details),
+            'prices'=>$this->prices,
+            'quantity_types'=>$this->quantity_types,
+            'product_items'=>$this->product_items,
         ];
     }
 }

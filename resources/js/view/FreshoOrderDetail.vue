@@ -9,7 +9,7 @@
                     <span class="inline fw-bold fs-4">{{ order.customer }}</span>
                 </div>
                 <div>
-                    <span class="bg-success text-white p-1 rounded">{{ order.state }}</span>
+                    <span class="bg-success badge">{{ order.state }}</span>
                 </div>
             </template>
 
@@ -81,7 +81,7 @@
             <table class="table table-bordered mt-4">
                 <thead class="table-secondary">
                 <tr>
-                    <th colspan="2">Product</th>
+                    <th colspan="2" class="w-50">Product</th>
                     <th>Status</th>
                     <th>Quantity</th>
                     <th>Unit</th>

@@ -188,6 +188,7 @@ class OrderController extends Controller
             $isLocked = $rv['supplier_order']['is_locked'];
             if ($isLocked) {
                 $order->is_locked = true;
+                throw new \Exception("Unhandling locked order");
                 //get detail from separate page
                 // url https://app.fresho.com/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/customer_orders/df6126c9-5540-4f81-a441-1691080b4a50
             } else {
@@ -238,7 +239,7 @@ class OrderController extends Controller
 
 //        Log::debug(json_encode($order));
 
-        return new OrderResource($order);
+        return new OrderResource($order, $rv['quantity_types'], $rv['products'], $rv['prices'], $rv['product_items']);
     }
 
     /**
