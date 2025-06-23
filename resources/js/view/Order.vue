@@ -120,7 +120,7 @@
             </template>
             <template #row-details="row">
                 <BCard>
-                    <div class="row" v-for="p in row.item.products" :key="p.name">
+                    <div class="row" v-for="p in row.item.product_orders" :key="p.name">
                         <div class="col-2">{{ p.group }}</div>
                         <div class="col">{{ p.name }}</div>
                         <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
