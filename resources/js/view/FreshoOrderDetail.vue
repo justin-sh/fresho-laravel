@@ -259,7 +259,7 @@ const printLabel = async function (row) {
     const f = document.forms[row.id];
     f.querySelector('input[name="_token"]').value = getCsrfToken();
     const prds = [];
-    row.products.forEach(p => {
+    row.product_orders.forEach(p => {
 
         if (!['backorder', 'n/a'].includes(p.status)) {
             var x = toDate(row.deliveryDate);

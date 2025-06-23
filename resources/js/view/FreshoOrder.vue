@@ -126,7 +126,7 @@
                         <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
                         <div class="col-2">{{ p.status }}</div>
                     </div>
-                    <div v-if="!row.item.products">No Products</div>
+                    <div v-if="!row.item.product_orders">No Products</div>
                 </BCard>
             </template>
         </BTable>
@@ -293,7 +293,7 @@ const printLabel = async function (row){
     const f = document.forms[row.id];
     f.querySelector('input[name="_token"]').value = getCsrfToken();
     const prds = [];
-    row.products.forEach(p=>{
+    row.product_orders.forEach(p=>{
 
         if(!['backorder','n/a'].includes(p.status)) {
             var x = toDate(row.deliveryDate);
