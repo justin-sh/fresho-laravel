@@ -90,7 +90,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="p in order.products">
+                <tr v-for="p in order.product_orders">
                     <td style="border-right: none;">
                         {{ p.name }}
                     </td>

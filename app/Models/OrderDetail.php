@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string id
  * @property string order_number
  * @property string prd_code
+ * @property string product_id
  * @property string prd_name
  * @property float qty
  * @property string qty_type
@@ -20,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class OrderDetail extends Model
 {
+
+    use HasUuids;
 
     public $timestamps = false;
 

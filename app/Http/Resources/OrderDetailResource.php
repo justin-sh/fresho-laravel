@@ -20,12 +20,15 @@ class OrderDetailResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
+            'product_id' => $this->resource->product_id,
             'name' => $this->resource->prd_name,
             'group' => $this->resource->group,
             'qty' => $this->resource->qty,
             'qtyType' => $this->resource->qty_type,
             'price' => bcdiv($this->resource->price_cents_per_quantity, 100, 2),
             'status' => $this->resource->status,
+            'customer_notes' => $this->resource->customer_notes,
+            'supplier_notes' => $this->resource->supplier_notes,
         ];
     }
 }

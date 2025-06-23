@@ -178,6 +178,10 @@ class OrderController extends Controller
             ->where('order_number', $order_no)
             ->first();
 
+        $quantity_types = [];
+        $products = [];
+        $prices = [];
+        $product_items = [];
         if (count($order->details) == 0 || $isDetailPage) {
             //no detail and sync it from Fresho
             $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
@@ -188,10 +192,15 @@ class OrderController extends Controller
             $isLocked = $rv['supplier_order']['is_locked'];
             if ($isLocked) {
                 $order->is_locked = true;
-                throw new \Exception("Unhandling locked order");
+                throw new \Exception("Unhandling LOCKED order");
                 //get detail from separate page
                 // url https://app.fresho.com/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/customer_orders/df6126c9-5540-4f81-a441-1691080b4a50
             } else {
+                $quantity_types = $rv['quantity_types'];
+                $products = $rv['products'];
+                $prices = $rv['prices'];
+                $product_items = $rv['product_items'];
+
                 $run = $rv['supplier_order']['delivery_run_code'];
                 $picking_instructions = $rv['supplier_order']['picking_instructions'];
                 $number_of_boxes = $rv['supplier_order']['number_of_boxes'] ?? 0;
@@ -239,7 +248,7 @@ class OrderController extends Controller
 
 //        Log::debug(json_encode($order));
 
-        return new OrderResource($order, $rv['quantity_types'], $rv['products'], $rv['prices'], $rv['product_items']);
+        return new OrderResource($order, $quantity_types, $products, $prices, $product_items);
     }
 
     /**
