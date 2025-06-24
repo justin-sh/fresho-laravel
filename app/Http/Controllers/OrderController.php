@@ -227,6 +227,7 @@ class OrderController extends Controller
                         'product_id'=>$d['product_id'],
                         'prd_name'=>$d['product_name'],
                         'qty'=>$d['quantity'],
+                        'quantity_type_id'=>$d['quantity_type_id'],
                         'qty_type'=>$d['quantity_type_name'],
                         'original_quantity'=>$d['original_quantity'],
                         'price_cents_per_quantity'=>$d['price_per_quantity'],

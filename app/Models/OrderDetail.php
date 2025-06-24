@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string product_id
  * @property string prd_name
  * @property float qty
+ * @property string quantity_type_id
  * @property string qty_type
  * @property int price_cents_per_quantity
  * @property string group

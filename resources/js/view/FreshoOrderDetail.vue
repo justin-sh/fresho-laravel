@@ -108,7 +108,12 @@
                     <td>
                         <input type="number" v-model="p.qty" class="text-end pe-0" style="width: 75px;"/>
                     </td>
-                    <td>{{ p.qtyType }}</td>
+                    <td>
+                        <template v-if="order.products&&order.products">
+                        {{ order.products }}
+                        {{ p.qtyType }}
+                        </template>
+                    </td>
                     <td>$
                         <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 75px;"/>
                     </td>

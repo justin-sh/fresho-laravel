@@ -37,6 +37,13 @@ class OrderResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $prds = [];
+        foreach($this->products as $v){
+            $id = $v['id'];
+            unset($v['id']);
+            $prds[$id] = $v;
+        }
+
         return [
             'id' => $this->resource->id,
             'orderNo' => $this->resource->order_number,
@@ -53,7 +60,7 @@ class OrderResource extends JsonResource
             'at' => $this->resource->delivery_at,
             'proof' => $this->resource->delivery_proof,
             'product_orders' => OrderDetailResource::collection($this->resource->details),
-            'products'=>$this->products,
+            'products'=>$prds,
             'prices'=>$this->prices,
             'quantity_types'=>$this->quantity_types,
             'product_items'=>$this->product_items,
