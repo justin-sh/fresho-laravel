@@ -229,10 +229,12 @@ const searchFreshoOrder = async () => {
 }
 
 const loadDetailForOne = async (row) => {
-    if(!row.detailsShowing){
+    // console.log(row)
+    if(!row.detailsShowing && row.item.product_orders.length == 0){
         detail_syncing.value = true
         current_order_no.value = row.item.orderNo
-        await syncOrderDetailByOrderNo(row.item.orderNo)
+        const orderWithDetail = (await syncOrderDetailByOrderNo(row.item.orderNo, 'OrderPage')).data.data
+        row.item.product_orders = orderWithDetail.product_orders
         detail_syncing.value = false
     }
     row.toggleDetails()

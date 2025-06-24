@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @property Order $resource
@@ -37,12 +38,11 @@ class OrderResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $prds = [];
-        foreach($this->products as $v){
-            $id = $v['id'];
-            unset($v['id']);
-            $prds[$id] = $v;
-        }
+        $prds = collect($this->products)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
+        $prices = collect($this->prices)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
+        $qtyTypes = collect($this->quantity_types)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
+        $product_items = collect($this->product_items)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
+        Log::debug(json_encode($prices));
 
         return [
             'id' => $this->resource->id,
@@ -61,9 +61,16 @@ class OrderResource extends JsonResource
             'proof' => $this->resource->delivery_proof,
             'product_orders' => OrderDetailResource::collection($this->resource->details),
             'products'=>$prds,
-            'prices'=>$this->prices,
-            'quantity_types'=>$this->quantity_types,
-            'product_items'=>$this->product_items,
+            'prices'=>$prices,
+            'quantity_types'=>$qtyTypes,
+            'product_items'=>$product_items,
         ];
+    }
+
+    private function unsetIdFromArray($arr): array
+    {
+        $id = $arr['id'];
+        unset($arr['id']);
+        return [$id => $arr];
     }
 }

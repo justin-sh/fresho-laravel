@@ -16,13 +16,13 @@
             <template #footer>
                 <div class="d-flex clear justify-content-end">
                     <div>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="loading_data">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="saveNClose">
                             Save & Close
                         </BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="loading_data">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="saveNClose">
                             Save & Print Picking Slip
                         </BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="loading_data">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="saveNClose">
                             Invoice
                         </BButton>
                     </div>
@@ -109,9 +109,17 @@
                         <input type="number" v-model="p.qty" class="text-end pe-0" style="width: 75px;"/>
                     </td>
                     <td>
-                        <template v-if="order.products&&order.products">
-                        {{ order.products }}
-                        {{ p.qtyType }}
+                        <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
+
+                            <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">
+                                <option :value="order.product_items[piid]['quantity_type_id']" :data-piid="piid" v-for="piid in order.products[p.product_id]['product_item_ids']">
+                                    {{ order.quantity_types[order.product_items[piid]['quantity_type_id']].name }}
+                                </option>
+                            </select>
+
+                        </template>
+                        <template v-else>
+                            {{ p.qtyType }}
                         </template>
                     </td>
                     <td>$
@@ -169,47 +177,24 @@ const data_loading = shallowRef(false)
 
 let abortController: AbortController | null = null;
 
-const loading_data = async () => {
+const saveNClose = async () => {
+    console.log(order.value)
+}
 
-    // data_loading.value = true
-    // orders.value = []
-    // orders_backup = orders.value
-    // if (abortController != null) {
-    //     abortController.abort()
-    // }
+const qtyTypeChanged = function (p, evt){
+    const prdId = p.product_id
+    const qtyTypeId = p.qtyTypeId
+    const piid = evt.srcElement.selectedOptions[0].dataset['piid']
+    const pitem = order.value.product_items[piid]
 
-    // try {
-    //     abortController = new AbortController()
-
-    //     const data = (await searchFreshoOrdersWithFilters({
-    //             delivery_date: deliveryDate.value,
-    //             delivery_date2: deliveryDate.value,
-    //             customer: customer.value,
-    //             product: product.value,
-    //             status: status.value,
-    //             credit: credit.value,
-    //         },
-    //         {signal: abortController.signal}
-    //     )).data.data
-
-
-    //     orders.value = data.map(function (x) {
-    //         x.detailsShowing = false
-    //         x.delivery_date_md = formatInTimeZone(new Date(x.deliveryDate), localTZ, "yyyy-MM-dd")
-    //         x.delivery_at_hm = x.at ? formatInTimeZone(new Date(x.at), localTZ, "HH:mm") : ''
-    //         return x
-    //     })
-
-    //     orders_backup = orders.value
-
-    // } catch (e) {
-    //     if (!(e instanceof CanceledError)) {
-    //         console.error(e)
-    //     }
-    // } finally {
-    //     abortController = null
-    //     data_loading.value = false
-    // }
+    p.price = order.value.prices[pitem['price_id']]['price']/100
+    p.group = pitem['product_group']
+    console.log(p)
+    console.log(p.qtyTypeId)
+    // console.log(`prdId    =${prdId}`)
+    // console.log(`qtyTypeId=${qtyTypeId}`)
+    // console.log(`pii      d=${piid}`)
+    // console.log(`pitem    d=${pitem}`)
 }
 
 const loadDetailForOne = async () => {
@@ -236,26 +221,26 @@ onMounted(() => {
     loadDetailForOne()
 })
 
-watch([deliveryDate, customer, product, status, credit, runs],
-    async ([deliveryDate_new, customer_new, product_new, status_new, credit_new, runs_new],
-           [deliveryDate_old, customer_old, product_old, status_old, credit_old, runs_old]) => {
-
-        // console.log(`deliveryDate ${deliveryDate_old}=>${deliveryDate_new}`)
-
-        runs_old = runs_old || []
-        if (runs_new.toString() !== runs_old.toString()) {
-            const _s = new Date().getTime()
-            let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
-            // console.log("filter data in js:" + (new Date().getTime() - _s))
-            orders.value = x
-            // setTimeout(() => {
-            //     console.log("update page:" + (new Date().getTime() - _s))
-            // }, 0);
-        } else {
-            // console.log('loading data')
-            await loading_data()
-        }
-    }, {immediate: true})
+// watch([deliveryDate, customer, product, status, credit, runs],
+//     async ([deliveryDate_new, customer_new, product_new, status_new, credit_new, runs_new],
+//            [deliveryDate_old, customer_old, product_old, status_old, credit_old, runs_old]) => {
+//
+//         // console.log(`deliveryDate ${deliveryDate_old}=>${deliveryDate_new}`)
+//
+//         runs_old = runs_old || []
+//         if (runs_new.toString() !== runs_old.toString()) {
+//             const _s = new Date().getTime()
+//             let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
+//             // console.log("filter data in js:" + (new Date().getTime() - _s))
+//             orders.value = x
+//             // setTimeout(() => {
+//             //     console.log("update page:" + (new Date().getTime() - _s))
+//             // }, 0);
+//         } else {
+//             // console.log('loading data')
+//             // await loading_data()
+//         }
+//     }, {immediate: true})
 
 
 const printLabel = async function (row) {
