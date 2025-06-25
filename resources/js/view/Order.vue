@@ -161,6 +161,7 @@ const fields = [
     {key: 'orderNo', label: 'Order#', sortable: true},
     {key: 'delivery_date_md', label: 'Date', sortable: true},
     {key: 'customer', label: 'Customer', sortable: true},
+    {key: 'run', label: 'Run', sortable: true},
     {key: 'state', label: 'State', sortable: true},
     {key: 'by', label: 'By', sortable: true},
     {key: 'delivery_at_hm', label: 'At', sortable: true},
