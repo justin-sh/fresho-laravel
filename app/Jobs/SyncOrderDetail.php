@@ -45,7 +45,7 @@ class SyncOrderDetail implements ShouldQueue
         $orderDetail = [];
         $orderNoCodeIdex = [];
         if (($fp = fopen($absFilename, 'r')) !== false) {
-            $row = 1;
+            // $row = 1;
             $header = true;
             while (($data = fgetcsv($fp)) !== false) {
                 if ($header === true) {
@@ -67,12 +67,13 @@ class SyncOrderDetail implements ShouldQueue
                 $ordNo = $data[12];
 
                 
-                $orderNoCodeIdex[$ordNo . $prdCode] = array_key_exists($ordNo . $prdCode, $orderNoCodeIdex)? ($orderNoCodeIdex[$ordNo . $prdCode] + 1) : 1;
-
+                $orderNoCodeIdex[$ordNo] = array_key_exists($ordNo, $orderNoCodeIdex)? ($orderNoCodeIdex[$ordNo] + 1) : 0;
+                
                 $orderDetail[] = [
+                    'id' => '',
                     'group' => $data[0],
                     'prd_code' => $prdCode,
-                    'idx' => $orderNoCodeIdex[$ordNo . $prdCode],
+                    'idx' => $orderNoCodeIdex[$ordNo],
                     'prd_name' => $data[2],
                     'qty_type' => $data[3],
                     'qty' => floatval($data[4]),
@@ -81,10 +82,11 @@ class SyncOrderDetail implements ShouldQueue
                     'status' => $data[7],
                     'order_number' => $data[12],
                 ];
+
 //                Log::debug();
 //                Log::debug($data[1]);
 
-                $row++;
+                // $row++;
             }
 
             fclose($fp);
