@@ -10,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -66,9 +67,9 @@ class SyncOrderDetail implements ShouldQueue
                 $prdCode = Str::trim($data[1], "'");
                 $ordNo = $data[12];
 
-                
-                $orderNoCodeIdex[$ordNo] = array_key_exists($ordNo, $orderNoCodeIdex)? ($orderNoCodeIdex[$ordNo] + 1) : 0;
-                
+
+                $orderNoCodeIdex[$ordNo] = array_key_exists($ordNo, $orderNoCodeIdex) ? ($orderNoCodeIdex[$ordNo] + 1) : 0;
+
                 $orderDetail[] = [
                     'id' => '',
                     'group' => $data[0],
@@ -92,14 +93,24 @@ class SyncOrderDetail implements ShouldQueue
             fclose($fp);
         }
 
-        DB::transaction(function () use ($order, $orderDetail) {
+        $on = '';
+        $dIdx = 0;
+        $sortedDetail = collect($orderDetail)->sortBy(['order_number', 'prd_code'])
+            ->map(function ($d) use (&$on, &$dIdx) {
+                $dIdx = $on == $d['order_number'] ? $dIdx + 1 : 0;
+//                Log::debug("orderNo:" . $d['order_number'] . '..' . $d['prd_code'] . ' idx:' . $d['idx'] .'->'.$dIdx);
+                $on = $d['order_number'];
+                return array_merge($d, ['idx' => $dIdx]);
+            })->all();
+
+        DB::transaction(function () use ($order, $sortedDetail) {
             collect($order)->each(function ($x) {
                 Order::query()->where('order_number', $x['order_no'])
                     ->update(['delivery_run' => $x['run']]);
             });
 
             // did not handle the deleted product case
-            OrderDetail::upsert($orderDetail, ['order_number', 'prd_code', 'idx'], ['qty_type', 'qty', 'supplier_notes', 'customer_notes', 'status']);
+            OrderDetail::upsert($sortedDetail, ['order_number', 'prd_code', 'idx'], ['qty_type', 'qty', 'supplier_notes', 'customer_notes', 'status']);
 
         });
 

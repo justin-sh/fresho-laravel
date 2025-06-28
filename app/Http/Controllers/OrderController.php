@@ -216,9 +216,12 @@ class OrderController extends Controller
                 $order->is_credit_note = $is_credit_note;
                 $order->freight_rule = $freight_rule;
 
-                $details = $rv['product_orders'];
+//                $details = $rv['product_orders'];
+
+                $details = collect($rv['product_orders'])->sortBy('product_code')->all();
                 $prd_orders = [];
-                foreach ($details as $idx=>$d){
+                $idx = 0;
+                foreach ($details as $d){
                     $prd_orders[] = [
                         'id'=>$d['id'],
                         'order_number'=>$order_no,
@@ -237,6 +240,7 @@ class OrderController extends Controller
                         'customer_notes'=>$d['notes']??'',
                         'supplier_notes'=>$d['supplier_notes']??'',
                     ];
+                    $idx = $idx + 1;
                 }
 
                 $order->details()->delete();
@@ -246,8 +250,6 @@ class OrderController extends Controller
 
             $order->refresh();
         }
-
-//        Log::debug(json_encode($order));
 
         return new OrderResource($order, $quantity_types, $products, $prices, $product_items);
     }

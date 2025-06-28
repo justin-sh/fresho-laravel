@@ -79,7 +79,7 @@
         </div>
     </header>
 
-    <div class="container vh90">
+    <div class="container vh90 vw-mix">
         <RouterView/>
     </div>
     <footer>
@@ -102,5 +102,11 @@ onMounted(async function () {
 <style>
 .vh90 {
     min-height: calc(100vh - 105px);
+}
+
+@media (min-width: 1200px) {
+    .vw-mix{
+        max-width: calc(100vw - 80px);
+    }
 }
 </style>
