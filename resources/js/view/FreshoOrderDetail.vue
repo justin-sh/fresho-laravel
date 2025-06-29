@@ -346,8 +346,6 @@ tbody tr {
 }
 
 .list-group-item:hover{
-    //color: lightgreen;
-    //color: #009A44;
     font-weight: bold;
     background-color: rgb(239, 239, 239);
 }
