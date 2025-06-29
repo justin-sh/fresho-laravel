@@ -16,13 +16,16 @@
             <template #footer>
                 <div class="d-flex clear justify-content-end">
                     <div>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="saveNClose">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
+                                 @click.stop="saveNClose">
                             Save & Close
                         </BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="saveNClose">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
+                                 @click.stop="saveNClose">
                             Save & Print Picking Slip
                         </BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading" @click.stop="saveNClose">
+                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
+                                 @click.stop="saveNClose">
                             Invoice
                         </BButton>
                     </div>
@@ -112,7 +115,8 @@
                         <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
 
                             <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">
-                                <option :value="order.product_items[piid]['quantity_type_id']" :data-piid="piid" v-for="piid in order.products[p.product_id]['product_item_ids']">
+                                <option :value="order.product_items[piid]['quantity_type_id']" :data-piid="piid"
+                                        v-for="piid in order.products[p.product_id]['product_item_ids']">
                                     {{ order.quantity_types[order.product_items[piid]['quantity_type_id']].name }}
                                 </option>
                             </select>
@@ -129,8 +133,20 @@
                 </tr>
 
                 <tr>
-                    <td colspan="2">
-                        <input type="text" name="search" class="w-100 rounded p-1 border-dark-subtle" placeholder="Start typing to find a product">
+                    <td colspan="2" class="position-relative">
+                        <div>
+                            <input type="text" v-model="s" name="search" @keyup="searchProducts"
+                                   class="w-100 rounded p-1 border-dark-subtle"
+                                   placeholder="Start typing to find a product">
+                        </div>
+                        <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">
+                            <a href="#" class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id">
+                                {{ prd.name }}
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+                            <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+                            <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+                        </div>
                     </td>
                     <td></td>
                 </tr>
@@ -141,12 +157,13 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, shallowRef, watch} from "vue";
+import {onMounted, ref, shallowRef} from "vue";
 import bigDecimal from "js-big-decimal";
-import {syncOrderDetailByOrderNo} from '../api'
+import {searchProductsByKey, syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import {values} from "pusher-js/types/src/core/utils/collections";
 
 const router = useRouter()
 const route = useRoute()
@@ -160,6 +177,8 @@ const status = shallowRef(['submitted', 'accepted', 'invoiced'])
 const credit = shallowRef('no')
 const order_run = ['EDN', 'EDS', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR']
 const runs = shallowRef([])
+const s = ref('');
+const prdRv = ref([])
 
 const order = ref({'id': ''})
 let orders_backup = []
@@ -181,13 +200,13 @@ const saveNClose = async () => {
     console.log(order.value)
 }
 
-const qtyTypeChanged = function (p, evt){
+const qtyTypeChanged = function (p, evt) {
     const prdId = p.product_id
     const qtyTypeId = p.qtyTypeId
     const piid = evt.srcElement.selectedOptions[0].dataset['piid']
     const pitem = order.value.product_items[piid]
 
-    p.price = order.value.prices[pitem['price_id']]['price']/100
+    p.price = order.value.prices[pitem['price_id']]['price'] / 100
     p.group = pitem['product_group']
     console.log(p)
     console.log(p.qtyTypeId)
@@ -200,8 +219,19 @@ const qtyTypeChanged = function (p, evt){
 const loadDetailForOne = async () => {
     data_loading.value = true
     order.value = (await syncOrderDetailByOrderNo(route.params.id, 'OrderDetailPage')).data.data
-    console.log(order.value)
+    // console.log(order.value)
     data_loading.value = false
+}
+
+const searchProducts = async () => {
+    console.log('----seach products---')
+    console.log('-------' + s.value)
+    if (s.value.trim().length < 3) {
+        prdRv.value = []
+        return;
+    }
+    prdRv.value = (await searchProductsByKey(s.value, order.value.id)).data.search_products;
+    console.log(prdRv.value)
 }
 
 onBeforeRouteLeave((to, before) => {
@@ -306,5 +336,18 @@ tbody tr {
 
 .card-footer ul {
     margin-bottom: 0;
+}
+
+.prd-list {
+    padding-right: 0.9rem;
+    margin-top: -0.1rem;
+    height: 140px;
+    overflow-y: scroll;
+}
+
+.list-group-item:hover{
+    //color: lightgreen;
+    color: #009A44;
+    background-color: rgb(239, 239, 239);
 }
 </style>

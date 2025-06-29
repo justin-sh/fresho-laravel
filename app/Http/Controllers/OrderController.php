@@ -166,7 +166,7 @@ class OrderController extends Controller
         return $this->index($request);
     }
 
-    public function searchDetailByOrderNo(Request $request)
+    public function searchDetailByOrderNo(Request $request): JsonResource
     {
         $order_no = $request->str('order_no');
         $src = $request->str('src', '');
@@ -187,7 +187,7 @@ class OrderController extends Controller
             $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
 
             $rv = Http::get($url)->json();
-            Log::debug(json_encode($rv));
+//            Log::debug(json_encode($rv));
             // locked::: {"supplier_order":{"id":"0be5d6f4-451b-4e83-9c7e-9f0b05e8d63a","state":"invoiced","order_number":"40679598","prefixed_order_number":"F40679598","is_locked":true,"receiving_company_name":"Butcher on Deakin","payment_method_available":false}}
             $isLocked = $rv['supplier_order']['is_locked'];
             if ($isLocked) {
@@ -221,24 +221,24 @@ class OrderController extends Controller
                 $details = collect($rv['product_orders'])->sortBy('product_code')->all();
                 $prd_orders = [];
                 $idx = 0;
-                foreach ($details as $d){
+                foreach ($details as $d) {
                     $prd_orders[] = [
-                        'id'=>$d['id'],
-                        'order_number'=>$order_no,
-                        'prd_code'=>$d['product_code'],
-                        'idx'=>$idx,
-                        'product_id'=>$d['product_id'],
-                        'prd_name'=>$d['product_name'],
-                        'qty'=>$d['quantity'],
-                        'quantity_type_id'=>$d['quantity_type_id'],
-                        'qty_type'=>$d['quantity_type_name'],
-                        'original_quantity'=>$d['original_quantity'],
-                        'price_cents_per_quantity'=>$d['price_per_quantity'],
-                        'cost_cents'=>$d['cost_cents'],
-                        'group'=>$d['product_group'],
-                        'status'=>$d['supplied_status'],
-                        'customer_notes'=>$d['notes']??'',
-                        'supplier_notes'=>$d['supplier_notes']??'',
+                        'id' => $d['id'],
+                        'order_number' => $order_no,
+                        'prd_code' => $d['product_code'],
+                        'idx' => $idx,
+                        'product_id' => $d['product_id'],
+                        'prd_name' => $d['product_name'],
+                        'qty' => $d['quantity'],
+                        'quantity_type_id' => $d['quantity_type_id'],
+                        'qty_type' => $d['quantity_type_name'],
+                        'original_quantity' => $d['original_quantity'],
+                        'price_cents_per_quantity' => $d['price_per_quantity'],
+                        'cost_cents' => $d['cost_cents'],
+                        'group' => $d['product_group'],
+                        'status' => $d['supplied_status'],
+                        'customer_notes' => $d['notes'] ?? '',
+                        'supplier_notes' => $d['supplier_notes'] ?? '',
                     ];
                     $idx = $idx + 1;
                 }
@@ -252,6 +252,25 @@ class OrderController extends Controller
         }
 
         return new OrderResource($order, $quantity_types, $products, $prices, $product_items);
+    }
+
+    public function searchProductsByKey(Request $request)
+    {
+        $prdKey = $request->str('s', '');
+        $orderId = $request->str('order_id', '');
+//        $sellingCompanyId = $request->str('selling_company_id','');
+        Log::debug("product key=$prdKey, orderId=$orderId");
+
+        $url = 'https://app.fresho.com/api/v1/my/customers/search_products';
+        $params = [
+            'q[term]' => $prdKey,
+            'order_id' => $orderId,
+            'selling_company_id' => 'b181ee08-2214-46ec-ad1e-926a2bbfb8fb',
+        ];
+
+        $rv = Http::withHeader('fresho-mode', 'sell')->get($url, $params)->json();
+
+        return json_encode($rv);
     }
 
     /**

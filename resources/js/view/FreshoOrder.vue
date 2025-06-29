@@ -160,6 +160,7 @@ const fields = [
     {key: 'orderNo', label: 'Order#', sortable: true},
     {key: 'delivery_date_md', label: 'Date', sortable: true},
     {key: 'customer', label: 'Customer', sortable: true},
+    {key: 'run', label: 'Run', sortable: true},
     {key: 'state', label: 'State', sortable: true},
     {key: 'show_details', label: 'Action'},
 ]
