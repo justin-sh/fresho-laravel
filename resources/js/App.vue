@@ -104,7 +104,7 @@ onMounted(async function () {
     min-height: calc(100vh - 105px);
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1200px and max-width: 1400px) {
     .vw-mix{
         max-width: calc(100vw - 80px);
     }
