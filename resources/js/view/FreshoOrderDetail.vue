@@ -135,17 +135,17 @@
                 <tr>
                     <td colspan="2" class="position-relative">
                         <div>
+                            <div class="position-absolute d-inline mt-1 ps-1 text-body-tertiary">
+                                <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                            </div>
                             <input type="text" v-model="s" name="search" @keyup="searchProducts"
-                                   class="w-100 rounded p-1 border-dark-subtle"
+                                   class="w-100 rounded ps-4 border-dark-subtle"
                                    placeholder="Start typing to find a product">
                         </div>
                         <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">
-                            <a href="#" class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id">
+                            <div href="#" class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id">
                                 {{ prd.name }}
-                            </a>
-                            <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-                            <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-                            <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+                            </div>
                         </div>
                     </td>
                     <td></td>
@@ -347,7 +347,8 @@ tbody tr {
 
 .list-group-item:hover{
     //color: lightgreen;
-    color: #009A44;
+    //color: #009A44;
+    font-weight: bold;
     background-color: rgb(239, 239, 239);
 }
 </style>
