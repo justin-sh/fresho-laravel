@@ -115,6 +115,7 @@
                         <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
 
                             <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">
+                                <option value="" disabled>Select</option>
                                 <option :value="order.product_items[piid]['quantity_type_id']" :data-piid="piid"
                                         v-for="piid in order.products[p.product_id]['product_item_ids']">
                                     {{ order.quantity_types[order.product_items[piid]['quantity_type_id']].name }}
@@ -136,14 +137,15 @@
                     <td colspan="2" class="position-relative">
                         <div>
                             <div class="position-absolute d-inline mt-1 ps-1 text-body-tertiary">
-                                <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                                <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>
                             </div>
                             <input type="text" v-model="s" name="search" @keyup="searchProducts"
                                    class="w-100 rounded ps-4 border-dark-subtle"
                                    placeholder="Start typing to find a product">
                         </div>
                         <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">
-                            <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id" @click="getProductById(prd.id)">
+                            <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id"
+                                 @click="getProductById(prd.id)">
                                 {{ prd.name }}
                             </div>
                         </div>
@@ -159,11 +161,11 @@
 <script lang="ts" setup>
 import {onMounted, ref, shallowRef} from "vue";
 import bigDecimal from "js-big-decimal";
-import {searchProductsByKey, getProductInfoById, syncOrderDetailByOrderNo} from '../api'
+import {getProductInfoById, searchProductsByKey, syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
-import {values} from "pusher-js/types/src/core/utils/collections";
+import {v4 as uuidv4} from 'uuid';
 
 const router = useRouter()
 const route = useRoute()
@@ -175,24 +177,12 @@ const customer = shallowRef('')
 const product = shallowRef('')
 const status = shallowRef(['submitted', 'accepted', 'invoiced'])
 const credit = shallowRef('no')
-const order_run = ['EDN', 'EDS', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR']
-const runs = shallowRef([])
 const s = ref('');
 const prdRv = ref([])
 
 const order = ref({'id': ''})
-let orders_backup = []
-
-const fields = [
-    {key: 'orderNo', label: 'Order#', sortable: true},
-    {key: 'delivery_date_md', label: 'Date', sortable: true},
-    {key: 'customer', label: 'Customer', sortable: true},
-    {key: 'state', label: 'State', sortable: true},
-    {key: 'show_details', label: 'Action'},
-]
 
 const data_loading = shallowRef(false)
-
 
 let abortController: AbortController | null = null;
 
@@ -206,9 +196,10 @@ const qtyTypeChanged = function (p, evt) {
     const piid = evt.srcElement.selectedOptions[0].dataset['piid']
     const pitem = order.value.product_items[piid]
 
-    p.price = order.value.prices[pitem['price_id']]['price'] / 100
+    p.price = (order.value.prices[pitem['price_id']]['price'] / 100).toFixed(2)
     p.group = pitem['product_group']
     console.log(p)
+    console.log(order.value)
     console.log(p.qtyTypeId)
     // console.log(`prdId    =${prdId}`)
     // console.log(`qtyTypeId=${qtyTypeId}`)
@@ -219,13 +210,10 @@ const qtyTypeChanged = function (p, evt) {
 const loadDetailForOne = async () => {
     data_loading.value = true
     order.value = (await syncOrderDetailByOrderNo(route.params.id, 'OrderDetailPage')).data.data
-    // console.log(order.value)
     data_loading.value = false
 }
 
 const searchProducts = async () => {
-    console.log('----seach products---')
-    console.log('-------' + s.value)
     if (s.value.trim().length < 3) {
         prdRv.value = []
         return;
@@ -238,73 +226,61 @@ const getProductById = async (pid) => {
     console.log('----get product info ---')
     console.log('-------' + s.value)
     console.log('-------' + pid)
+    s.value = ''
+    prdRv.value = []
     const prd = (await getProductInfoById(pid, order.value.id)).data;
     console.log(prd)
 
     console.log(order.value)
-    prd.prices.forEach(e=>{
-        if(!(e.id in order.value.prices)){
-            const eid = e.id
+    const productsInfo = {'price_ids': [], 'product_item_ids': []}
+    prd.prices.forEach(e => {
+        const eid = e.id
+        productsInfo['price_ids'].push(eid)
+        if (!(eid in order.value.prices)) {
             delete e['id']
             order.value.prices[eid] = e
         }
     })
 
-    prd.product_items.forEach(e=>{
-        if(!(e.id in order.value.product_items)){
+    prd.product_items.forEach(e => {
+        const eid = e.id
+        productsInfo['product_item_ids'].push(eid)
+        if (!(eid in order.value.product_items)) {
             const eid = e.id
             delete e['id']
             order.value.product_items[eid] = e
         }
     })
 
-    prd.products.forEach(e=>{
-        if(!(e.id in order.value.products)){
-            const eid = e.id
-            delete e['id']
-            order.value.products[eid] = e
-        }
-    })
+    productsInfo['name'] = prd.products[0]['name']
+    order.value.products[pid] = productsInfo
 
-    prd.quantity_types.forEach(e=>{
-        if(!(e.id in order.value.quantity_types)){
+    prd.quantity_types.forEach(e => {
+        if (!(e.id in order.value.quantity_types)) {
             const eid = e.id
             delete e['id']
             order.value.quantity_types[eid] = e
         }
     })
 
-    const p = prd.products[0]
-    order.value.product_orders.push(
-        {
-            'id':'',
-            'name':p.name,
-            'group':'',
-            'customer_notes':'',
-            'price':0,
-            'product_id':p.id,
-            'qty': 0,
-            'qtyType':'',
-            'qtyTypeId':'',
-            'status':'supplied',
-            'supplier_notes':''
-        }
-    )
+    const curPrd = {
+        'id': uuidv4(),
+        'name': prd.products[0].name,
+        'group': prd.product_items.length == 1 ? prd.product_items[0].product_group : '',
+        'customer_notes': '',
+        'price': prd.prices.length == 1 ? (prd.prices[0].price / 100).toFixed(2) : 0,
+        'product_id': pid,
+        'qty': 0,
+        'qtyType': prd.quantity_types.length == 1 ? prd.quantity_types[0].name : '',
+        'qtyTypeId': prd.quantity_types.length == 1 ? prd.quantity_types[0].id : '',
+        'status': 'supplied',
+        'supplier_notes': ''
+    }
+    order.value.product_orders.push(curPrd)
 
-    prdRv.value = []
 }
 
 onBeforeRouteLeave((to, before) => {
-    // if (to.name == 'dept-report') {
-    //     to.meta.orders = orders.value
-
-    //     const weedDay = toDate(deliveryDate.value).getDay()
-    //     if ([2, 4].includes(weedDay)) {
-    //         to.meta.ordered_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-    //     } else {
-    //         to.meta.ordered_run = ['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-    //     }
-    // }
 })
 
 onMounted(() => {
@@ -405,7 +381,7 @@ tbody tr {
     overflow-y: scroll;
 }
 
-.list-group-item:hover{
+.list-group-item:hover {
     font-weight: bold;
     background-color: rgb(239, 239, 239);
 }
