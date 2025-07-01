@@ -143,7 +143,7 @@
                                    placeholder="Start typing to find a product">
                         </div>
                         <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">
-                            <div href="#" class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id">
+                            <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id" @click="getProductById(prd.id)">
                                 {{ prd.name }}
                             </div>
                         </div>
@@ -159,7 +159,7 @@
 <script lang="ts" setup>
 import {onMounted, ref, shallowRef} from "vue";
 import bigDecimal from "js-big-decimal";
-import {searchProductsByKey, syncOrderDetailByOrderNo} from '../api'
+import {searchProductsByKey, getProductInfoById, syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
@@ -232,6 +232,66 @@ const searchProducts = async () => {
     }
     prdRv.value = (await searchProductsByKey(s.value, order.value.id)).data.search_products;
     console.log(prdRv.value)
+}
+
+const getProductById = async (pid) => {
+    console.log('----get product info ---')
+    console.log('-------' + s.value)
+    console.log('-------' + pid)
+    const prd = (await getProductInfoById(pid, order.value.id)).data;
+    console.log(prd)
+
+    console.log(order.value)
+    prd.prices.forEach(e=>{
+        if(!(e.id in order.value.prices)){
+            const eid = e.id
+            delete e['id']
+            order.value.prices[eid] = e
+        }
+    })
+
+    prd.product_items.forEach(e=>{
+        if(!(e.id in order.value.product_items)){
+            const eid = e.id
+            delete e['id']
+            order.value.product_items[eid] = e
+        }
+    })
+
+    prd.products.forEach(e=>{
+        if(!(e.id in order.value.products)){
+            const eid = e.id
+            delete e['id']
+            order.value.products[eid] = e
+        }
+    })
+
+    prd.quantity_types.forEach(e=>{
+        if(!(e.id in order.value.quantity_types)){
+            const eid = e.id
+            delete e['id']
+            order.value.quantity_types[eid] = e
+        }
+    })
+
+    const p = prd.products[0]
+    order.value.product_orders.push(
+        {
+            'id':'',
+            'name':p.name,
+            'group':'',
+            'customer_notes':'',
+            'price':0,
+            'product_id':p.id,
+            'qty': 0,
+            'qtyType':'',
+            'qtyTypeId':'',
+            'status':'supplied',
+            'supplier_notes':''
+        }
+    )
+
+    prdRv.value = []
 }
 
 onBeforeRouteLeave((to, before) => {

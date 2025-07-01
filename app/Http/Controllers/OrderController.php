@@ -273,6 +273,25 @@ class OrderController extends Controller
         return json_encode($rv);
     }
 
+    public function getProductInfoById(Request $request)
+    {
+        $prdId = $request->str('pid', '');
+        $orderId = $request->str('order_id', '');
+//        $sellingCompanyId = $request->str('selling_company_id','');
+        Log::debug("product id=$prdId, orderId=$orderId");
+
+        $url = 'https://app.fresho.com/api/v1/my/customers/product_items';
+        $params = [
+            'customer_order_id' => $orderId,
+            'product_id' => $prdId,
+            // 'selling_company_id' => 'b181ee08-2214-46ec-ad1e-926a2bbfb8fb',
+        ];
+
+        $rv = Http::withHeader('fresho-mode', 'sell')->get($url, $params)->json();
+
+        return json_encode($rv);
+    }
+
     /**
      * Update the specified resource in storage.
      */

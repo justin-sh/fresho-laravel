@@ -8,6 +8,7 @@ export const getOrdersWithFilters = (params: OrderFilter, options?: OptionConfig
 export const searchFreshoOrdersWithFilters = (params: OrderFilter, options?: OptionConfig) => axios.get('/api/fresho-orders', {params, ...options})
 export const syncOrderDetailByOrderNo = (order_no: string, src: string) => axios.get('/api/fresho-orders/sync-detail-by-order-no', {params: {order_no, src}})
 export const searchProductsByKey = (s: string, order_id: string) => axios.get('/api/fresho-orders/search_products', {params: {s, order_id}})
+export const getProductInfoById = (pid: string, order_id: string) => axios.get('/api/fresho-orders/get-product-info', {params: {pid, order_id}})
 export const initOrders = (delivery_date: string) => axios.get('/api/orders/sync-summary', {params: {delivery_date}})
 export const syncOrderDetails = (delivery_date: string) => axios.get('/api/orders/sync-detail', {params: {delivery_date}})
 export const syncOrderDeliveryProofs = () => axios.get('/api/orders/sync-delivery-proof')
