@@ -120,12 +120,21 @@
             </template>
             <template #row-details="row">
                 <BCard>
-                    <div class="row" v-for="p in row.item.product_orders" :key="p.name">
-                        <div class="col-2">{{ p.group }}</div>
-                        <div class="col">{{ p.name }}</div>
-                        <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
-                        <div class="col-2">{{ p.status }}</div>
-                    </div>
+                    <template v-for="p in row.item.product_orders" :key="p.name">
+                        <div class="row">
+                            <div class="col-2">{{ p.group }}</div>
+                            <div class="col">{{ p.name }}</div>
+                            <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
+                            <div class="col-2">{{ p.status }}</div>
+                        </div>
+                        <div class="row" v-if="p.customer_notes.length>0 || p.supplier_notes > 0">
+                            <div class="col-2"></div>
+                            <div class="col">
+                            <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} </span> &nbsp;
+                            <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} </span>
+                            </div>
+                        </div>
+                    </template>
                     <div v-if="!row.item.products">No Products</div>
                 </BCard>
             </template>
