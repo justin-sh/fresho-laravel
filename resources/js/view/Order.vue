@@ -127,10 +127,10 @@
                             <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
                             <div class="col-2">{{ p.status }}</div>
                         </div>
-                        <div class="row" v-if="p.customer_notes.length>0 || p.supplier_notes > 0">
+                        <div class="row" v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
                             <div class="col-2"></div>
                             <div class="col">
-                            <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} </span> &nbsp;
+                            <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
                             <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} </span>
                             </div>
                         </div>
