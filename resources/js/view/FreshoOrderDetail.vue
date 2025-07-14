@@ -161,7 +161,7 @@
 <script lang="ts" setup>
 import {onMounted, ref, shallowRef} from "vue";
 import bigDecimal from "js-big-decimal";
-import {getProductInfoById, searchProductsByKey, syncOrderDetailByOrderNo} from '../api'
+import {getProductInfoById, searchProductsByKey, syncOrderDetailByOrderNo, updateOrder} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
@@ -188,6 +188,15 @@ let abortController: AbortController | null = null;
 
 const saveNClose = async () => {
     console.log(order.value)
+
+    const params = {
+        'numberOfBoxes':order.value.numberOfBoxes,
+        'deliveryDate':order.value.deliveryDate,
+        'additionalNotes':order.value.additionalNotes,
+        'details':order.value.product_orders,
+    }
+
+    await updateOrder(order.value.orderNo, params);
 }
 
 const qtyTypeChanged = function (p, evt) {

@@ -4,7 +4,7 @@ namespace App\Http\Dto;
 
 class OrderData
 {
-    private string $additional_notes;
+    public string $additional_notes;
     private string $buying_list_id;
     private bool $can_edit_due_date = false;
     private bool $cancellable = true;
@@ -59,6 +59,9 @@ class OrderData
     private string $picking_instructions = '';
     private string $placed_by_name;
     private string $prefixed_order_number; // F42026377
+    /**
+     * @var array<OrderItemData> $product_orders_attributes product order items details
+     */
     private array $product_orders_attributes;
     private bool $purchase_reconciliation_enabled = false;
     private bool $received_post_stocktake = false;

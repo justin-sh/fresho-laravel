@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Dto\OrderData;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrdersResource;
 use App\Jobs\SyncOrderDeliveryProof;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
+use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -290,6 +292,24 @@ class OrderController extends Controller
         $rv = Http::withHeader('fresho-mode', 'sell')->get($url, $params)->json();
 
         return json_encode($rv);
+    }
+
+    public function updateFreshoOrder(Request $request, string $order_no){
+
+        Log::debug("update fresho order: {$order_no}");
+
+        $data = $request->json()->all();
+
+        Log::debug(json_encode($data));
+        Log::debug($data['deliveryDate']);
+        Log::debug($data['numberOfBoxes']);
+        Log::debug($data['additionalNotes']);
+        Log::debug($data['details']);
+
+//        $freshoOrder = new OrderData();
+//        $freshoOrder->additional_notes='';
+
+        return json_encode(['ok'=>true]);
     }
 
     /**
