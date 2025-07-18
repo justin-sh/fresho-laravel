@@ -42,7 +42,7 @@ class OrderResource extends JsonResource
         $prices = collect($this->prices)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
         $qtyTypes = collect($this->quantity_types)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
         $product_items = collect($this->product_items)->map(fn($v)=>$this->unsetIdFromArray($v))->collapseWithKeys();
-        Log::debug(json_encode($prices));
+//        Log::debug(json_encode($prices));
 
         return [
             'id' => $this->resource->id,

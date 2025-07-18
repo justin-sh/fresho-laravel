@@ -15,23 +15,20 @@
                     <label for="customer" class="justify-content-start">Customer</label>
                     <BFormInput id="customer" v-model="customer"></BFormInput>
                 </div>
-                <div class="ml-3  col">
-                    <label for="product" class="justify-content-start">Product</label>
-                    <BFormInput id="product" v-model="product"></BFormInput>
-                </div>
             </div>
             <div class="row">
                 <div class="col">
                     <label>State</label>
                     <div class="d-flex">
-                        <BFormCheckboxGroup v-model="status">
-                            <BFormCheckbox value="in_progress" switch>Process</BFormCheckbox>
-                            <BFormCheckbox value="submitted" switch>Submitted</BFormCheckbox>
-                            <BFormCheckbox value="accepted" switch>Accepted</BFormCheckbox>
-                            <BFormCheckbox value="invoiced" switch>Invoiced</BFormCheckbox>
-                            <BFormCheckbox value="paid" switch>Paid</BFormCheckbox>
-                            <BFormCheckbox value="cancelled" switch>Cancelled</BFormCheckbox>
-                        </BFormCheckboxGroup>
+                        <BFormRadioGroup v-model="status">
+                            <BFormRadio value="in_progress">Process</BFormRadio>
+                            <BFormRadio value="submitted">Submitted</BFormRadio>
+                            <BFormRadio value="accepted">Accepted</BFormRadio>
+                            <BFormRadio value="invoiced">Invoiced</BFormRadio>
+                            <BFormRadio value="paid">Paid</BFormRadio>
+                            <BFormRadio value="cancelled">Cancelled</BFormRadio>
+                            <BFormRadio value="all" switch>All</BFormRadio>
+                        </BFormRadioGroup>
                         <!-- <BFormCheckbox v-model="credit" value="yes" uncheckedValue="no" switch>Credit -->
                         <!-- </BFormCheckbox> -->
                     </div>
@@ -41,12 +38,12 @@
                 <div class="col">
                     <label>Run</label>
                     <div class="d-flex">
-                        <BFormCheckbox-group v-model="runs" class="run-group">
-                            <BFormCheckbox :value="r" :key="r" checked v-for="r in order_run" switch>{{
+                        <BFormRadioGroup v-model="runs" class="run-group">
+                            <BFormRadio :value="r" :key="r" v-for="r in order_run">{{
                                     (r + "").substring(0, 5)
                                 }}
-                            </BFormCheckbox>
-                        </BFormCheckbox-group>
+                            </BFormRadio>
+                        </BFormRadioGroup>
                     </div>
                 </div>
             </div>
@@ -120,12 +117,21 @@
             </template>
             <template #row-details="row">
                 <BCard>
-                    <div class="row" v-for="p in row.item.product_orders" :key="p.name">
-                        <div class="col-2">{{ p.group }}</div>
-                        <div class="col">{{ p.name }}</div>
-                        <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
-                        <div class="col-2">{{ p.status }}</div>
-                    </div>
+                    <template v-for="p in row.item.product_orders" :key="p.name">
+                        <div class="row">
+                            <div class="col-2">{{ p.group }}</div>
+                            <div class="col">{{ p.name }}</div>
+                            <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>
+                            <div class="col-2">{{ p.status }}</div>
+                        </div>
+                        <div class="row" v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
+                            <div class="col-2"></div>
+                            <div class="col">
+                                <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
+                                <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} </span>
+                            </div>
+                        </div>
+                    </template>
                     <div v-if="!row.item.product_orders">No Products</div>
                 </BCard>
             </template>
@@ -136,31 +142,35 @@
 <script lang="ts" setup>
 import {ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
-import {searchFreshoOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetailByOrderNo} from '../api'
+import {searchFreshoOrdersWithFilters, syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
-import {onBeforeRouteLeave, useRouter} from "vue-router";
-
-const router = useRouter()
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-const deliveryDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
-const customer = shallowRef('')
-const product = shallowRef('')
-const status = shallowRef(['submitted', 'accepted', 'invoiced'])
-const credit = shallowRef('no')
-const order_run = ['EDN', 'EDS', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR']
-const runs = shallowRef([])
+const router = useRouter()
+const route = useRoute()
+
+const  defaultDate = route.query.d??formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd")
+const  defaultCustomer = route.query.c??''
+const  defaultStatus = route.query.s??'accepted'
+const  defaultRun = route.query.r??'EDN'
+
+const deliveryDate = shallowRef(defaultDate)
+const customer = shallowRef(defaultCustomer)
+const status = shallowRef( defaultStatus)
+const order_run = ['EDN', 'EDS', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'W', 'RM2', 'TTP', 'PU', 'CA', 'EA', '~NR', 'ALL']
+const runs = shallowRef(defaultRun)
 
 const orders = shallowRef([])
 let orders_backup = []
 
 const fields = [
     {key: 'orderNo', label: 'Order#', sortable: true},
-    {key: 'delivery_date_md', label: 'Date', sortable: true},
+    // {key: 'delivery_date_md', label: 'Date', sortable: true},
     {key: 'customer', label: 'Customer', sortable: true},
-    {key: 'run', label: 'Run', sortable: true},
+    // {key: 'run', label: 'Run', sortable: true},
     {key: 'state', label: 'State', sortable: true},
     {key: 'show_details', label: 'Action'},
 ]
@@ -177,13 +187,14 @@ const page_size_options = [
     {item: 50, name: '50'},
     {item: 999, name: 'all'}
 ]
-const sortBy = ref([{key: 'delivery_date_md', order: 'desc'}, {key: 'customer', order: 'asc'}])
+const sortBy = ref([{key: 'customer', order: 'asc'}])
 
 
 let abortController: AbortController | null = null;
 
 const loading_data = async () => {
 
+    console.log('loading.....')
     data_loading.value = true
     orders.value = []
     orders_backup = orders.value
@@ -196,20 +207,17 @@ const loading_data = async () => {
 
         const data = (await searchFreshoOrdersWithFilters({
                 delivery_date: deliveryDate.value,
-                delivery_date2: deliveryDate.value,
                 customer: customer.value,
-                product: product.value,
                 status: status.value,
-                credit: credit.value,
+                run: runs.value
             },
             {signal: abortController.signal}
-        )).data.data
+        )).data
 
 
         orders.value = data.map(function (x) {
             x.detailsShowing = false
-            x.delivery_date_md = formatInTimeZone(new Date(x.deliveryDate), localTZ, "yyyy-MM-dd")
-            x.delivery_at_hm = x.at ? formatInTimeZone(new Date(x.at), localTZ, "HH:mm") : ''
+            x.product_orders = []
             return x
         })
 
@@ -225,12 +233,10 @@ const loading_data = async () => {
     }
 }
 const searchFreshoOrder = async () => {
-    // await initOrders(deliveryDate.value)
     await loading_data()
 }
 
 const loadDetailForOne = async (row) => {
-    // console.log(row)
     if(!row.detailsShowing && row.item.product_orders.length == 0){
         detail_syncing.value = true
         current_order_no.value = row.item.orderNo
@@ -263,25 +269,10 @@ onBeforeRouteLeave((to, before) => {
     // }
 })
 
-watch([deliveryDate, customer, product, status, credit, runs],
-    async ([deliveryDate_new, customer_new, product_new, status_new, credit_new, runs_new],
-           [deliveryDate_old, customer_old, product_old, status_old, credit_old, runs_old]) => {
-
-        // console.log(`deliveryDate ${deliveryDate_old}=>${deliveryDate_new}`)
-
-        runs_old = runs_old || []
-        if (runs_new.toString() !== runs_old.toString()) {
-            const _s = new Date().getTime()
-            let x = runs_new.length === 0 ? orders_backup : orders_backup.filter((o) => runs.value.includes(o.run))
-            // console.log("filter data in js:" + (new Date().getTime() - _s))
-            orders.value = x
-            // setTimeout(() => {
-            //     console.log("update page:" + (new Date().getTime() - _s))
-            // }, 0);
-        } else {
-            // console.log('loading data')
-            await loading_data()
-        }
+watch([deliveryDate, customer, status, runs],
+    async () => {
+        await router.push({'name': 'freshoOrder', query: {d: deliveryDate.value, c:customer.value,s:status.value,r:runs.value}})
+        await searchFreshoOrder()
     }, {immediate: true})
 
 const tableHeaderRefEl = ref<HTMLElement | null>(null)

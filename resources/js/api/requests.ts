@@ -1,5 +1,14 @@
 import {axios} from "../axios";
-import {type OptionConfig, type OrderFilter, type ReportParams, ProductFilter, PurchaseOrder, SaleOrder, type User} from "./interfaces";
+import {
+    type OptionConfig,
+    type OrderFilter,
+    type ReportParams,
+    ProductFilter,
+    PurchaseOrder,
+    SaleOrder,
+    type User,
+    FreshoOrderFilter
+} from "./interfaces";
 
 export const getUserInfo = () => axios.get<User>('/auth/user-info')
 // @ts-ignore
@@ -7,7 +16,7 @@ export const uploadOrdersCsv = (f) => axios.postForm('/api/orders/update-details
 export const getOrdersWithFilters = (params: OrderFilter, options?: OptionConfig) => axios.get('/api/orders', {params, ...options})
 
 
-export const searchFreshoOrdersWithFilters = (params: OrderFilter, options?: OptionConfig) => axios.get('/api/fresho-orders', {params, ...options})
+export const searchFreshoOrdersWithFilters = (params: FreshoOrderFilter, options?: OptionConfig) => axios.get('/api/fresho-orders', {params, ...options})
 export const syncOrderDetailByOrderNo = (order_no: string, src: string) => axios.get('/api/fresho-orders/sync-detail-by-order-no', {params: {order_no, src}})
 export const searchProductsByKey = (s: string, order_id: string) => axios.get('/api/fresho-orders/search_products', {params: {s, order_id}})
 export const getProductInfoById = (pid: string, order_id: string) => axios.get('/api/fresho-orders/get-product-info', {params: {pid, order_id}})

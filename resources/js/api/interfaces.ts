@@ -15,6 +15,13 @@ export interface OrderFilter {
     credit: string
 }
 
+export interface FreshoOrderFilter {
+    delivery_date: string
+    customer: string
+    status: string
+    run:string
+}
+
 export interface ProductFilter {
     code?: string
     name?: string

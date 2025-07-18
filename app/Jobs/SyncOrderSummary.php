@@ -79,7 +79,7 @@ class SyncOrderSummary implements ShouldQueue
                 ];
 
 
-                if(count($data) >= 10){
+                if(count($data) >= 100){
                     Order::upsert($data, ['id'], ['delivery_date', 'additional_notes', 'delivery_instructions', 'formatted_cached_payable_total', 'payable_total_in_cents', 'submitted_at', 'state', 'placed_by_name']);
 
                     $data = [];

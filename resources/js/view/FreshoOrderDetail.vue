@@ -96,9 +96,16 @@
                 <tr v-for="p in order.product_orders">
                     <td style="border-right: none;">
                         {{ p.name }}
+                        <div class="row note-fz" v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
+<!--                            <div class="col-2"></div>-->
+<!--                            <div class="col">-->
+                                <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
+                                <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} </span>
+<!--                            </div>-->
+                        </div>
                     </td>
-                    <td style="border-left: none;">{{ p.group }}</td>
-                    <td>
+                    <td class="align-middle" style="border-left: none;">{{ p.group }}</td>
+                    <td class="align-middle">
                         <select v-model="p.status">
                             <option value="to_pick">To Pick</option>
                             <option value="supplied">Supplied</option>
@@ -108,10 +115,10 @@
                             <option value="substituted">Substituted</option>
                         </select>
                     </td>
-                    <td>
+                    <td class="align-middle">
                         <input type="number" v-model="p.qty" class="text-end pe-0" style="width: 75px;"/>
                     </td>
-                    <td>
+                    <td class="align-middle">
                         <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
 
                             <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">
@@ -127,10 +134,10 @@
                             {{ p.qtyType }}
                         </template>
                     </td>
-                    <td>$
+                    <td class="align-middle">$
                         <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 75px;"/>
                     </td>
-                    <td class="text-end pe-0">${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
+                    <td class="text-end pe-1 align-middle">${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
                 </tr>
 
                 <tr>
@@ -296,7 +303,7 @@ onMounted(() => {
     loadDetailForOne()
 })
 
-// watch([deliveryDate, customer, product, status, credit, runs],
+// watch([deliveryDate, customer, product, status, runs],
 //     async ([deliveryDate_new, customer_new, product_new, status_new, credit_new, runs_new],
 //            [deliveryDate_old, customer_old, product_old, status_old, credit_old, runs_old]) => {
 //
@@ -393,5 +400,9 @@ tbody tr {
 .list-group-item:hover {
     font-weight: bold;
     background-color: rgb(239, 239, 239);
+}
+
+.note-fz{
+    font-size: 0.8rem;
 }
 </style>

@@ -10,6 +10,7 @@ use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
 use App\Support\MpdfZt411Label;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,6 +18,7 @@ use Illuminate\Http\Response;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -157,15 +159,56 @@ class OrderController extends Controller
     }
 
 
-    public function searchFreshoOrders(Request $request): JsonResource
+    public function searchFreshoOrders(Request $request)
     {
         $delivery_date = $request->str('delivery_date', '')->value();
         $customer = $request->str('customer', '')->value();
-        $product = $request->str('product', '')->value();
-        if (empty($customer) && empty($product)) { // init data
-            SyncOrderSummary::dispatchSync($delivery_date);
+        $status = $request->str('status', 'all')->value();
+        $run = $request->str('run', 'ALL')->value();
+        if('ALL' == $run){
+            $run = '';
         }
-        return $this->index($request);
+//        Log::debug($status);
+//        $product = $request->str('product', '')->value();
+//        if (empty($customer) && empty($product)) { // init data
+//            SyncOrderSummary::dispatchSync($delivery_date);
+//        }
+        // get data from fresho
+        $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders';
+        $params = [
+            'page' => 1,
+            'per_page' => 200,
+            'q[order_state]' => $status,
+            'q[receiving_company_id]' => '',
+            'q[delivery_run_code]' => $run,
+            'q[delivery_date]' => $delivery_date,
+            'sort' => '-delivery_date,-submitted_at,-order_number',
+        ];
+//        Log::debug($params);
+//        $_s = microtime(true);
+        $resp = Http::get($url, $params)->json();
+//        Log::debug('elapse time:' . (microtime(true)-$_s));
+        $resp_data = $resp['supplier_orders'];
+        $resp_data2 = [];
+        if($resp['meta']['total_pages']>1){
+            $params['page'] = 2;
+            $resp2 = Http::get($url, $params)->json();
+            $resp_data2 = $resp2['supplier_orders'];
+        }
+
+        $data = [];
+        collect($resp_data)->concat($resp_data2)->each(function ($order) use ($customer, &$data) {
+//            Log::debug($order['receiving_company_name'] . '--->' . $customer);
+            if(empty($customer) || Str::contains($order['receiving_company_name'], $customer,true)){
+                $data[] = [
+                    'id' => $order['id'],
+                    'orderNo' => $order['order_number'],
+                    'customer' => $order['receiving_company_name'],
+                    'state' => $order['state'],
+                ];
+            }
+        });
+        return json_encode($data);
     }
 
     public function searchDetailByOrderNo(Request $request): JsonResource
