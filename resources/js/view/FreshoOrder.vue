@@ -112,7 +112,7 @@
                     </form>
                 </BButton>
                 <BButton size="sm" :href="'/fresho-order/' + row.item.orderNo" class="mr-2 ms-2" variant="light">
-                    Edit/View
+                    {{ row.item.isLocked?'View':'Edit' }}
                 </BButton>
             </template>
             <template #row-details="row">

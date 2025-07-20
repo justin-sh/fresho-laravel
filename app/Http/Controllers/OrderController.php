@@ -185,9 +185,9 @@ class OrderController extends Controller
             'sort' => '-delivery_date,-submitted_at,-order_number',
         ];
 //        Log::debug($params);
-//        $_s = microtime(true);
+       $_s = microtime(true);
         $resp = Http::get($url, $params)->json();
-//        Log::debug('elapse time:' . (microtime(true)-$_s));
+       Log::debug('elapse time:' . (microtime(true)-$_s));
         $resp_data = $resp['supplier_orders'];
         $resp_data2 = [];
         if($resp['meta']['total_pages']>1){
@@ -205,6 +205,7 @@ class OrderController extends Controller
                     'orderNo' => $order['order_number'],
                     'customer' => $order['receiving_company_name'],
                     'state' => $order['state'],
+                    'isLocked' => $order['is_locked'],
                 ];
             }
         });
@@ -253,8 +254,15 @@ class OrderController extends Controller
                 $delivery_run_position = $rv['supplier_order']['delivery_run_position'];
                 $freight_rule = $rv['supplier_order']['freight_rule'];
                 $is_credit_note = $rv['supplier_order']['is_credit_note'];
-                $order->state = $state;
+                $order->delivery_date = $rv['supplier_order']['delivery_date'];
                 $order->number_of_boxes = $number_of_boxes;
+                $order->additional_notes = $rv['supplier_order']['additional_notes'];
+                $order->contact_name = $rv['supplier_order']['contact_name'];
+                $order->contact_phone = $rv['supplier_order']['contact_phone'];
+                $order->delivery_venue = $rv['supplier_order']['delivery_venue'];
+                $order->delivery_address = $rv['supplier_order']['delivery_address'];
+                $order->external_reference = $rv['supplier_order']['external_reference'];
+                $order->state = $state;
                 $order->picking_instructions = $picking_instructions;
                 $order->delivery_run = $run;
                 $order->delivery_run_position = $delivery_run_position;
@@ -349,10 +357,19 @@ class OrderController extends Controller
         Log::debug($data['additionalNotes']);
         Log::debug($data['details']);
 
-//        $freshoOrder = new OrderData();
+        $order = Order::query()
+            // ->with('details')
+            ->where('order_number', $order_no)
+            ->first();
+
+        $order->delivery_date = $data['deliveryDate'];
+        $order->number_of_boxes = intval($data['numberOfBoxes'] ?? '0');
+        $order->additional_notes = $data['additionalNotes'];
+        Log::debug($order);
+        $freshoOrder = new OrderData($order, $data['details']);
 //        $freshoOrder->additional_notes='';
 
-        return json_encode(['ok'=>true]);
+        return json_encode(['ok'=>true, 'supplier_order'=>$freshoOrder]);
     }
 
     /**

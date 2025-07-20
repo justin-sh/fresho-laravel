@@ -100,9 +100,12 @@
 <!--                            <div class="col-2"></div>-->
 <!--                            <div class="col">-->
                                 <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
-                                <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} </span>
+                                <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} <font-awesome-icon icon="fa-solid fa-pencil"/></span>
 <!--                            </div>-->
                         </div>
+                        <template v-else>
+                            <span><font-awesome-icon icon="fa-solid fa-pencil"/></span>
+                        </template>
                     </td>
                     <td class="align-middle" style="border-left: none;">{{ p.group }}</td>
                     <td class="align-middle">
@@ -115,8 +118,9 @@
                             <option value="substituted">Substituted</option>
                         </select>
                     </td>
-                    <td class="align-middle">
-                        <input type="number" v-model="p.qty" class="text-end pe-0" style="width: 75px;"/>
+                    <td class="align-middle position-relative">
+                        <input type="number" v-model="p.qty" placeholder="0" class="text-end pe-0" style="width: 75px;"/>
+                        <!-- textarea class="position-absolute top-50 start-0" style="z-index:99;"></textarea-->
                     </td>
                     <td class="align-middle">
                         <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
@@ -153,7 +157,8 @@
                         <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">
                             <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id"
                                  @click="getProductById(prd.id)">
-                                {{ prd.name }}
+                                <span>{{ prd.name }}</span>
+                                <span v-if="prd.is_pantry_item" class="float-end"><font-awesome-icon icon="fa-solid fa-star"/></span>
                             </div>
                         </div>
                     </td>
@@ -239,15 +244,10 @@ const searchProducts = async () => {
 }
 
 const getProductById = async (pid) => {
-    console.log('----get product info ---')
-    console.log('-------' + s.value)
-    console.log('-------' + pid)
     s.value = ''
     prdRv.value = []
     const prd = (await getProductInfoById(pid, order.value.id)).data;
-    console.log(prd)
 
-    console.log(order.value)
     const productsInfo = {'price_ids': [], 'product_item_ids': []}
     prd.prices.forEach(e => {
         const eid = e.id
@@ -286,7 +286,7 @@ const getProductById = async (pid) => {
         'customer_notes': '',
         'price': prd.prices.length == 1 ? (prd.prices[0].price / 100).toFixed(2) : 0,
         'product_id': pid,
-        'qty': 0,
+        'qty': '',
         'qtyType': prd.quantity_types.length == 1 ? prd.quantity_types[0].name : '',
         'qtyTypeId': prd.quantity_types.length == 1 ? prd.quantity_types[0].id : '',
         'status': 'supplied',
@@ -326,7 +326,6 @@ onMounted(() => {
 
 
 const printLabel = async function (row) {
-    // console.log(row)
 
     const f = document.forms[row.id];
     f.querySelector('input[name="_token"]').value = getCsrfToken();
