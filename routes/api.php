@@ -26,7 +26,7 @@ Route::apiResource('/orders', OrderController::class)->only(['index', 'show']);
 Route::get('/fresho-orders/sync-detail-by-order-no', [OrderController::class, 'searchDetailByOrderNo']);
 Route::get('/fresho-orders/search_products', [OrderController::class, 'searchProductsByKey']);
 Route::get('/fresho-orders/get-product-info', [OrderController::class, 'getProductInfoById']);
-Route::post('/fresho-orders/{order_no}', [OrderController::class, 'updateFreshoOrder']);
+Route::post('/fresho-orders/{order_id}', [OrderController::class, 'updateFreshoOrder']);
 Route::get('/fresho-orders', [OrderController::class, 'searchFreshoOrders']);
 
 

@@ -23,6 +23,7 @@ use Ramsey\Uuid\Nonstandard\Uuid;
  * @property OrderState $state
  * @property int $number_of_boxes
  * @property string $formatted_cached_payable_total
+ * @property int $payable_total_in_cents
  * @property Date $submitted_at
  * @property string $delivery_method
  * @property string $delivery_venue
@@ -35,8 +36,10 @@ use Ramsey\Uuid\Nonstandard\Uuid;
  * @property Date $delivery_at
  * @property string $delivery_by
  * @property string $delivery_proof
+ * @property string $parent_order_id
  * @property boolean $is_credit_note
  * @property string $freight_rule
+ * @property string $placed_by_name
  * @property boolean $is_locked
  */
 class Order extends Model
@@ -58,6 +61,8 @@ class Order extends Model
 
     public function details(): HasMany
     {
-        return $this->hasMany(OrderDetail::class, 'order_number', 'order_number');
+        return $this->hasMany(OrderDetail::class, 'order_number', 'order_number')
+            ->orderBy('group')
+            ->orderBy('prd_name');
     }
 }

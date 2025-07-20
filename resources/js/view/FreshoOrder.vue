@@ -111,7 +111,7 @@
                         <input type="hidden" name="_token" value="">
                     </form>
                 </BButton>
-                <BButton size="sm" :href="'/fresho-order/' + row.item.orderNo" class="mr-2 ms-2" variant="light">
+                <BButton size="sm" :href="'/fresho-order/' + row.item.id" class="mr-2 ms-2" variant="light">
                     {{ row.item.isLocked?'View':'Edit' }}
                 </BButton>
             </template>

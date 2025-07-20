@@ -165,7 +165,7 @@ class OrderController extends Controller
         $customer = $request->str('customer', '')->value();
         $status = $request->str('status', 'all')->value();
         $run = $request->str('run', 'ALL')->value();
-        if('ALL' == $run){
+        if ('ALL' == $run) {
             $run = '';
         }
 //        Log::debug($status);
@@ -185,12 +185,12 @@ class OrderController extends Controller
             'sort' => '-delivery_date,-submitted_at,-order_number',
         ];
 //        Log::debug($params);
-       $_s = microtime(true);
+        $_s = microtime(true);
         $resp = Http::get($url, $params)->json();
-       Log::debug('elapse time:' . (microtime(true)-$_s));
+        Log::debug('elapse time:' . (microtime(true) - $_s));
         $resp_data = $resp['supplier_orders'];
         $resp_data2 = [];
-        if($resp['meta']['total_pages']>1){
+        if ($resp['meta']['total_pages'] > 1) {
             $params['page'] = 2;
             $resp2 = Http::get($url, $params)->json();
             $resp_data2 = $resp2['supplier_orders'];
@@ -199,7 +199,7 @@ class OrderController extends Controller
         $data = [];
         collect($resp_data)->concat($resp_data2)->each(function ($order) use ($customer, &$data) {
 //            Log::debug($order['receiving_company_name'] . '--->' . $customer);
-            if(empty($customer) || Str::contains($order['receiving_company_name'], $customer,true)){
+            if (empty($customer) || Str::contains($order['receiving_company_name'], $customer, true)) {
                 $data[] = [
                     'id' => $order['id'],
                     'orderNo' => $order['order_number'],
@@ -214,20 +214,23 @@ class OrderController extends Controller
 
     public function searchDetailByOrderNo(Request $request): JsonResource
     {
-        $order_no = $request->str('order_no');
+        $order_id = $request->str('id');
         $src = $request->str('src', '');
         $isDetailPage = 'OrderDetailPage' == $src;
-        Log::debug("sync order detail data for No:$order_no");
+        Log::debug("sync order detail data for id:$order_id");
 
         $order = Order::query()
             ->with('details')
-            ->where('order_number', $order_no)
-            ->first();
+            ->where('id', $order_id)
+            ->firstOrNew([
+                'id' => $order_id
+            ]);
 
         $quantity_types = [];
         $products = [];
         $prices = [];
         $product_items = [];
+//        Log::debug($order);
         if (count($order->details) == 0 || $isDetailPage) {
             //no detail and sync it from Fresho
             $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
@@ -254,48 +257,73 @@ class OrderController extends Controller
                 $delivery_run_position = $rv['supplier_order']['delivery_run_position'];
                 $freight_rule = $rv['supplier_order']['freight_rule'];
                 $is_credit_note = $rv['supplier_order']['is_credit_note'];
+
+                $order->order_number = $rv['supplier_order']['order_number'];
                 $order->delivery_date = $rv['supplier_order']['delivery_date'];
-                $order->number_of_boxes = $number_of_boxes;
+                $order->receiving_company_id = $rv['supplier_order']['receiving_company_id'];
+                $order->receiving_company_name = $rv['supplier_order']['receiving_company_name'];
                 $order->additional_notes = $rv['supplier_order']['additional_notes'];
                 $order->contact_name = $rv['supplier_order']['contact_name'];
                 $order->contact_phone = $rv['supplier_order']['contact_phone'];
-                $order->delivery_venue = $rv['supplier_order']['delivery_venue'];
                 $order->delivery_address = $rv['supplier_order']['delivery_address'];
+                if ('PICKUP FROM: 20 Tolley Street, Wingfield SA 5013, Australia' == $order->delivery_address) {
+                    $order->delivery_method = 'Pickup'; // NO this value in this api
+                } else {
+                    $order->delivery_method = 'Delivery'; // NO this value in this api
+                }
+                $order->delivery_venue = $rv['supplier_order']['delivery_venue'];
                 $order->external_reference = $rv['supplier_order']['external_reference'];
-                $order->state = $state;
+                $order->delivery_instructions = $rv['supplier_order']['delivery_instructions'];
                 $order->picking_instructions = $picking_instructions;
+                $order->number_of_boxes = $number_of_boxes;
+                $order->payable_total_in_cents = $rv['supplier_order']['cached_payable_total_in_cents'];
+                $order->formatted_cached_payable_total = '$' . number_format($order->payable_total_in_cents / 100, 2);
+                $order->submitted_at = 'in_progress' == $state ? null : Carbon::create($rv['supplier_order']['submitted_at']);
+                $order->state = $state;
+                $order->is_locked = $rv['supplier_order']['is_locked'];
+                // todo no available in this api
+//                $order->placed_by_name = $rv['supplier_order']['placed_by_name'];
                 $order->delivery_run = $run;
                 $order->delivery_run_position = $delivery_run_position;
+                $order->parent_order_id = $rv['supplier_order']['parent_order_id'];
                 $order->is_credit_note = $is_credit_note;
                 $order->freight_rule = $freight_rule;
 
-//                $details = $rv['product_orders'];
 
-                $details = collect($rv['product_orders'])->sortBy('product_code')->all();
+                $details = collect($rv['product_orders'])
+                    ->sortBy('product_group')
+                    ->sortBy('product_code')
+                    ->all();
                 $prd_orders = [];
                 $idx = 0;
                 foreach ($details as $d) {
                     $prd_orders[] = [
+                        'best_before_date' => $d['best_before_date'],
+                        'currency_symbol' => $d['currency_symbol'], // $
+                        'customer_order_type' => $d['customer_order_type'], //SupplierOrder
+                        'cost_cents' => $d['cost_cents'],
                         'id' => $d['id'],
-                        'order_number' => $order_no,
-                        'prd_code' => $d['product_code'],
+                        'order_number' => $order->order_number,
                         'idx' => $idx,
+                        'customer_notes' => $d['notes'] ?? '',
+                        'original_quantity' => $d['original_quantity'],
+                        'packed_on_date' => $d['packed_on_date'],
+                        'price_cents_per_quantity' => $d['price_per_quantity'],
+                        'prd_code' => $d['product_code'],
+                        'group' => $d['product_group'],
                         'product_id' => $d['product_id'],
                         'prd_name' => $d['product_name'],
                         'qty' => $d['quantity'],
                         'quantity_type_id' => $d['quantity_type_id'],
                         'qty_type' => $d['quantity_type_name'],
-                        'original_quantity' => $d['original_quantity'],
-                        'price_cents_per_quantity' => $d['price_per_quantity'],
-                        'cost_cents' => $d['cost_cents'],
-                        'group' => $d['product_group'],
                         'status' => $d['supplied_status'],
-                        'customer_notes' => $d['notes'] ?? '',
                         'supplier_notes' => $d['supplier_notes'] ?? '',
+                        'tax_applicable' => $d['tax_applicable'] ?? false,
+                        'unit_of_order' => $d['unit_of_order'] ?? '',
+                        'use_by_date' => $d['use_by_date'],
                     ];
                     $idx = $idx + 1;
                 }
-
                 $order->details()->delete();
                 $order->details()->createMany($prd_orders);
                 $order->save();
@@ -345,13 +373,13 @@ class OrderController extends Controller
         return json_encode($rv);
     }
 
-    public function updateFreshoOrder(Request $request, string $order_no){
+    public function updateFreshoOrder(Request $request, string $order_id)
+    {
 
-        Log::debug("update fresho order: {$order_no}");
+        Log::debug("update fresho order: {$order_id}");
 
         $data = $request->json()->all();
-
-        Log::debug(json_encode($data));
+//        Log::debug(json_encode($data));
         Log::debug($data['deliveryDate']);
         Log::debug($data['numberOfBoxes']);
         Log::debug($data['additionalNotes']);
@@ -359,7 +387,7 @@ class OrderController extends Controller
 
         $order = Order::query()
             // ->with('details')
-            ->where('order_number', $order_no)
+            ->where('id', $order_id)
             ->first();
 
         $order->delivery_date = $data['deliveryDate'];
@@ -367,9 +395,8 @@ class OrderController extends Controller
         $order->additional_notes = $data['additionalNotes'];
         Log::debug($order);
         $freshoOrder = new OrderData($order, $data['details']);
-//        $freshoOrder->additional_notes='';
 
-        return json_encode(['ok'=>true, 'supplier_order'=>$freshoOrder]);
+        return json_encode(['ok' => true, 'supplier_order' => $freshoOrder]);
     }
 
     /**

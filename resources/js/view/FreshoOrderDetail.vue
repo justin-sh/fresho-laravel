@@ -4,7 +4,7 @@
             <template #header>
                 <div class="col align-content-center" ref="tableHeaderRefEl">
                     <span class="fs-4">Order </span>
-                    <span class="inline fw-bold fs-4">{{ 'F' + route.params.id }}</span>
+                    <span class="inline fw-bold fs-4">{{ 'F' + order.orderNo }}</span>
                     <span class="fs-4"> For </span>
                     <span class="inline fw-bold fs-4">{{ order.customer }}</span>
                 </div>
@@ -175,20 +175,16 @@ import {onMounted, ref, shallowRef} from "vue";
 import bigDecimal from "js-big-decimal";
 import {getProductInfoById, searchProductsByKey, syncOrderDetailByOrderNo, updateOrder} from '../api'
 
-import {format, formatInTimeZone, toDate} from "date-fns-tz";
+import {format, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {v4 as uuidv4} from 'uuid';
 
 const router = useRouter()
 const route = useRoute()
 
-const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-const deliveryDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
 const customer = shallowRef('')
 const product = shallowRef('')
 const status = shallowRef(['submitted', 'accepted', 'invoiced'])
-const credit = shallowRef('no')
 const s = ref('');
 const prdRv = ref([])
 
@@ -208,20 +204,20 @@ const saveNClose = async () => {
         'details':order.value.product_orders,
     }
 
-    await updateOrder(order.value.orderNo, params);
+    await updateOrder(order.value.id, params);
 }
 
 const qtyTypeChanged = function (p, evt) {
-    const prdId = p.product_id
-    const qtyTypeId = p.qtyTypeId
+    // const prdId = p.product_id
+    // const qtyTypeId = p.qtyTypeId
     const piid = evt.srcElement.selectedOptions[0].dataset['piid']
     const pitem = order.value.product_items[piid]
 
     p.price = (order.value.prices[pitem['price_id']]['price'] / 100).toFixed(2)
     p.group = pitem['product_group']
-    console.log(p)
-    console.log(order.value)
-    console.log(p.qtyTypeId)
+    // console.log(p)
+    // console.log(order.value)
+    // console.log(p.qtyTypeId)
     // console.log(`prdId    =${prdId}`)
     // console.log(`qtyTypeId=${qtyTypeId}`)
     // console.log(`pii      d=${piid}`)

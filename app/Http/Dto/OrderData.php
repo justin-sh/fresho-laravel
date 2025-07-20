@@ -7,15 +7,15 @@ use App\Models\Order;
 
 class OrderData
 {
-    public string $additional_notes;
+    public ?string $additional_notes;
     public ?string $buying_list_id = null;
     public bool $can_edit_due_date = false;
     public bool $cancellable = true;
     public bool $charge_credit_card = false;
     public bool $charge_customer_credit_card_fee = false;
     public bool $chargeable = false;
-    public string $contact_name;
-    public string $contact_phone;
+    public ?string $contact_name;
+    public ?string $contact_phone;
     public ?string $created_at = null;
     public ?string $currency_symbol = null;
     public bool $customer_may_comment = false;
@@ -23,19 +23,19 @@ class OrderData
     public bool $customer_may_mark_never_to_be_invoiced = false;
     public bool $customer_may_refinalise = false;
     public bool $customer_payment_method_available = false;
-    public string $delivery_address;
+    public ?string $delivery_address;
     public string $delivery_date; // yyyy-MM-dd
     public ?string $delivery_date_message = null;
-    public string $delivery_instructions = '';
+    public ?string $delivery_instructions = '';
     public string $delivery_method = 'Delivery';
     public string $delivery_or_dispatch_date_text = 'Delivery Date';  // 'Delivery Date'
-    public string $delivery_run_code; // EE
+    public ?string $delivery_run_code; // EE
     public int $delivery_run_position; // 28
-    public string $delivery_venue;
+    public ?string $delivery_venue;
     public int $discount_percent = 0;
     public ?string $display_number = null;
     public ?string $due_date = null;
-    public string $external_reference;
+    public ?string $external_reference;
     public bool $finalised = false;
     public string $formatted_cached_payable_total; // $406.40
     public ?string $freight_rule = null; //require_freight
@@ -59,8 +59,8 @@ class OrderData
     public bool $payment_method_available = false;
     public bool $picked = false;
     public bool $picked_post_stocktake = false;
-    public string $picking_instructions = '';
-    public string $placed_by_name;
+    public ?string $picking_instructions = '';
+    public ?string $placed_by_name;
     public string $prefixed_order_number; // F42026377
     /**
      * @var array<OrderItemData> $product_orders_attributes product order items details
@@ -78,8 +78,8 @@ class OrderData
     public bool $start_as_invoice = false;
 
     public string $state = 'submitted';
-    public string $status_icons = '';
-    public string $submitted_at; // yyyy-MM-dd
+    public ?string $status_icons = '';
+    public ?string $submitted_at; // yyyy-MM-dd
     public string $supplier_id = '34b3d836-d88d-43b0-87d2-de05bbfc83eb';
     public ?string $supplier_orders_emails = null;
     public float $tax_rate = 0.1;
@@ -91,6 +91,7 @@ class OrderData
     {
         $this->additional_notes = $order->additional_notes;
         $this->delivery_date = $order->delivery_date->format('Y-m-d');
+        $this->delivery_instructions = $order->delivery_instructions;
         if($order->number_of_boxes > 0){
             $this->number_of_boxes = strval($order->number_of_boxes);
         }
@@ -102,11 +103,15 @@ class OrderData
         $this->delivery_venue = $order->delivery_venue;
         $this->external_reference = $order->external_reference;
         $this->formatted_cached_payable_total = $order->formatted_cached_payable_total;
+        $this->freight_rule = $order->freight_rule;
         $this->order_number = $order->order_number;
+        $this->picking_instructions = $order->picking_instructions;
+        $this->placed_by_name = $order->placed_by_name;
+        $this->prefixed_order_number = 'F' . $order->order_number;
         $this->receiving_company_id = $order->receiving_company_id;
         $this->receiving_company_name = $order->receiving_company_name;
         $this->state = $order->state->value;
-        $this->submitted_at = $order->submitted_at->format('Y-m-d');
+        $this->submitted_at = $order->submitted_at?->format('Y-m-d');
 
         $this->product_orders_attributes = $details;
     }
