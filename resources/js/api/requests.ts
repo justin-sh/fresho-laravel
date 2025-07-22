@@ -9,6 +9,7 @@ import {
     type User,
     FreshoOrderFilter
 } from "./interfaces";
+import {LocationQueryValue} from "vue-router";
 
 export const getUserInfo = () => axios.get<User>('/auth/user-info')
 // @ts-ignore
@@ -46,3 +47,6 @@ export const approveSo = (params: SaleOrder) => axios.put(`/api/sale-orders/${pa
 
 export const deptReport = (params: ReportParams) => axios.post(`/api/report/dept`, params)
 export const dailyReport = (reportDate: string) => axios.get(`/api/report/daily/${reportDate}`)
+
+
+export const inventory = (d: string) => axios.get('/api/inventory', {params:{d}})

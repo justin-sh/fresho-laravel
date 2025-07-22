@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DailyReportController;
+use App\Http\Controllers\DailyStockController;
 use App\Http\Controllers\DeptReportController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
