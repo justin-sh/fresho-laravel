@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyStock;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DailyStockController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $inventoryDateStr = $request->str('d')->value();
+        $inventoryDate = Carbon::create($inventoryDateStr);
     }
 
     /**

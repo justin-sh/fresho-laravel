@@ -29,6 +29,9 @@
                         <BNavItem :to="{name:'products'}">
                             Products
                         </BNavItem>
+                        <BNavItem :to="{name:'inventory'}">
+                            Inventory
+                        </BNavItem>
                     </BNavbarNav>
 
                     <BNavbarNav>

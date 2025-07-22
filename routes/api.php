@@ -48,3 +48,5 @@ Route::put('/sale-orders/{sale_order}/approve', [SaleOrderController::class, 'ap
 // report api
 Route::apiResource('/report/dept', DeptReportController::class);
 Route::get('/report/daily/{report_date}', [DailyReportController::class, 'index']);
+
+Route::get('/inventory', [DailyStockController::class, 'index']);
