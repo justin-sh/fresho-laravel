@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyStock;
-use App\Models\Order;
 use App\Models\OrderState;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class DailyStockController extends Controller
 {
@@ -21,8 +18,33 @@ class DailyStockController extends Controller
 
         $orders = DB::table('orders')
             ->join('order_details', 'orders.order_number', 'order_details.order_number')
-            ->select('orders.receiving_company_name',
-                'order_details.prd_code', 'order_details.prd_name', 'order_details.qty', 'order_details.qty_type',
+            ->select(
+//                'orders.receiving_company_name',
+                'order_details.prd_code', 'order_details.prd_name',
+                'order_details.qty_type',
+                DB::raw('sum(order_details.qty) as qty')
+//                'sum(order_details.qty) as qty',
+//                'order_details.qty', 'order_details.qty_type',
+//                'order_details.customer_notes', 'order_details.supplier_notes'
+            )
+            ->where('orders.delivery_date', $inventoryDateStr)
+            ->whereIn('orders.state', [OrderState::Invoiced->value, OrderState::Paid->value])
+            ->where('orders.is_credit_note', false)
+            ->whereIn('order_details.group', ['Frozen Products', 'Band Saw'])
+            ->whereIn('order_details.status', ['substituted', 'supplied'])
+            ->where('order_details.customer_notes', '')
+            ->where('order_details.supplier_notes', '')
+            ->groupBy('order_details.prd_code', 'order_details.prd_name', 'order_details.qty_type')
+            ->get();
+
+        $orders2 = DB::table('orders')
+            ->join('order_details', 'orders.order_number', 'order_details.order_number')
+            ->select(
+//                'orders.receiving_company_name',
+                'order_details.prd_code', 'order_details.prd_name',
+//                'order_details.qty_type',
+//                'sum(order_details.qty) as qty',
+                'order_details.qty', 'order_details.qty_type',
                 'order_details.customer_notes', 'order_details.supplier_notes'
             )
             ->where('orders.delivery_date', $inventoryDateStr)
@@ -30,13 +52,18 @@ class DailyStockController extends Controller
             ->where('orders.is_credit_note', false)
             ->whereIn('order_details.group', ['Frozen Products', 'Band Saw'])
             ->whereIn('order_details.status', ['substituted', 'supplied'])
+            ->where('order_details.customer_notes', '<>', '')
+            ->where('order_details.supplier_notes', '<>', '')
+//            ->groupBy('order_details.prd_code', 'order_details.prd_name', 'order_details.qty_type')
             ->get();
 
-        $rv  = $orders->mapToGroups(function ($item){
-            return [$item->prd_code . '--' . $item->prd_name => $item];
-        });
+        $rv = $orders
+            ->concat($orders2->all())
+            ->mapToGroups(function ($item) {
+                return [$item->prd_code . '--' . $item->prd_name => $item];
+            });
 
-        return json_encode(['ok'=>true, 'data'=>$rv]);
+        return json_encode(['ok' => true, 'data' => $rv]);
     }
 
     /**

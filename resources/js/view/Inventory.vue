@@ -73,9 +73,9 @@
                     <td>
                         {{ x.qty + x.qty_type }}
                     </td>
-                    <td>
+                    <td width="40%">
                         {{ x.customer_notes ? 'C:' + x.customer_notes : '' }}
-                        {{ x.supplier_notes ? 'S:' + x.supplier_notes : '' }}
+                        {{ x.supplier_notes ? ( 'S:' + x.supplier_notes) : '' }}
                     </td>
                 </tr>
             </template>
