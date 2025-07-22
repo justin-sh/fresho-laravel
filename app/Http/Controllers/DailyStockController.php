@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyStock;
 use App\Models\OrderState;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -52,9 +53,10 @@ class DailyStockController extends Controller
             ->where('orders.is_credit_note', false)
             ->whereIn('order_details.group', ['Frozen Products', 'Band Saw'])
             ->whereIn('order_details.status', ['substituted', 'supplied'])
-            ->where('order_details.customer_notes', '<>', '')
-            ->where('order_details.supplier_notes', '<>', '')
-//            ->groupBy('order_details.prd_code', 'order_details.prd_name', 'order_details.qty_type')
+            ->where(function (Builder $query){
+                $query->where('order_details.customer_notes', '<>', '')
+                    ->orWhere('order_details.supplier_notes', '<>', '');
+            })
             ->get();
 
         $rv = $orders
