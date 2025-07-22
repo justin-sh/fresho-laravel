@@ -82,6 +82,9 @@ class SyncOrderDetail implements ShouldQueue
                     'supplier_notes' => $data[6],
                     'status' => $data[7],
                     'order_number' => $data[12],
+                    'currency_symbol' => '$',
+                    'unit_of_order' => '',
+                    'tax_applicable' => false,
                 ];
 
 //                Log::debug();
