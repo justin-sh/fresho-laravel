@@ -26,9 +26,10 @@ export interface ProductFilter {
     code?: string
     name?: string
     page?: number
+    page_size?: number
     cat?: string[]
     // wh?: string[]
-    hasStock: boolean
+    // hasStock: boolean
 }
 
 export interface PoDetail {

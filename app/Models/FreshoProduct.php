@@ -16,6 +16,7 @@ use Ramsey\Uuid\Uuid;
  * @property String $price_text
  * @property Uuid $product_id
  * @property String $qty_type
+ * @property String hoc_code
  */
 class FreshoProduct extends Model
 {

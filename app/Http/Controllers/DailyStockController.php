@@ -39,7 +39,9 @@ class DailyStockController extends Controller
                 return [$item->prd_code . '.' . $item->prd_name => $item];
             });
 
-        return json_encode(['ok' => true, 'data' => $rv]);
+
+        $hocPrds = DB::connection('mysql2')->select('select prd_code as code, prd_name as name from hoc_products');
+        return json_encode(['ok' => true, 'data' => $rv, 'hocPrds'=>$hocPrds]);
     }
 
     /**

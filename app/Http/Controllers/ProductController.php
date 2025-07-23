@@ -16,33 +16,20 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResource
     {
-        $cat = $request->input('cat', []);
-//        $wh = $request->input('wh', []);
+        $code = $request->input('code', '');
         $name = $request->str('name', '')->value();
-        $hasStock = $request->boolean('hasStock', false);
-
-//        $products = Product::query()
-//            ->when($cat, function (Builder $query, $cat) {
-//                $query->whereIn('cat', $cat);
-//            })
-//            ->when($name, function (Builder $query, $name) {
-//                $query->whereLike('name', '%' . $name . '%');
-//            })
-//            ->whereRelation('warehouses', function (Builder $query) use ( $hasStock) {
-////                if ($wh) {
-////                    $query->whereIn('warehouse_id', $wh);
-////                }
-//                if ($hasStock) {
-//                    $query->where('onhand_qty', '>', 0);
-//                }
-//            })
-//            ->with('warehouses')
-//            ->orderBy('cat')
-//            ->orderBy('name')
-//            ->get();
+        $cat = $request->input('cat', []);
+        $pageSize = $request->input('page_size', 50);
 
         $products = FreshoProduct::query()
-            ->paginate(50);
+            ->whereLike('name', '%' . $name . '%')
+            ->whereLike('code', $code . '%')
+            ->where(function (Builder $query) use ($cat) {
+                if (!empty($cat)) {
+                    $query->whereIn('mkt_cat', $cat);
+                }
+            })
+            ->paginate($pageSize);
 
         return ProductResource::collection($products);
     }

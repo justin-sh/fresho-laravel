@@ -5,26 +5,11 @@
                 <div class="col-2">
                     <label>Code</label>
                     <BFormInput id="code" size="md" v-model="code"></BFormInput>
-<!--                    <div class="d-flex">-->
-<!--                        <BFormCheckboxGroup v-model="wh">-->
-<!--                            <BFormCheckbox switch :value="w.id" v-for="w in warehouses">-->
-<!--                                {{ w.name }}-->
-<!--                            </BFormCheckbox>-->
-<!--                        </BFormCheckboxGroup>-->
-<!--                    </div>-->
                 </div>
                 <div class="col-8 ms-3">
                     <label for="customer" class="justify-content-start">Product Name</label>
                     <BFormInput id="name" size="md" v-model="name"></BFormInput>
                 </div>
-<!--                <div class="col ms-3">-->
-<!--                    <label>Stock</label>-->
-<!--                    <div class="d-flex">-->
-<!--                        <BFormCheckbox switch v-model="hasStock">-->
-<!--                            Has Stock-->
-<!--                        </BFormCheckbox>-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
             <div class="row mt-2">
                 <div class="col">
@@ -70,9 +55,9 @@
                 :busy="data_loading"
                 :items="products"
                 :fields="fields">
-<!--            <template #cell(rowNo)="row">-->
-<!--                {{ row.id }}-->
-<!--            </template>-->
+            <template #cell(rowNo)="row">
+                {{ row.index + 1 }}
+            </template>
             <!--            <template #cell(orderNo)="row">-->
             <!--                <a :href="'https://app.fresho.com/supplier/orders/' + row.item.id" target="_blank">-->
             <!--                    {{ row.value }}-->
@@ -110,8 +95,6 @@ const name = shallowRef('')
 const code = shallowRef('')
 const product = ref([])
 const cat = shallowRef()
-const wh = shallowRef<string[]>([])
-const hasStock = shallowRef(true)
 
 const products = ref([{
     "cat":"BEEF",
@@ -128,10 +111,10 @@ let products_backup = [{
 
 const fields_base = [
     {key: 'rowNo', label: '#'},
-    {key: 'cat', label: 'Category', sortable: true},
     {key: 'code', label: 'Code', sortable: true},
     {key: 'name', label: 'Name', sortable: true},
     {key: 'qty_type', label: 'Qyt Type'},
+    {key: 'cat', label: 'Category', sortable: true},
 ]
 const fields = shallowRef([])
 
@@ -146,15 +129,11 @@ const page_size_options = [
     {item: 999, name: 'all'}
 ]
 
-const warehouses = shallowRef([])
-
 let abortController: AbortController | null = null;
 
 const loading_data = async (page=1) => {
 
     data_loading.value = true
-    // products.value = []
-    // products_backup = products.value
     if (abortController != null) {
         abortController.abort()
     }
@@ -163,22 +142,13 @@ const loading_data = async (page=1) => {
         abortController = new AbortController()
 
         const data = (await getProductsWithFilters(
-            {name: name.value, cat: cat.value, hasStock: hasStock.value, page},
+            {code:code.value, name: name.value, cat: cat.value, page, page_size:page_size.value},
             {signal: abortController.signal}
         )).data
 
         fields.value = [...fields_base]
         totalRows.value = data.meta.total
-        console.log(totalRows.value)
         products.value = data.data
-        // products.value.push({
-        //     "cat":"BEEF",
-        //     "code":"2166",
-        //     "name":"Beef Chuck Tender Diced ",
-        //     "qty_type":"KG",
-        // })
-        console.log(products.value)
-        console.log(fields.value)
 
     } catch (e) {
         if (!(e instanceof CanceledError)) {
@@ -191,37 +161,15 @@ const loading_data = async (page=1) => {
 }
 
 onMounted(async () => {
-    // const data = (await getWarehousesWithFilters()).data.data
-    // warehouses.value = data
-
-    // fields_base.push(...data.map(function (x) {
-    //     return {key: x.code, sortable: true}
-    // }))
 
     fields.value = [...fields_base]
 
     await loading_data(1);
 })
 
-// onBeforeRouteLeave((to, before) => {
-//     if (to.name == 'dept-report') {
-//         to.meta.orders = orders.value
-//
-//         const weedDay = toDate(deliveryDate.value).getDay()
-//         if ([2, 4].includes(weedDay)) {
-//             to.meta.ordered_run = ['ED', 'EE', 'RM1', 'CT', 'S', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-//         } else {
-//             to.meta.ordered_run = ['ED', 'EE', 'RM1', 'S', 'CT', 'N', 'LE', 'RM2', 'W', 'PU', 'CA', 'EA', '~NR']
-//         }
-//     }
-// })
-
-watch([name, cat, wh, hasStock],
-    async ([name_new, status_new, wh_new, hasStock_new],
-           [name2, status2, wh_old, hasStock_old]) => {
-        // console.log('loading data')
+watch([code, name, cat, page_size],
+    async () => {
         await loading_data()
-        // }
     })
 
 const tableHeaderRefEl = ref<HTMLElement | null>(null)
@@ -232,13 +180,6 @@ const goTableHead = async (page: number) => {
     tableHeaderRefEl.value?.scrollIntoView({behavior: 'smooth'})
 
     await loading_data(page)
-    // products.value.push({
-    //     "cat":"BEEF",
-    //     "code":"2166",
-    //     "name":"Beef Chuck Tender Diced ",
-    //     "qty_type":"KG",
-    // })
-    // console.log(products.value)
 }
 
 </script>
