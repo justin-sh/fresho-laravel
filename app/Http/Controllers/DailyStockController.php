@@ -18,51 +18,25 @@ class DailyStockController extends Controller
         $inventoryDateStr = $request->str('d', date('Y-m-d'))->value();
 
         $orders = DB::table('orders')
-            ->join('order_details', 'orders.order_number', 'order_details.order_number')
+            ->join('order_details as d', 'orders.order_number', 'd.order_number')
             ->select(
-//                'orders.receiving_company_name',
-                'order_details.prd_code', 'order_details.prd_name',
-                'order_details.qty_type',
-                DB::raw('sum(order_details.qty) as qty')
-//                'sum(order_details.qty) as qty',
-//                'order_details.qty', 'order_details.qty_type',
-//                'order_details.customer_notes', 'order_details.supplier_notes'
+                'd.prd_code', 'd.prd_name',
+                'd.qty_type',
+                'd.customer_notes',
+                'd.supplier_notes',
+                DB::raw('sum(d.qty) as qty')
             )
             ->where('orders.delivery_date', $inventoryDateStr)
             ->whereIn('orders.state', [OrderState::Invoiced->value, OrderState::Paid->value])
             ->where('orders.is_credit_note', false)
-            ->whereIn('order_details.group', ['Frozen Products', 'Band Saw'])
-            ->whereIn('order_details.status', ['substituted', 'supplied'])
-            ->where('order_details.customer_notes', '')
-            ->where('order_details.supplier_notes', '')
-            ->groupBy('order_details.prd_code', 'order_details.prd_name', 'order_details.qty_type')
-            ->get();
-
-        $orders2 = DB::table('orders')
-            ->join('order_details', 'orders.order_number', 'order_details.order_number')
-            ->select(
-//                'orders.receiving_company_name',
-                'order_details.prd_code', 'order_details.prd_name',
-//                'order_details.qty_type',
-//                'sum(order_details.qty) as qty',
-                'order_details.qty', 'order_details.qty_type',
-                'order_details.customer_notes', 'order_details.supplier_notes'
-            )
-            ->where('orders.delivery_date', $inventoryDateStr)
-            ->whereIn('orders.state', [OrderState::Invoiced->value, OrderState::Paid->value])
-            ->where('orders.is_credit_note', false)
-            ->whereIn('order_details.group', ['Frozen Products', 'Band Saw'])
-            ->whereIn('order_details.status', ['substituted', 'supplied'])
-            ->where(function (Builder $query){
-                $query->where('order_details.customer_notes', '<>', '')
-                    ->orWhere('order_details.supplier_notes', '<>', '');
-            })
+            ->whereIn('d.group', ['Frozen Products', 'Band Saw'])
+            ->whereIn('d.status', ['substituted', 'supplied'])
+            ->groupBy('d.prd_code', 'd.prd_name', 'd.qty_type', 'd.customer_notes', 'd.supplier_notes')
             ->get();
 
         $rv = $orders
-            ->concat($orders2->all())
             ->mapToGroups(function ($item) {
-                return [$item->prd_code . '--' . $item->prd_name => $item];
+                return [$item->prd_code . '.' . $item->prd_name => $item];
             });
 
         return json_encode(['ok' => true, 'data' => $rv]);

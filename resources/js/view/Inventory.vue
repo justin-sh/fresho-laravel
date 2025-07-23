@@ -67,16 +67,20 @@
         <table class="table">
             <template v-for="(d, key) in orders">
                 <tr class="border" v-for="(x, idx) in d">
-                    <td v-if="idx === 0" :rowspan="d.length">
-                        {{ key }}
+                    <td>
+                        <div>{{ key }}</div>
+                        <div style="font-size: 0.8rem" v-if="x.customer_notes || x.supplier_notes">
+                            {{ x.customer_notes ? 'C:' + x.customer_notes : '' }}
+                            {{ x.supplier_notes ? ( 'S:' + x.supplier_notes) : '' }}
+                        </div>
                     </td>
                     <td>
                         {{ x.qty + x.qty_type }}
                     </td>
-                    <td width="40%">
-                        {{ x.customer_notes ? 'C:' + x.customer_notes : '' }}
-                        {{ x.supplier_notes ? ( 'S:' + x.supplier_notes) : '' }}
-                    </td>
+<!--                    <td width="40%">-->
+<!--                        {{ x.customer_notes ? 'C:' + x.customer_notes : '' }}-->
+<!--                        {{ x.supplier_notes ? ( 'S:' + x.supplier_notes) : '' }}-->
+<!--                    </td>-->
                 </tr>
             </template>
         </table>
