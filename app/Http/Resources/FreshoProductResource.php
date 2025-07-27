@@ -3,14 +3,13 @@
 namespace App\Http\Resources;
 
 use App\Models\FreshoProduct;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property Product $resource
+ * @property FreshoProduct $resource
  */
-class ProductResource extends JsonResource
+class FreshoProductResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,9 +19,15 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->resource->id,
             'code' => $this->resource->code,
+            'cat' => $this->resource->mkt_cat,
             'name' => $this->resource->name,
-            'base_unit' => $this->resource->base_unit,
+            'qty_type' => $this->resource->qty_type,
+            'hoc_code' => $this->resource->hoc_code,
+            'hoc_name' => $this->resource->hoc_name,
+            'unit_map_ratio' => $this->resource->unit_map_ratio,
+//            $this->merge($whs),
         ];
     }
 }

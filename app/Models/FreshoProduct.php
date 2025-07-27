@@ -13,10 +13,12 @@ use Ramsey\Uuid\Uuid;
  * @property String $code
  * @property String $name
  * @property integer $cost
- * @property String $price_text
+ * @property String mkt_cat
  * @property Uuid $product_id
  * @property String $qty_type
  * @property String hoc_code
+ * @property String hoc_name
+ * @property String unit_map_ratio
  */
 class FreshoProduct extends Model
 {

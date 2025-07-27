@@ -32,6 +32,7 @@ class DailyStockController extends Controller
             ->whereIn('d.group', ['Frozen Products', 'Band Saw'])
             ->whereIn('d.status', ['substituted', 'supplied'])
             ->groupBy('d.prd_code', 'd.prd_name', 'd.qty_type', 'd.customer_notes', 'd.supplier_notes')
+            ->orderBy('prd_code')
             ->get();
 
         $rv = $orders

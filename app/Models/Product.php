@@ -7,8 +7,6 @@ use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -19,35 +17,21 @@ use Ramsey\Uuid\Uuid;
  * @property int $onhand_qty
  * @property int $free_qty
  * @property string $comment
- * @property array $warehouses
+ * @property string base_unit
+ * @property \DateTime sync_time
  */
 class Product extends Model
 {
     use HasFactory, Timestamp, HasUuids;
 
-    protected $casts = ['cat' => ProductCategory::class];
+    protected $casts = [
+        'cat' => ProductCategory::class,
+        'sync_time' => 'datetime'
+    ];
 
     protected static function booted()
     {
         parent::booted();
         static::unguard();
-    }
-
-    public function warehouses(): BelongsToMany
-    {
-        return $this->belongsToMany(Warehouse::class, 'product_warehouse', 'prd_code', 'wh_code', 'code', 'code')
-            ->withPivot(['onhand_qty', 'free_qty'])->withTimestamps();
-    }
-
-    public function saleOrder(): BelongsToMany
-    {
-        return $this->belongsToMany(SaleOrder::class, 'sale_order_details', 'prd_id', 'so_id')
-            ->withTimestamps();
-    }
-
-    public function purchaseOrder(): BelongsToMany
-    {
-        return $this->belongsToMany(PurchaseOrder::class, 'purchase_order_details','prd_id', 'po_id')
-            ->withTimestamps();
     }
 }

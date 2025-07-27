@@ -4,6 +4,7 @@ use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\DailyStockController;
 use App\Http\Controllers\DeptReportController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\FreshoProductController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SaleOrderController;
@@ -31,9 +32,12 @@ Route::post('/fresho-orders/{order_id}', [OrderController::class, 'updateFreshoO
 Route::get('/fresho-orders', [OrderController::class, 'searchFreshoOrders']);
 
 
+Route::get('/fresho-products', [FreshoProductController::class, 'index']);
+
+
 //product api
 Route::get('/products/all', [ProductController::class, 'all']);
-Route::apiResource('/products', ProductController::class);
+Route::apiResource('/products', FreshoProductController::class);
 
 Route::apiResource('/warehouses', WarehouseController::class);
 

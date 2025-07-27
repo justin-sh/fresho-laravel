@@ -30,7 +30,6 @@
                         </BFormCheckboxGroup>
                     </div>
                 </div>
-
             </div>
         </BForm>
     </BCard>
@@ -53,32 +52,22 @@
 
         <BTable id="product-table" striped hover
                 :busy="data_loading"
-                :items="products"
+                :items="freshoProducts"
                 :fields="fields">
             <template #cell(rowNo)="row">
                 {{ row.index + 1 }}
             </template>
-            <!--            <template #cell(orderNo)="row">-->
-            <!--                <a :href="'https://app.fresho.com/supplier/orders/' + row.item.id" target="_blank">-->
-            <!--                    {{ row.value }}-->
-            <!--                </a>-->
-            <!--            </template>-->
-<!--            <template #cell(show_details)="row">-->
-<!--                <BButton size="sm" @click="row.toggleDetails" class="mr-2" variant="light">-->
-<!--                    {{ row.detailsShowing ? 'Hide' : 'Show' }} Details-->
-<!--                </BButton>-->
-<!--            </template>-->
-<!--            <template #row-details="row">-->
-<!--                <BCard>-->
-<!--                    <div class="row" v-for="p in row.item.products" :key="p.name">-->
-<!--                        <div class="col-2">{{ p.group }}</div>-->
-<!--                        <div class="col">{{ p.name }}</div>-->
-<!--                        <div class="col-2">{{ p.qty }} {{ p.qtyType }}</div>-->
-<!--                        <div class="col-1">{{ p.status }}</div>-->
-<!--                    </div>-->
-<!--                    <div v-if="!row.item.products">No Products</div>-->
-<!--                </BCard>-->
-<!--            </template>-->
+            <template #cell(mapping)="row">
+                <template v-if="row.item.hoc_code">
+                    {{ row.item.unit_map_ratio }} <span class="small fst-italic">{{ row.item.qty_type }}</span>
+                    =
+                    1 <span class="small fst-italic">{{ hocProducts['Beef OP Ribs Bone IN'].base_unit }}</span>
+                    {{ hocProducts['Beef OP Ribs Bone IN'].name }}
+                </template>
+            </template>
+            <template #cell(action)="row">
+                <BButton size="sm" variant="info">Mapping</BButton>
+            </template>
         </BTable>
     </BCard>
 </template>
@@ -86,7 +75,7 @@
 <script lang="ts" setup>
 import {onMounted, ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
-import {getProductsWithFilters, getWarehousesWithFilters} from '../api'
+import {getAllProducts, getFreshoProductsWithFilters, getWarehousesWithFilters} from '../api'
 import {useRouter} from "vue-router";
 
 const router = useRouter()
@@ -96,25 +85,17 @@ const code = shallowRef('')
 const product = ref([])
 const cat = shallowRef()
 
-const products = ref([{
-    "cat":"BEEF",
-    "code":"2166",
-    "name":"Beef Chuck Tender Diced ",
-    "qty_type":"KG",
-}])
-let products_backup = [{
-    "cat":"BEEF",
-    "code":"2166",
-    "name":"Beef Chuck Tender Diced ",
-    "qty_type":"KG",
-}]
+const freshoProducts = ref([])
+const hocProducts = {}
 
 const fields_base = [
     {key: 'rowNo', label: '#'},
     {key: 'code', label: 'Code', sortable: true},
     {key: 'name', label: 'Name', sortable: true},
     {key: 'qty_type', label: 'Qyt Type'},
-    {key: 'cat', label: 'Category', sortable: true},
+    {key: 'cat', label: 'Category'},
+    {key: 'mapping', label: 'Mapping'},
+    {key: 'action', label: 'Action'},
 ]
 const fields = shallowRef([])
 
@@ -131,7 +112,7 @@ const page_size_options = [
 
 let abortController: AbortController | null = null;
 
-const loading_data = async (page=1) => {
+const loading_data = async (page = 1) => {
 
     data_loading.value = true
     if (abortController != null) {
@@ -141,14 +122,14 @@ const loading_data = async (page=1) => {
     try {
         abortController = new AbortController()
 
-        const data = (await getProductsWithFilters(
-            {code:code.value, name: name.value, cat: cat.value, page, page_size:page_size.value},
+        const data = (await getFreshoProductsWithFilters(
+            {code: code.value, name: name.value, cat: cat.value, page, page_size: page_size.value},
             {signal: abortController.signal}
         )).data
 
         fields.value = [...fields_base]
         totalRows.value = data.meta.total
-        products.value = data.data
+        freshoProducts.value = data.data
 
     } catch (e) {
         if (!(e instanceof CanceledError)) {
@@ -163,6 +144,12 @@ const loading_data = async (page=1) => {
 onMounted(async () => {
 
     fields.value = [...fields_base]
+
+    const hocPrds = (await getAllProducts()).data.data
+    hocPrds.forEach((e) => {
+        hocProducts[e.code] = e
+    })
+    // console.log(hocProducts)
 
     await loading_data(1);
 })
