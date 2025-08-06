@@ -101,7 +101,7 @@ class MpdfZt411Label
         $this->pdf->AddPage();
         $this->pdf->SetFont($this->font, 'B');
 
-        $this->pdf->Image(Storage::path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
+        $this->pdf->Image(base_path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
         $this->pdf->setXY($this->leftMargin, $this->topOfCustomer);
         $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,  $cusName);
 

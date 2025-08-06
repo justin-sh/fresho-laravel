@@ -240,8 +240,9 @@ const loadDetailForOne = async (row) => {
     if(!row.detailsShowing && row.item.product_orders.length == 0){
         detail_syncing.value = true
         current_order_no.value = row.item.orderNo
-        const orderWithDetail = (await syncOrderDetailByOrderNo(row.item.orderNo, 'OrderPage')).data.data
+        const orderWithDetail = (await syncOrderDetailByOrderNo(row.item.id, 'OrderPage')).data.data
         row.item.product_orders = orderWithDetail.product_orders
+        row.item.run = orderWithDetail.run
         detail_syncing.value = false
     }
     row.toggleDetails()

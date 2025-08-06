@@ -203,6 +203,7 @@ class OrderController extends Controller
                 $data[] = [
                     'id' => $order['id'],
                     'orderNo' => $order['order_number'],
+                    'deliveryDate' => $order['delivery_date'],
                     'customer' => $order['receiving_company_name'],
                     'state' => $order['state'],
                     'isLocked' => $order['is_locked'],
