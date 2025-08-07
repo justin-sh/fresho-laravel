@@ -21,6 +21,7 @@ Route::get('/user-info', function (Request $request) {
 // order api
 Route::get('/orders/sync-summary', [OrderController::class, 'syncSummary']);
 Route::get('/orders/sync-detail', [OrderController::class, 'syncDetail']);
+Route::get('/orders/delete-details', [OrderController::class, 'deleteAllDetailOn']);
 Route::get('/orders/sync-delivery-proof', [OrderController::class, 'syncDeliveryProof']);
 Route::apiResource('/orders', OrderController::class)->only(['index', 'show']);
 

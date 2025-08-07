@@ -74,6 +74,10 @@
                              @click.stop="syncDeliveryProofs">
                         Sync Delivery Proof
                     </BButton>
+                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm" :loading="delete_detail_syncing"
+                             @click.stop="deleteDetails">
+                        Delete Details
+                    </BButton>
                 </div>
             </div>
         </template>
@@ -145,7 +149,7 @@
 <script lang="ts" setup>
 import {ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
-import {getOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetails} from '../api'
+import {deleteOrderDetails, getOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetails} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
@@ -180,6 +184,7 @@ const fields = [
 
 const init_loading = shallowRef(false)
 const detail_syncing = shallowRef(false)
+const delete_detail_syncing = shallowRef(false)
 const syncing_del_proof = shallowRef(false)
 const data_loading = shallowRef(false)
 
@@ -246,6 +251,12 @@ const initOrder2Server = async () => {
 const syncDetails = async () => {
     detail_syncing.value = true
     await syncOrderDetails(deliveryDate.value)
+    detail_syncing.value = false
+    await loading_data()
+}
+const deleteDetails = async () => {
+    detail_syncing.value = true
+    await deleteOrderDetails(deliveryDate.value)
     detail_syncing.value = false
     await loading_data()
 }

@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -186,6 +187,21 @@ class OrderController extends Controller
         Log::debug("sync order detail data for $delivery_date");
         $ids = Order::query()->where('delivery_date', $delivery_date)->get('id')->pluck('id');
         SyncOrderDetail::dispatchSync($ids);
+
+        return json_encode(['ok' => true]);
+    }
+
+    public function deleteAllDetailOn(Request $request): string
+    {
+        $delivery_date = $request->str('delivery_date');
+        Log::debug("delete order detail data for $delivery_date");
+
+        if(empty($delivery_date)){
+            Log::error("delete order detail data for empty delivery_date");
+            return json_encode(['ok' => false, 'msg' => 'empty delivery_date']);
+        }
+
+        DB::delete('delete from order_details where order_details.order_number in ( select orders.order_number from orders where delivery_date = ? )', [$delivery_date]);
 
         return json_encode(['ok' => true]);
     }
