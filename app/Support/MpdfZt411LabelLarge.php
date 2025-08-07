@@ -32,22 +32,27 @@ function mm2in($mm): float
 class MpdfZt411LabelLarge
 {
     protected int $fs = 12; // unit 12 pt
-    protected int $pageWidth = 80; // mm
-    protected int $pageHeight = 60; // mm
+    protected int $pageWidth = 100; // mm
+    protected int $pageHeight = 100; // mm
     protected int $marginXY = 4;
 
     protected $lineHeight;
     protected $leftMargin;
-    protected $topOfCustomer;
+    protected $topOfHoC;
     protected $widthOfCustomer;
     protected $topOfProduct;
     protected $widthOfWholeRow;
     protected $topOfQty;
     protected $topOfLabelPD;
     protected $topOfLabelBBD;
-    protected $topOfOrderNo;
-    protected $widthOfOrderNo;
-    protected $widthOfRun;
+    protected $topOfAccNo;
+    protected $widthOfAccNo;
+    protected $topOfAddress;
+    protected $widthOfAddress;
+    protected $topOfStorageCondition;
+    protected $widthOfStorageCondition;
+    protected $topOfPhoneNo;
+    protected $widthOfPhoneNo;
 
     protected $pdf;
     protected $font;
@@ -84,43 +89,59 @@ class MpdfZt411LabelLarge
 
         $this->lineHeight = pt2mm($this->fs) + 1;
         $this->leftMargin = $this->marginXY;
-        $this->topOfCustomer = $this->marginXY;
-        $this->widthOfCustomer = 52;
-        $this->topOfProduct = 18;
+        $this->topOfHoC = $this->marginXY;
         $this->widthOfWholeRow = $this->pageWidth - $this->marginXY - $this->marginXY;
+        $this->widthOfCustomer = $this->widthOfWholeRow;
+        $this->topOfProduct = 18;
         $this->topOfQty = $this->topOfProduct + 12;
-        $this->topOfLabelPD = $this->topOfQty + 8;
+        $this->topOfLabelPD = $this->topOfQty + 15;
         $this->topOfLabelBBD = $this->topOfLabelPD + 6;
-        $this->topOfOrderNo = $this->topOfLabelBBD + 8;
-        $this->widthOfOrderNo = 40;
-        $this->widthOfRun = 40;
+        $this->topOfAccNo = $this->topOfLabelBBD + 12;
+        $this->widthOfAccNo = $this->widthOfWholeRow;
+        $this->topOfAddress = $this->topOfAccNo + 8;
+        $this->widthOfAddress = $this->widthOfWholeRow;
+        $this->topOfStorageCondition = $this->topOfAddress + 8;
+        $this->widthOfStorageCondition = $this->widthOfWholeRow;
+        $this->topOfPhoneNo = $this->topOfStorageCondition + 8;
+        $this->widthOfPhoneNo = $this->widthOfWholeRow;
     }
 
-    function addNew($cusName, $prdName, $qty, $pDate, $bbDate, $orderNo, $run): void
+    function addNew($prdName, $qty, $pDate, $bbDate): void
     {
         $this->pdf->AddPage();
-        $this->pdf->SetFont($this->font, 'B');
-
-        $this->pdf->Image(base_path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
-        $this->pdf->setXY($this->leftMargin, $this->topOfCustomer);
-        $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,  $cusName);
-
         $this->pdf->SetFont($this->font, '', 10);
+
+//        $this->pdf->Image(base_path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
+        $this->pdf->setXY($this->leftMargin, $this->topOfHoC);
+        $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,  'House of Carnivore Pty Ltd');
+
+        $this->pdf->SetFont($this->font, 'B', 12);
         $this->pdf->setXY($this->leftMargin, $this->topOfProduct);
         $this->pdf->MultiCell($this->widthOfWholeRow, $this->lineHeight, $prdName);
 
         $this->pdf->setXY($this->leftMargin, $this->topOfQty);
         $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Qty: " . $qty);
 
+
+        $this->pdf->SetFont($this->font, '', 12);
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelPD);
-        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Pack Date: " . $pDate);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "PACKED ON " . $pDate);
 
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelBBD);
-        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Best Date: " . $bbDate);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "USE BY    " . $bbDate);
 
-        $this->pdf->SetXY($this->leftMargin, $this->topOfOrderNo);
-        $this->pdf->Cell($this->widthOfOrderNo, $this->lineHeight,  $orderNo);
-        $this->pdf->Cell($this->widthOfRun, $this->lineHeight,  "RUN: " . $run);
+
+        $this->pdf->SetFont($this->font, '', 10);
+        $this->pdf->SetXY($this->leftMargin, $this->topOfAccNo);
+        $this->pdf->Cell($this->widthOfAccNo, $this->lineHeight,  'Acc. No. 6-111');
+        $this->pdf->SetXY($this->leftMargin, $this->topOfAddress);
+        $this->pdf->Cell($this->widthOfAddress, $this->lineHeight,  '20-28 Tolley St, Wingfield SA 5013');
+        $this->pdf->SetXY($this->leftMargin, $this->topOfStorageCondition);
+        $this->pdf->Cell($this->widthOfStorageCondition, $this->lineHeight,  'Keep below -18 ℃');
+        $this->pdf->SetXY($this->leftMargin, $this->topOfPhoneNo);
+        $this->pdf->Cell($this->widthOfPhoneNo, $this->lineHeight,  'Phone: +61 410 334 213');
+//        $this->pdf->Cell($this->widthOfOrderNo, $this->lineHeight,  $orderNo);
+//        $this->pdf->Cell($this->widthOfRun, $this->lineHeight,  "RUN: " . $run);
     }
 
     function print($name = '', $dest = ''): ?string

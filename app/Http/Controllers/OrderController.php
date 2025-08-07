@@ -157,7 +157,7 @@ class OrderController extends Controller
 //
         $label = new MpdfZt411LabelLarge();
         foreach ($data as $item) {
-            $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
+            $label->addNew($item['prd'], $item['qty'], $item['pd'], $item['bbd']);
         }
 
         $filename = sprintf('label-large-%s.pdf', date('YmdHis'));
