@@ -22,6 +22,7 @@ export const syncOrderDetailByOrderNo = (order_id: string, src: string) => axios
 export const searchProductsByKey = (s: string, order_id: string) => axios.get('/api/fresho-orders/search_products', {params: {s, order_id}})
 export const getProductInfoById = (pid: string, order_id: string) => axios.get('/api/fresho-orders/get-product-info', {params: {pid, order_id}})
 export const updateOrder = (order_id:string, order_details:object) => axios.post(`/api/fresho-orders/${order_id}`, order_details)
+export const printLabelLargeOne = (order_data:object) => axios.post(`/api/fresho-orders/print-label/large`, order_data)
 export const getFreshoProductsWithFilters = (params: ProductFilter, options?: OptionConfig) => axios.get('/api/fresho-products', {params, ...options})
 
 

@@ -10,6 +10,7 @@ use App\Jobs\SyncOrderDetail;
 use App\Jobs\SyncOrderSummary;
 use App\Models\Order;
 use App\Support\MpdfZt411Label;
+use App\Support\MpdfZt411LabelLarge;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Mpdf\Output\Destination;
 
 class OrderController extends Controller
 {
@@ -120,6 +122,52 @@ class OrderController extends Controller
             ]);
 
 //        return $response->setContent("OK");
+    }
+
+    public function printLabelLarge(Request $request, Response $response)
+    {
+        $data = $request->json()->all();
+
+//        $data = json_decode($prds, true);
+//        foreach ($json['products'] as )
+
+//        $data = [];
+        Log::debug(json_encode($data));
+        if (empty($data)) {
+//            //for test
+            $data = [
+                ['cus' => "Nammi Vietnamese 宋烟如你注意到 83",
+                    "prd" => "Pork Neck (Fem宋烟 如你注ale)",
+                    "qty" => "31.94 <Kg>",
+                    "pd" => "20/05/2025",
+                    "bbd" => "27/05/2025",
+                    "orderNo" => "F40431677",
+                    "run" => "CT",
+                ],
+                ['cus' => "Nammi Vietnamese (Richmond Road) 83",
+                    "prd" => "Pork Belly Boneless Rind On (Fem宋烟如你注意到体ale)",
+                    "qty" => "31.94 <Kg>",
+                    "pd" => "20/05/2025",
+                    "bbd" => "27/05/2025",
+                    "orderNo" => "F40431676",
+                    "run" => "LE",
+                ],
+            ];
+        }
+//
+        $label = new MpdfZt411LabelLarge();
+        foreach ($data as $item) {
+            $label->addNew($item['cus'], $item['prd'], $item['qty'], $item['pd'], $item['bbd'], $item['orderNo'], $item['run']);
+        }
+
+        $filename = sprintf('label-large-%s.pdf', date('YmdHis'));
+        if(!is_dir(storage_path('app/tmp/label/'))){
+            mkdir(storage_path('app/tmp/label/'), 0777, true);
+        }
+
+        $label->print(name: storage_path('app/tmp/label/' . $filename), dest: Destination::FILE);
+        return json_encode(['ok'=>true, 'data'=>$filename]);
+
     }
 
     public function syncSummary(Request $request): string

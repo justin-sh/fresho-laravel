@@ -43,13 +43,13 @@ class AppServiceProvider extends ServiceProvider
 
 //        Log::debug(config('app.fresho.cookie'));
 
-        DB::listen(function (QueryExecuted $query) {
-           Log::warning("------- sql & params --------");
-           Log::debug(Str::padRight('sql', 20) . $query->sql);
-           Log::debug(Str::padRight('bindings', 10) . json_encode($query->bindings));
-           // Log::debug(Str::padRight('elapsed time', 20) . $query->time);
-           Log::warning("------- sql & params --------");
-        });
+//        DB::listen(function (QueryExecuted $query) {
+//           Log::warning("------- sql & params --------");
+//           Log::debug(Str::padRight('sql', 20) . $query->sql);
+//           Log::debug(Str::padRight('bindings', 10) . json_encode($query->bindings));
+//           // Log::debug(Str::padRight('elapsed time', 20) . $query->time);
+//           Log::warning("------- sql & params --------");
+//        });
 
         DB::whenQueryingForLongerThan(500, function (Connection $conn, QueryExecuted $q){
 //            Log::warning("------- Long sql than 1000ms --------");

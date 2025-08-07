@@ -111,6 +111,9 @@
                         <input type="hidden" name="_token" value="">
                     </form>
                 </BButton>
+                <BButton size="sm" @click="printLabelLarge(row.item)" class="mr-2 ms-2" variant="light">
+                    Label Large
+                </BButton>
                 <BButton size="sm" :href="'/fresho-order/' + row.item.id" class="mr-2 ms-2" variant="light">
                     {{ row.item.isLocked?'View':'Edit' }}
                 </BButton>
@@ -142,7 +145,7 @@
 <script lang="ts" setup>
 import {ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
-import {searchFreshoOrdersWithFilters, syncOrderDetailByOrderNo} from '../api'
+import {printLabelLargeOne, searchFreshoOrdersWithFilters, syncOrderDetailByOrderNo} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
@@ -314,6 +317,39 @@ const printLabel = async function (row){
 
     f.submit();
     // await printZt411Label(row)
+}
+
+const printLabelLarge = async function (row){
+    const prds = [];
+    row.product_orders.forEach(p=>{
+
+        if(!['backorder','n/a'].includes(p.status)) {
+            var x = toDate(row.deliveryDate);
+            if (p.group?.includes('Frozen') || p.group?.includes('Hot')) {
+                x.setDate(x.getDate() + 365)
+            } else {
+                x.setDate(x.getDate() + 7)
+            }
+
+            prds.push({
+                'cus': row.customer,
+                'prd': p.name,
+                'qty': p.qty + " " + p.qtyType,
+                'pd': row.deliveryDate,
+                'bbd': format(x, 'yyyy-MM-dd'),
+                'orderNo': 'F' + row.orderNo,
+                'run': row.run,
+            });
+        }
+    })
+
+    console.log(prds)
+
+    const rv = (await printLabelLargeOne(prds)).data
+    console.log(rv)
+    if(rv.ok){
+        window.open('/file-download?f='+rv.data, '_blank')
+    }
 }
 
 const getCsrfToken = ()=>{
