@@ -57,30 +57,33 @@ class SyncOrderSummary implements ShouldQueue
 //                Log::debug("delivery_instructions=". $order['delivery_instructions']);
 
                 $data[] = [
-                    'id' => $order['id'],
-                    'order_number' => $order['order_number'],
-                    'delivery_date' => $order['delivery_date'],
-                    'receiving_company_id' => $order['receiving_company_id'],
-                    'receiving_company_name' => $order['receiving_company_name'],
                     'additional_notes' => $order['additional_notes'],
+                    'payable_total_in_cents' => intval($order['cached_payable_total_in_cents'] ?? '0'),
                     'contact_name' => $order['contact_name'],
                     'contact_phone' => $order['contact_phone'],
                     'delivery_address' => $order['delivery_address'],
+                    'delivery_date' => $order['delivery_date'],
+                    'delivery_instructions' => $order['delivery_instructions'],
                     'delivery_method' => $order['delivery_method'],
                     'delivery_venue' => $order['delivery_venue'],
                     'external_reference' => $order['external_reference'],
-                    'delivery_instructions' => $order['delivery_instructions'],
                     'formatted_cached_payable_total' => $order['formatted_cached_payable_total'],
-                    'payable_total_in_cents' => intval(Str::remove(['$', ',', '.'], $order['formatted_cached_payable_total']) ?? '0'),
-                    'submitted_at' => Carbon::create($order['submitted_at'] ?? '2000'),
-                    'state' => $order['state'],
-                    'placed_by_name' => $order['placed_by_name'],
+                    'id' => $order['id'],
+                    'is_credit_note' => $order['is_credit_note'],
+                    'is_locked' => $order['is_locked'],
+                    'number_of_boxes' => $order['number_of_boxes'] ?? 0,
+                    'order_number' => $order['order_number'],
                     'parent_order_id' => $order['parent_order_id'],
+                    'placed_by_name' => $order['placed_by_name'],
+                    'receiving_company_id' => $order['receiving_company_id'],
+                    'receiving_company_name' => $order['receiving_company_name'],
+                    'state' => $order['state'],
+                    'submitted_at' => Carbon::create($order['submitted_at'] ?? '2000'),
                 ];
 
 
                 if(count($data) >= 100){
-                    Order::upsert($data, ['id'], ['delivery_date', 'additional_notes', 'delivery_instructions', 'formatted_cached_payable_total', 'payable_total_in_cents', 'submitted_at', 'state', 'placed_by_name']);
+                    Order::upsert($data, ['id'], ['additional_notes', 'payable_total_in_cents', 'delivery_date', 'delivery_instructions', 'formatted_cached_payable_total', 'external_reference', 'is_locked', 'number_of_boxes', 'placed_by_name', 'submitted_at', 'state']);
 
                     $data = [];
                 }
@@ -88,7 +91,7 @@ class SyncOrderSummary implements ShouldQueue
 
             });
 
-            Order::upsert($data, ['id'], ['delivery_date', 'additional_notes', 'delivery_instructions', 'formatted_cached_payable_total', 'payable_total_in_cents', 'submitted_at', 'state', 'placed_by_name']);
+            Order::upsert($data, ['id'], ['additional_notes', 'payable_total_in_cents', 'delivery_date', 'delivery_instructions', 'formatted_cached_payable_total', 'external_reference', 'is_locked', 'number_of_boxes', 'placed_by_name', 'submitted_at', 'state']);
 
 //            Log::debug('updated data:' . json_encode($data));
 
