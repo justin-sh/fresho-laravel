@@ -18,17 +18,21 @@ class OrderResource extends JsonResource
     private array $prices = [];
     private array $product_items = [];
 
+    private string $csrf_cookie = '';
+
     public function __construct($resource,
                                 array $quantity_types = [],
                                 array $products = [],
                                 array $prices = [],
-                                array $product_items = [])
+                                array $product_items = [],
+                                string $csrf_cookie = '')
     {
         parent::__construct($resource);
         $this->quantity_types = $quantity_types;
         $this->products = $products;
         $this->prices = $prices;
         $this->product_items = $product_items;
+        $this->csrf_cookie = $csrf_cookie;
     }
 
     /**
@@ -64,6 +68,7 @@ class OrderResource extends JsonResource
             'prices'=>$prices,
             'quantity_types'=>$qtyTypes,
             'product_items'=>$product_items,
+            'csrf_cookie'=>$this->csrf_cookie,
         ];
     }
 

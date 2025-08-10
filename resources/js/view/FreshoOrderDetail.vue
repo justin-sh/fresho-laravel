@@ -201,6 +201,7 @@ const saveNClose = async () => {
         'numberOfBoxes':order.value.numberOfBoxes,
         'deliveryDate':order.value.deliveryDate,
         'additionalNotes':order.value.additionalNotes,
+        'csrf_cookie':order.value.csrf_cookie,
         'details':order.value.product_orders,
     }
 
@@ -215,8 +216,14 @@ const qtyTypeChanged = function (p, evt) {
 
     p.price = (order.value.prices[pitem['price_id']]['price'] / 100).toFixed(2)
     p.group = pitem['product_group']
-    // console.log(p)
-    // console.log(order.value)
+    p.code = pitem['code']
+    p.cost_cents = pitem['cost_cents']
+    p.qtyTypeId = pitem['quantity_type_id']
+    p.qtyType = order.value.quantity_types[p.qtyTypeId].name
+    p.unit_of_order = pitem['unit_code']
+    p.tax_applicable = pitem['tax_applicable']
+    console.log(p)
+    console.log(order.value)
     // console.log(p.qtyTypeId)
     // console.log(`prdId    =${prdId}`)
     // console.log(`qtyTypeId=${qtyTypeId}`)
@@ -276,17 +283,27 @@ const getProductById = async (pid) => {
     })
 
     const curPrd = {
+        'best_before_date': null,
+        'code': prd.product_items.length == 1 ? prd.product_items[0].code : '',
+        'cost_cents': prd.product_items.length == 1 ? prd.product_items[0].cost_cents : 0,
+        'currency_symbol': '$',
+        'customer_notes': '',
+        'group': prd.product_items.length == 1 ? prd.product_items[0].product_group : '',
         'id': uuidv4(),
         'name': prd.products[0].name,
-        'group': prd.product_items.length == 1 ? prd.product_items[0].product_group : '',
-        'customer_notes': '',
+        'original_quantity': null,
+        'packed_on_date': null,
         'price': prd.prices.length == 1 ? (prd.prices[0].price / 100).toFixed(2) : 0,
         'product_id': pid,
         'qty': '',
         'qtyType': prd.quantity_types.length == 1 ? prd.quantity_types[0].name : '',
         'qtyTypeId': prd.quantity_types.length == 1 ? prd.quantity_types[0].id : '',
         'status': 'supplied',
-        'supplier_notes': ''
+        'supplier_notes': '',
+        'tax_applicable': prd.product_items.length == 1 ? prd.product_items[0].tax_applicable : false,
+        'unit_of_order': prd.product_items.length == 1 ? prd.product_items[0].unit_code : '',
+        'use_by_date': null,
+        '_destroy': false,
     }
     order.value.product_orders.push(curPrd)
 

@@ -40,6 +40,7 @@ class OrderDetailResource extends JsonResource
             'use_by_date' => $this->resource->use_by_date,
             'cost_cents' => $this->resource->cost_cents,
             'customer_order_type' => $this->resource->customer_order_type,
+            '_destroy' => false,
         ];
     }
 }

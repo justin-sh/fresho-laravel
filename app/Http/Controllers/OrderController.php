@@ -162,12 +162,12 @@ class OrderController extends Controller
         }
 
         $filename = sprintf('label-large-%s.pdf', date('YmdHis'));
-        if(!is_dir(storage_path('app/tmp/label/'))){
+        if (!is_dir(storage_path('app/tmp/label/'))) {
             mkdir(storage_path('app/tmp/label/'), 0777, true);
         }
 
         $label->print(name: storage_path('app/tmp/label/' . $filename), dest: Destination::FILE);
-        return json_encode(['ok'=>true, 'data'=>$filename]);
+        return json_encode(['ok' => true, 'data' => $filename]);
 
     }
 
@@ -196,7 +196,7 @@ class OrderController extends Controller
         $delivery_date = $request->str('delivery_date');
         Log::debug("delete order detail data for $delivery_date");
 
-        if(empty($delivery_date)){
+        if (empty($delivery_date)) {
             Log::error("delete order detail data for empty delivery_date");
             return json_encode(['ok' => false, 'msg' => 'empty delivery_date']);
         }
@@ -295,12 +295,16 @@ class OrderController extends Controller
         $products = [];
         $prices = [];
         $product_items = [];
+        $csrfToken = '';
 //        Log::debug($order);
         if (count($order->details) == 0 || $isDetailPage) {
             //no detail and sync it from Fresho
             $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order->id;
 
-            $rv = Http::get($url)->json();
+            $resp = Http::get($url);
+            $csrfToken = $resp->cookies()->getCookieByName('fresho-app-csrf-token')->getValue();
+            Log::debug('csrf-cookie:' . $csrfToken);
+            $rv = $resp->json();
 //            Log::debug(json_encode($rv));
             // locked::: {"supplier_order":{"id":"0be5d6f4-451b-4e83-9c7e-9f0b05e8d63a","state":"invoiced","order_number":"40679598","prefixed_order_number":"F40679598","is_locked":true,"receiving_company_name":"Butcher on Deakin","payment_method_available":false}}
             $isLocked = $rv['supplier_order']['is_locked'];
@@ -397,7 +401,7 @@ class OrderController extends Controller
             $order->refresh();
         }
 
-        return new OrderResource($order, $quantity_types, $products, $prices, $product_items);
+        return new OrderResource($order, $quantity_types, $products, $prices, $product_items, $csrfToken);
     }
 
     public function searchProductsByKey(Request $request)
@@ -443,12 +447,14 @@ class OrderController extends Controller
 
         Log::debug("update fresho order: {$order_id}");
 
+        Log::debug(json_decode('["a":"","b":null,"c":1]'));
         $data = $request->json()->all();
 //        Log::debug(json_encode($data));
         Log::debug($data['deliveryDate']);
         Log::debug($data['numberOfBoxes']);
         Log::debug($data['additionalNotes']);
         Log::debug($data['details']);
+        Log::debug($data['csrf_cookie']);
 
         $order = Order::query()
             // ->with('details')
@@ -458,10 +464,17 @@ class OrderController extends Controller
         $order->delivery_date = $data['deliveryDate'];
         $order->number_of_boxes = intval($data['numberOfBoxes'] ?? '0');
         $order->additional_notes = $data['additionalNotes'];
-        Log::debug($order);
+
         $freshoOrder = new OrderData($order, $data['details']);
 
-        return json_encode(['ok' => true, 'supplier_order' => $freshoOrder]);
+        $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order_id;
+
+        $rv = Http::withHeaders(['content-type' => 'application/json; charset=UTF-8', 'x-csrf-token' => $data['csrf_cookie']])
+            ->put($url, ['supplier_order' => $freshoOrder])->json();
+
+//        Log::debug($rv);
+
+        return json_encode(['ok' => true, 'data' => $rv]);
     }
 
     /**

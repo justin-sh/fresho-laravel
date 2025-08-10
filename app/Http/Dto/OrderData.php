@@ -92,7 +92,7 @@ class OrderData
         $this->additional_notes = $order->additional_notes;
         $this->delivery_date = $order->delivery_date->format('Y-m-d');
         $this->delivery_instructions = $order->delivery_instructions;
-        if($order->number_of_boxes > 0){
+        if ($order->number_of_boxes > 0) {
             $this->number_of_boxes = strval($order->number_of_boxes);
         }
         $this->contact_name = $order->contact_name;
@@ -113,6 +113,6 @@ class OrderData
         $this->state = $order->state->value;
         $this->submitted_at = $order->submitted_at?->format('Y-m-d');
 
-        $this->product_orders_attributes = $details;
+        $this->product_orders_attributes = collect($details)->map(fn($d) => new OrderItemData($d, $order->id))->all();
     }
 }
