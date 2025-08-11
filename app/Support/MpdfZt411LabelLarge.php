@@ -96,26 +96,26 @@ class MpdfZt411LabelLarge
         $this->topOfQty = $this->topOfProduct + 12;
         $this->topOfLabelPD = $this->topOfQty + 15;
         $this->topOfLabelBBD = $this->topOfLabelPD + 6;
-        $this->topOfAccNo = $this->topOfLabelBBD + 12;
+        $this->topOfAccNo = $this->topOfLabelBBD + 18;
         $this->widthOfAccNo = $this->widthOfWholeRow;
-        $this->topOfAddress = $this->topOfAccNo + 8;
+        $this->topOfAddress = $this->topOfAccNo + 6;
         $this->widthOfAddress = $this->widthOfWholeRow;
-        $this->topOfStorageCondition = $this->topOfAddress + 8;
+        $this->topOfStorageCondition = $this->topOfAddress + 6;
         $this->widthOfStorageCondition = $this->widthOfWholeRow;
-        $this->topOfPhoneNo = $this->topOfStorageCondition + 8;
+        $this->topOfPhoneNo = $this->topOfStorageCondition + 6;
         $this->widthOfPhoneNo = $this->widthOfWholeRow;
     }
 
     function addNew($prdName, $qty, $pDate, $bbDate): void
     {
         $this->pdf->AddPage();
-        $this->pdf->SetFont($this->font, '', 10);
+        $this->pdf->SetFont($this->font, '', 12);
 
 //        $this->pdf->Image(base_path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
         $this->pdf->setXY($this->leftMargin, $this->topOfHoC);
         $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,  'House of Carnivore Pty Ltd');
 
-        $this->pdf->SetFont($this->font, 'B', 12);
+        $this->pdf->SetFont($this->font, 'B', 14);
         $this->pdf->setXY($this->leftMargin, $this->topOfProduct);
         $this->pdf->MultiCell($this->widthOfWholeRow, $this->lineHeight, $prdName);
 
