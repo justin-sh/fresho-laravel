@@ -130,12 +130,12 @@ class MpdfZt411LabelLarge
         $this->pdf->SetFont($this->font, '', 12);
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelPD);
         $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "PACKED ON:");
-        $this->pdf->SetXY($this->leftMargin + 30, $this->topOfLabelPD);
+        $this->pdf->SetXY($this->leftMargin + 35, $this->topOfLabelPD);
         $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $pDate);
 
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelBBD);
-        $this->pdf->Cell(30, $this->lineHeight, "USE BY:");
-        $this->pdf->SetXY($this->leftMargin + 30, $this->topOfLabelBBD);
+        $this->pdf->Cell(30, $this->lineHeight, "BEST BEFORE:");
+        $this->pdf->SetXY($this->leftMargin + 35, $this->topOfLabelBBD);
         $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $bbDate);
 
 
@@ -145,9 +145,9 @@ class MpdfZt411LabelLarge
         $this->pdf->SetXY($this->leftMargin, $this->topOfAddress);
         $this->pdf->Cell($this->widthOfAddress, $this->lineHeight, '20-28 Tolley St, Wingfield SA 5013');
         $this->pdf->SetXY($this->leftMargin, $this->topOfStorageCondition);
-        $this->pdf->Cell($this->widthOfStorageCondition, $this->lineHeight, 'Keep below -18 ℃');
-        $this->pdf->SetXY($this->leftMargin, $this->topOfPhoneNo);
-        $this->pdf->Cell($this->widthOfPhoneNo, $this->lineHeight, 'Phone: +61 410 334 213');
+        $this->pdf->Cell($this->widthOfStorageCondition, $this->lineHeight, 'Keep below -18 ℃');//todo
+//        $this->pdf->SetXY($this->leftMargin, $this->topOfPhoneNo);
+//        $this->pdf->Cell($this->widthOfPhoneNo, $this->lineHeight, 'Phone: +61 410 334 213');
 //        $this->pdf->Cell($this->widthOfOrderNo, $this->lineHeight,  $orderNo);
 //        $this->pdf->Cell($this->widthOfRun, $this->lineHeight,  "RUN: " . $run);
     }
