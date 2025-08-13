@@ -111,7 +111,7 @@ class MpdfZt411LabelLarge
         $this->pdf->AddPage();
         $this->pdf->SetFont($this->font, '', 12);
 
-//        $this->pdf->Image(base_path('h.png'), $this->widthOfCustomer, $this->topOfCustomer, 23, 9);
+        $this->pdf->Image(base_path('h-v.png'), 75, 45, 20, 2.56*20);
         $this->pdf->setXY($this->leftMargin, $this->topOfHoC);
         $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight,  'House of Carnivore Pty Ltd');
 
@@ -125,10 +125,14 @@ class MpdfZt411LabelLarge
 
         $this->pdf->SetFont($this->font, '', 12);
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelPD);
-        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "PACKED ON " . $pDate);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "PACKED ON ");
+        $this->pdf->SetXY($this->leftMargin+30, $this->topOfLabelPD);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $pDate);
 
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelBBD);
-        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "USE BY    " . $bbDate);
+        $this->pdf->Cell(30, $this->lineHeight, "USE BY    ");
+        $this->pdf->SetXY($this->leftMargin+30, $this->topOfLabelBBD);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $bbDate);
 
 
         $this->pdf->SetFont($this->font, '', 10);
