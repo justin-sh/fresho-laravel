@@ -93,8 +93,8 @@ class MpdfZt411LabelLarge
         $this->widthOfWholeRow = $this->pageWidth - $this->marginXY - $this->marginXY;
         $this->widthOfCustomer = $this->widthOfWholeRow;
         $this->topOfProduct = 18;
-        $this->topOfQty = $this->topOfProduct + 18;
-        $this->topOfLabelPD = $this->topOfQty + 20;
+        $this->topOfQty = $this->topOfProduct + 25;
+        $this->topOfLabelPD = $this->topOfQty + 18;
         $this->topOfLabelBBD = $this->topOfLabelPD + 6;
         $this->topOfAccNo = $this->topOfLabelBBD + 10;
         $this->widthOfAccNo = $this->widthOfWholeRow;
@@ -111,7 +111,7 @@ class MpdfZt411LabelLarge
         $this->pdf->AddPage();
         $this->pdf->SetFont($this->font, '', 12);
 
-        $this->pdf->Image(base_path('h-v.png'), 75, 45, 20, 2.56 * 20);
+        $this->pdf->Image(base_path('h-v.png'), 75, 50, 18, 2.56 * 18);
         $this->pdf->setXY($this->leftMargin, $this->topOfHoC);
         $this->pdf->MultiCell($this->widthOfCustomer, $this->lineHeight, 'House of Carnivore Pty Ltd');
 
@@ -121,9 +121,9 @@ class MpdfZt411LabelLarge
 
         $this->pdf->SetFont($this->font, '', 14);
         $this->pdf->setXY($this->leftMargin, $this->topOfQty);
-        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Qty:");
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "Net Weight:");
         $this->pdf->SetFont($this->font, 'B', 14);
-        $this->pdf->setXY($this->leftMargin + 15, $this->topOfQty);
+        $this->pdf->setXY($this->leftMargin + 35, $this->topOfQty);
         $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $qty);
 
 
@@ -145,7 +145,7 @@ class MpdfZt411LabelLarge
         $this->pdf->SetXY($this->leftMargin, $this->topOfAddress);
         $this->pdf->Cell($this->widthOfAddress, $this->lineHeight, '20-28 Tolley St, Wingfield SA 5013');
         $this->pdf->SetXY($this->leftMargin, $this->topOfStorageCondition);
-        $this->pdf->Cell($this->widthOfStorageCondition, $this->lineHeight, 'Keep below -18 ℃');//todo
+        $this->pdf->Cell($this->widthOfStorageCondition, $this->lineHeight, 'Keep Refrigerated');
 //        $this->pdf->SetXY($this->leftMargin, $this->topOfPhoneNo);
 //        $this->pdf->Cell($this->widthOfPhoneNo, $this->lineHeight, 'Phone: +61 410 334 213');
 //        $this->pdf->Cell($this->widthOfOrderNo, $this->lineHeight,  $orderNo);
