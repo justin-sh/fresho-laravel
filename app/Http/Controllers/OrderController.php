@@ -281,7 +281,7 @@ class OrderController extends Controller
     {
         $order_id = $request->str('id');
         $src = $request->str('src', '');
-        $isDetailPage = 'OrderDetailPage' == $src;
+        $isDetailPage = 'OrderDetailPage' == $src || 'OrderPage' == $src;
         Log::debug("sync order detail data for id:$order_id");
 
         $order = Order::query()
