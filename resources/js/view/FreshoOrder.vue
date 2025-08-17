@@ -358,9 +358,6 @@ const getCsrfToken = ()=>{
 
 </script>
 <style scoped>
-tbody tr {
-    cursor: pointer;
-}
 
 #datepicker, #datepicker2 {
     width: 40%;

@@ -84,7 +84,7 @@
             <table class="table table-bordered mt-4">
                 <thead class="table-secondary">
                 <tr>
-                    <th colspan="2" class="w-50">Product</th>
+                    <th colspan="2">Product</th>
                     <th>Status</th>
                     <th>Quantity</th>
                     <th>Unit</th>
@@ -96,16 +96,36 @@
                 <tr v-for="p in order.product_orders">
                     <td style="border-right: none;">
                         {{ p.name }}
-                        <div class="row note-fz" v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
-<!--                            <div class="col-2"></div>-->
-<!--                            <div class="col">-->
-                                <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
-                                <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} <font-awesome-icon icon="fa-solid fa-pencil"/></span>
-<!--                            </div>-->
-                        </div>
-                        <template v-else>
-                            <span><font-awesome-icon icon="fa-solid fa-pencil"/></span>
+                        <template v-if="p.customer_notes.length==0 && p.supplier_notes.length == 0">
+                            <span class="text-success" style="cursor: pointer;" @click="initSupplierNoteModal(p)">
+                                <font-awesome-icon style="cursor: pointer;" icon="fa-solid fa-pencil"/>
+                            </span>
                         </template>
+                        <div class="row note-fz" v-else v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
+                            <div v-if="p.customer_notes" class="fw-bold text-danger">
+                                C: {{ p.customer_notes }}
+                                <template v-if="!p.supplier_notes && !p.best_before_date && !p.use_by_date && !p.packed_on_date">
+                                  <font-awesome-icon class="text-success" @click="initSupplierNoteModal(p)" style="cursor: pointer;" icon="fa-solid fa-pencil"/>
+                                </template>
+                            </div>
+                            <div @click="initSupplierNoteModal(p)" style="cursor: pointer;" class="fw-bold text-success">
+                                <div v-if="p.supplier_notes">
+                                    S: {{ p.supplier_notes }}
+                                    <font-awesome-icon v-if="!p.best_before_date && !p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>
+                                </div>
+                                <div v-if="p.best_before_date">
+                                    Best before: {{ p.best_before_date }}
+                                    <font-awesome-icon v-if="!p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>
+                                </div>
+                                <div v-if="p.use_by_date">
+                                    Use by: {{ p.use_by_date }}
+                                    <font-awesome-icon v-if="!p.packed_on_date" icon="fa-solid fa-pencil"/>
+                                </div>
+                                <div v-if="p.packed_on_date">
+                                    Packed on: {{ p.packed_on_date }} <font-awesome-icon icon="fa-solid fa-pencil"/>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                     <td class="align-middle" style="border-left: none;">{{ p.group }}</td>
                     <td class="align-middle">
@@ -119,8 +139,10 @@
                         </select>
                     </td>
                     <td class="align-middle position-relative">
-                        <input type="number" v-model="p.qty" placeholder="0" class="text-end pe-0" style="width: 75px;"/>
-                        <!-- textarea class="position-absolute top-50 start-0" style="z-index:99;"></textarea-->
+                        <input type="number" v-model="p.qty" disabled placeholder="0" class="text-end pe-0" style="width: 75px;"/>
+                        <div>
+                            <textarea v-model="p.qty_detail" :id="p.id" placeholder="0" rows="1" @keyup="updateTotalQty(p, $event)"></textarea>
+                        </div>
                     </td>
                     <td class="align-middle">
                         <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
@@ -139,7 +161,7 @@
                         </template>
                     </td>
                     <td class="align-middle">$
-                        <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 75px;"/>
+                        <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 60px;"/>
                     </td>
                     <td class="text-end pe-1 align-middle">${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
                 </tr>
@@ -166,12 +188,42 @@
                 </tr>
                 </tbody>
             </table>
+            <BModal v-model="supplierNote.show" class="modal-lg" :title="supplierNote.title" content-class="px-3" @ok="updateSupplierNoteModal">
+                <span class="fw-bold"> Note to customer </span>
+                <BFormTextarea v-model="supplierNote.note" rows="5"></BFormTextarea>
+                <div class="row justify-content-between mt-4">
+                    <div class="col-3">
+                        <label for="bbd" class="fw-bold">Best Before Date</label>
+                        <div>
+                            <BFormInput type="date" id="bbd" class="col-4 d-inline" v-model="supplierNote.bbd"
+                                        :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                            </BFormInput>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="useBy" class="fw-bold">Use By Date</label>
+                        <div>
+                            <BFormInput type="date" id="useBy" class="col-4 d-inline" v-model="supplierNote.useBy"
+                                        :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                            </BFormInput>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="packedOn" class="fw-bold">Packed On Date</label>
+                        <div>
+                            <BFormInput type="date" id="packedOn" class="col-4 d-inline" v-model="supplierNote.packedOn"
+                                        :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                            </BFormInput>
+                        </div>
+                    </div>
+                </div>
+            </BModal>
         </BCard>
     </BOverlay>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, shallowRef} from "vue";
+import {onMounted, reactive, ref, shallowRef, useTemplateRef} from "vue";
 import bigDecimal from "js-big-decimal";
 import {getProductInfoById, searchProductsByKey, syncOrderDetailByOrderNo, updateOrder} from '../api'
 
@@ -192,11 +244,11 @@ const order = ref({'id': ''})
 
 const data_loading = shallowRef(false)
 
+const supplierNote = reactive({title:'', note:'', bbd:'', useBy:'', packedOn:'', show:false, ref: null})
+
 let abortController: AbortController | null = null;
 
 const saveNClose = async () => {
-    console.log(order.value)
-
     const params = {
         'numberOfBoxes':order.value.numberOfBoxes,
         'deliveryDate':order.value.deliveryDate,
@@ -222,13 +274,33 @@ const qtyTypeChanged = function (p, evt) {
     p.qtyType = order.value.quantity_types[p.qtyTypeId].name
     p.unit_of_order = pitem['unit_code']
     p.tax_applicable = pitem['tax_applicable']
-    console.log(p)
-    console.log(order.value)
+    // console.log(p)
+    // console.log(order.value)
     // console.log(p.qtyTypeId)
     // console.log(`prdId    =${prdId}`)
     // console.log(`qtyTypeId=${qtyTypeId}`)
     // console.log(`pii      d=${piid}`)
     // console.log(`pitem    d=${pitem}`)
+}
+
+const updateTotalQty = function (p, evt){
+    const x = p.qty_detail.replace(/[\n\s]/g, '').split('+');
+    let sum = new bigDecimal('0')
+    // console.log(evt)
+    const el = document.getElementById(p.id)
+    for (let i of x){
+        try {
+            sum = sum.add(new bigDecimal(i))
+        }catch (e) {
+            console.error('Not Number value:' + i)
+            const spos = el.value.indexOf(i)
+            console.log(spos)
+            el.setSelectionRange(spos, spos+i.length)
+        }
+    }
+    // console.log('sum=' + sum.getValue())
+    // console.log(el.value)
+    p.qty = sum.stripTrailingZero().getValue()
 }
 
 const loadDetailForOne = async () => {
@@ -243,7 +315,7 @@ const searchProducts = async () => {
         return;
     }
     prdRv.value = (await searchProductsByKey(s.value, order.value.id)).data.search_products;
-    console.log(prdRv.value)
+    // console.log(prdRv.value)
 }
 
 const getProductById = async (pid) => {
@@ -296,6 +368,7 @@ const getProductById = async (pid) => {
         'price': prd.prices.length == 1 ? (prd.prices[0].price / 100).toFixed(2) : 0,
         'product_id': pid,
         'qty': '',
+        'qty_detail':'',
         'qtyType': prd.quantity_types.length == 1 ? prd.quantity_types[0].name : '',
         'qtyTypeId': prd.quantity_types.length == 1 ? prd.quantity_types[0].id : '',
         'status': 'supplied',
@@ -306,7 +379,25 @@ const getProductById = async (pid) => {
         '_destroy': false,
     }
     order.value.product_orders.push(curPrd)
+}
 
+const initSupplierNoteModal = function (p){
+    // console.log(p)
+    supplierNote.title = 'Supplier\'s note for ' + p.name
+    supplierNote.note = p.supplier_notes
+    supplierNote.bbd = p.best_before_date
+    supplierNote.useBy = p.use_by_date
+    supplierNote.packedOn = p.packed_on_date
+    supplierNote.ref = p
+    supplierNote.show = true
+}
+
+const updateSupplierNoteModal = function (){
+    // console.log(supplierNote)
+    supplierNote.ref.supplier_notes = supplierNote.note
+    supplierNote.ref.best_before_date = supplierNote.bbd
+    supplierNote.ref.use_by_date = supplierNote.useBy
+    supplierNote.ref.packed_on_date = supplierNote.packedOn
 }
 
 onBeforeRouteLeave((to, before) => {
@@ -377,11 +468,7 @@ const getCsrfToken = () => {
 
 </script>
 <style scoped>
-tbody tr {
-    cursor: pointer;
-}
-
-#datepicker, #datepicker2 {
+#datepicker {
     width: 40%;
 }
 

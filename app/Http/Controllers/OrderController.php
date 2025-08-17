@@ -303,7 +303,7 @@ class OrderController extends Controller
 
             $resp = Http::get($url);
             $csrfToken = $resp->cookies()->getCookieByName('fresho-app-csrf-token')->getValue();
-            Log::debug('csrf-cookie:' . $csrfToken);
+//            Log::debug('csrf-cookie:' . $csrfToken);
             $rv = $resp->json();
 //            Log::debug(json_encode($rv));
             // locked::: {"supplier_order":{"id":"0be5d6f4-451b-4e83-9c7e-9f0b05e8d63a","state":"invoiced","order_number":"40679598","prefixed_order_number":"F40679598","is_locked":true,"receiving_company_name":"Butcher on Deakin","payment_method_available":false}}
@@ -365,7 +365,20 @@ class OrderController extends Controller
                     ->all();
                 $prd_orders = [];
                 $idx = 0;
+
+                $detailMap = [];
+                foreach ($order->details() as $detail){
+                    $detailMap[$detail->id] = $detail;
+                }
+
                 foreach ($details as $d) {
+                    $qtyDetail = $d['quantity'];
+                    if(array_key_exists($d['id'], $detailMap)){
+                        $detail = $detailMap[$d['id']];
+                        if($detail->qty == $d['quantity']){
+                            $qtyDetail = $detail->qty_detail;
+                        }
+                    }
                     $prd_orders[] = [
                         'best_before_date' => $d['best_before_date'],
                         'currency_symbol' => $d['currency_symbol'], // $
@@ -383,6 +396,7 @@ class OrderController extends Controller
                         'product_id' => $d['product_id'],
                         'prd_name' => $d['product_name'],
                         'qty' => $d['quantity'],
+                        'qty_detail' => $qtyDetail,
                         'quantity_type_id' => $d['quantity_type_id'],
                         'qty_type' => $d['quantity_type_name'],
                         'status' => $d['supplied_status'],
@@ -445,16 +459,16 @@ class OrderController extends Controller
     public function updateFreshoOrder(Request $request, string $order_id)
     {
 
-        Log::debug("update fresho order: {$order_id}");
+//        Log::debug("update fresho order: {$order_id}");
 
-        Log::debug(json_decode('["a":"","b":null,"c":1]'));
+//        Log::debug(json_decode('["a":"","b":null,"c":1]'));
         $data = $request->json()->all();
 //        Log::debug(json_encode($data));
-        Log::debug($data['deliveryDate']);
-        Log::debug($data['numberOfBoxes']);
-        Log::debug($data['additionalNotes']);
-        Log::debug($data['details']);
-        Log::debug($data['csrf_cookie']);
+//        Log::debug($data['deliveryDate']);
+//        Log::debug($data['numberOfBoxes']);
+//        Log::debug($data['additionalNotes']);
+//        Log::debug($data['details']);
+//        Log::debug($data['csrf_cookie']);
 
         $order = Order::query()
             // ->with('details')
