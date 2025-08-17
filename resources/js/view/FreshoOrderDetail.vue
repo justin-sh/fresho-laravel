@@ -294,13 +294,23 @@ const updateTotalQty = function (p, evt){
         }catch (e) {
             console.error('Not Number value:' + i)
             const spos = el.value.indexOf(i)
-            console.log(spos)
+            // console.log(spos)
             el.setSelectionRange(spos, spos+i.length)
         }
     }
     // console.log('sum=' + sum.getValue())
     // console.log(el.value)
     p.qty = sum.stripTrailingZero().getValue()
+
+    if(p.original_quantity == null){
+        p.original_quantity = p.qty
+    }
+    if(p.qty == 0){
+        console.log('delete this item')
+        p._destroy = true
+    }else{
+        p._destroy = false
+    }
 }
 
 const loadDetailForOne = async () => {

@@ -478,11 +478,65 @@ class OrderController extends Controller
         $order->delivery_date = $data['deliveryDate'];
         $order->number_of_boxes = intval($data['numberOfBoxes'] ?? '0');
         $order->additional_notes = $data['additionalNotes'];
+        $order->save();
+
+        foreach ($data['details'] as $detail){
+//            Log::debug($detail['id'] . '->' . $detail['_destroy'] . ' --> qty-detail:'. $detail['qty_detail']);
+            $d = $order->details()->where('id', $detail['id'])->first();
+            if($d){
+                if($detail['_destroy']){
+                    // delete this one
+                    $d->delete();
+                }else{
+                    // update this one
+                    $d->update([
+                        'qty'=>$detail['qty'],
+                        'qty_detail'=>$detail['qty_detail'],
+                        'quantity_type_id'=>$detail['qtyTypeId'],
+                        'qty_type'=>$detail['qtyType'],
+                        'price_cents_per_quantity'=>$detail['price'] * 100,
+                        'status'=>$detail['status'],
+                        'supplier_notes'=>$detail['supplier_notes'] ?? '',
+                        'best_before_date'=>$detail['best_before_date'],
+                        'packed_on_date'=>$detail['packed_on_date'],
+                        'use_by_date'=>$detail['use_by_date'],
+                    ]);
+                }
+            }else{
+                // create a new one
+                $order->details()->create([
+                    'id'=>$detail['id'],
+                    'order_number'=>$order->order_number,
+                    'prd_code'=>$detail['code'],
+                    'product_id'=>$detail['product_id'],
+                    'prd_name'=>$detail['name'],
+                    'qty'=>$detail['qty'],
+                    'qty_detail'=>$detail['qty_detail'],
+                    'original_quantity'=>$detail['qty'],
+                    'quantity_type_id'=>$detail['qtyTypeId'],
+                    'qty_type'=>$detail['qtyType'],
+                    'price_cents_per_quantity'=>$detail['price'] * 100,
+                    'cost_cents'=>$detail['cost_cents'],
+                    'group'=>$detail['group'],
+                    'status'=>$detail['status'],
+                    'customer_notes'=>$detail['customer_notes']??'',
+                    'supplier_notes'=>$detail['supplier_notes']??'',
+                    'best_before_date'=>$detail['best_before_date'],
+                    'packed_on_date'=>$detail['packed_on_date'],
+                    'use_by_date'=>$detail['use_by_date'],
+                    'currency_symbol'=>$detail['currency_symbol'],
+//                    'customer_order_type'=>$detail['customer_order_type'],
+                    'unit_of_order'=>$detail['unit_of_order']??'',
+                    'tax_applicable'=>$detail['tax_applicable'],
+                ]);
+            }
+        }
 
         $freshoOrder = new OrderData($order, $data['details']);
 
         $url = 'https://app.fresho.com/api/v1/my/suppliers/supplier_orders/' . $order_id;
 
+//        $rv = [];
         $rv = Http::withHeaders(['content-type' => 'application/json; charset=UTF-8', 'x-csrf-token' => $data['csrf_cookie']])
             ->put($url, ['supplier_order' => $freshoOrder])->json();
 
