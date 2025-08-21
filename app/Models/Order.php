@@ -51,6 +51,7 @@ class Order extends Model
         'delivery_date' => 'date:Y-m-d',
         'delivery_at' => 'datetime',
         'submitted_at' => 'datetime',
+        'is_locked' => 'bool',
     ];
 
     protected static function booted()

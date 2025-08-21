@@ -59,6 +59,7 @@ class OrderResource extends JsonResource
             'pickingInstructions' => $this->resource->picking_instructions,
             'additionalNotes' => $this->resource->additional_notes,
             'numberOfBoxes' => $this->resource->number_of_boxes,
+            'isLocked' => $this->resource->is_locked,
             'run' => $this->resource->delivery_run,
             'by' => $this->resource->delivery_by,
             'at' => $this->resource->delivery_at,

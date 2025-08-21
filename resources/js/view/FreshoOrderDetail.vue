@@ -17,15 +17,15 @@
                 <div class="d-flex clear justify-content-end">
                     <div>
                         <BButton variant="outline-primary" @click="goBack" size="sm">Close</BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
+                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
                                  @click.stop="saveNClose">
                             Save & Close
                         </BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
+                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
                                  @click.stop="saveNClose">
                             Save & Print Large Label
                         </BButton>
-                        <BButton variant="outline-primary" disabled class="mx-2" size="sm" :loading="data_loading"
+                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
                                  @click.stop="saveNClose">
                             Invoice
                         </BButton>
@@ -41,14 +41,14 @@
                 <div class="col-4">
                     <label for="datepicker">Preferred Delivery Date:</label>
                     <div>
-                        <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="order.deliveryDate"
+                        <BFormInput type="date" id="datepicker" :disabled="order.isLocked" class="col-4 d-inline" v-model="order.deliveryDate"
                                     :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
                         </BFormInput>
                     </div>
                 </div>
                 <div class="col-2">
                     <label for="datepicker">Boxes:</label>
-                    <BFormInput type="number" class="w-50" v-model="order.numberOfBoxes"/>
+                    <BFormInput type="number" :disabled="order.isLocked" class="w-50" v-model="order.numberOfBoxes"/>
                 </div>
                 <div class="col-2">
                     <label for="datepicker">Delivery Run:</label>
@@ -76,120 +76,120 @@
                 <div class="col">
                     <label for="additionalNotes">Additional Notes:</label>
                     <div>
-                        <BFormTextarea id="additionalNotes" class="col-4 d-inline" v-model="order.additionalNotes">
+                        <BFormTextarea id="additionalNotes" :disabled="order.isLocked"  class="col-4 d-inline" v-model="order.additionalNotes">
                         </BFormTextarea>
                     </div>
                 </div>
             </div>
 
-            <table class="table table-bordered mt-4">
-                <thead class="table-secondary">
-                <tr>
-                    <th colspan="2">Product</th>
-                    <th>Status</th>
-                    <th>Quantity</th>
-                    <th>Unit</th>
-                    <th>Price (Ex TAX)</th>
-                    <th>Total</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="p in order.product_orders">
-                    <td style="border-right: none;">
-                        {{ p.name }}
-                        <template v-if="p.customer_notes.length==0 && p.supplier_notes.length == 0">
-                            <span class="text-success" style="cursor: pointer;" @click="initSupplierNoteModal(p)">
-                                <font-awesome-icon style="cursor: pointer;" icon="fa-solid fa-pencil"/>
-                            </span>
-                        </template>
-                        <div class="row note-fz" v-else v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
-                            <div v-if="p.customer_notes" class="fw-bold text-danger">
-                                C: {{ p.customer_notes }}
-                                <template v-if="!p.supplier_notes && !p.best_before_date && !p.use_by_date && !p.packed_on_date">
-                                  <font-awesome-icon class="text-success" @click="initSupplierNoteModal(p)" style="cursor: pointer;" icon="fa-solid fa-pencil"/>
-                                </template>
-                            </div>
-                            <div @click="initSupplierNoteModal(p)" style="cursor: pointer;" class="fw-bold text-success">
-                                <div v-if="p.supplier_notes">
-                                    S: {{ p.supplier_notes }}
-                                    <font-awesome-icon v-if="!p.best_before_date && !p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>
-                                </div>
-                                <div v-if="p.best_before_date">
-                                    Best before: {{ p.best_before_date }}
-                                    <font-awesome-icon v-if="!p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>
-                                </div>
-                                <div v-if="p.use_by_date">
-                                    Use by: {{ p.use_by_date }}
-                                    <font-awesome-icon v-if="!p.packed_on_date" icon="fa-solid fa-pencil"/>
-                                </div>
-                                <div v-if="p.packed_on_date">
-                                    Packed on: {{ p.packed_on_date }} <font-awesome-icon icon="fa-solid fa-pencil"/>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="align-middle" style="border-left: none;">{{ p.group }}</td>
-                    <td class="align-middle">
-                        <select v-model="p.status">
-                            <option value="to_pick">To Pick</option>
-                            <option value="supplied">Supplied</option>
-                            <option value="n/a">Not available</option>
-                            <option value="backorder">Back order</option>
-                            <option value="partially_picked">Partially picked</option>
-                            <option value="substituted">Substituted</option>
-                        </select>
-                    </td>
-                    <td class="align-middle position-relative">
-                        <input type="number" v-model="p.qty" disabled placeholder="0" class="text-end pe-0" style="width: 75px;"/>
-                        <div>
-                            <textarea v-model="p.qty_detail" :id="p.id" placeholder="0" rows="1" @keyup="updateTotalQty(p, $event)"></textarea>
-                        </div>
-                    </td>
-                    <td class="align-middle">
-                        <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">
+<!--            <table class="table table-bordered mt-4">-->
+<!--                <thead class="table-secondary">-->
+<!--                <tr>-->
+<!--                    <th colspan="2">Product</th>-->
+<!--                    <th>Status</th>-->
+<!--                    <th>Quantity</th>-->
+<!--                    <th>Unit</th>-->
+<!--                    <th>Price (Ex TAX)</th>-->
+<!--                    <th>Total</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr v-for="p in order.product_orders">-->
+<!--                    <td style="border-right: none;">-->
+<!--                        {{ p.name }}-->
+<!--                        <template v-if="p.customer_notes.length==0 && p.supplier_notes.length == 0">-->
+<!--                            <span class="text-success" style="cursor: pointer;" @click="initSupplierNoteModal(p)">-->
+<!--                                <font-awesome-icon style="cursor: pointer;" icon="fa-solid fa-pencil"/>-->
+<!--                            </span>-->
+<!--                        </template>-->
+<!--                        <div class="row note-fz" v-else v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">-->
+<!--                            <div v-if="p.customer_notes" class="fw-bold text-danger">-->
+<!--                                C: {{ p.customer_notes }}-->
+<!--                                <template v-if="!p.supplier_notes && !p.best_before_date && !p.use_by_date && !p.packed_on_date">-->
+<!--                                  <font-awesome-icon class="text-success" @click="initSupplierNoteModal(p)" style="cursor: pointer;" icon="fa-solid fa-pencil"/>-->
+<!--                                </template>-->
+<!--                            </div>-->
+<!--                            <div @click="initSupplierNoteModal(p)" style="cursor: pointer;" class="fw-bold text-success">-->
+<!--                                <div v-if="p.supplier_notes">-->
+<!--                                    S: {{ p.supplier_notes }}-->
+<!--                                    <font-awesome-icon v-if="!p.best_before_date && !p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>-->
+<!--                                </div>-->
+<!--                                <div v-if="p.best_before_date">-->
+<!--                                    Best before: {{ p.best_before_date }}-->
+<!--                                    <font-awesome-icon v-if="!p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>-->
+<!--                                </div>-->
+<!--                                <div v-if="p.use_by_date">-->
+<!--                                    Use by: {{ p.use_by_date }}-->
+<!--                                    <font-awesome-icon v-if="!p.packed_on_date" icon="fa-solid fa-pencil"/>-->
+<!--                                </div>-->
+<!--                                <div v-if="p.packed_on_date">-->
+<!--                                    Packed on: {{ p.packed_on_date }} <font-awesome-icon icon="fa-solid fa-pencil"/>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="align-middle" style="border-left: none;">{{ p.group }}</td>-->
+<!--                    <td class="align-middle">-->
+<!--                        <select v-model="p.status">-->
+<!--                            <option value="to_pick">To Pick</option>-->
+<!--                            <option value="supplied">Supplied</option>-->
+<!--                            <option value="n/a">Not available</option>-->
+<!--                            <option value="backorder">Back order</option>-->
+<!--                            <option value="partially_picked">Partially picked</option>-->
+<!--                            <option value="substituted">Substituted</option>-->
+<!--                        </select>-->
+<!--                    </td>-->
+<!--                    <td class="align-middle position-relative">-->
+<!--                        <input type="number" v-model="p.qty" disabled placeholder="0" class="text-end pe-0" style="width: 75px;"/>-->
+<!--                        <div>-->
+<!--                            <textarea v-model="p.qty_detail" :id="p.id" placeholder="0" rows="1" @keyup="updateTotalQty(p, $event)"></textarea>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="align-middle">-->
+<!--                        <template v-if="(order.products[p.product_id]['product_item_ids'].length??0) > 1">-->
 
-                            <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">
-                                <option value="" disabled>Select</option>
-                                <option :value="order.product_items[piid]['quantity_type_id']" :data-piid="piid"
-                                        v-for="piid in order.products[p.product_id]['product_item_ids']">
-                                    {{ order.quantity_types[order.product_items[piid]['quantity_type_id']].name }}
-                                </option>
-                            </select>
+<!--                            <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">-->
+<!--                                <option value="" disabled>Select</option>-->
+<!--                                <option :value="order.product_items[piid]['quantity_type_id']" :data-piid="piid"-->
+<!--                                        v-for="piid in order.products[p.product_id]['product_item_ids']">-->
+<!--                                    {{ order.quantity_types[order.product_items[piid]['quantity_type_id']].name }}-->
+<!--                                </option>-->
+<!--                            </select>-->
 
-                        </template>
-                        <template v-else>
-                            {{ p.qtyType }}
-                        </template>
-                    </td>
-                    <td class="align-middle">$
-                        <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 60px;"/>
-                    </td>
-                    <td class="text-end pe-1 align-middle">
-                        ${{ ['n/a','backorder'].includes(p.status)?'0.00':parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}
-                    </td>
-                </tr>
+<!--                        </template>-->
+<!--                        <template v-else>-->
+<!--                            {{ p.qtyType }}-->
+<!--                        </template>-->
+<!--                    </td>-->
+<!--                    <td class="align-middle">$-->
+<!--                        <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 60px;"/>-->
+<!--                    </td>-->
+<!--                    <td class="text-end pe-1 align-middle">-->
+<!--                        ${{ ['n/a','backorder'].includes(p.status)?'0.00':parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}-->
+<!--                    </td>-->
+<!--                </tr>-->
 
-                <tr>
-                    <td colspan="2" class="position-relative">
-                        <div>
-                            <div class="position-absolute d-inline mt-1 ps-1 text-body-tertiary">
-                                <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>
-                            </div>
-                            <input type="text" v-model="s" name="search" @keyup="searchProducts"
-                                   class="w-100 rounded ps-4 border-dark-subtle"
-                                   placeholder="Start typing to find a product">
-                        </div>
-                        <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">
-                            <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id"
-                                 @click="getProductById(prd.id)">
-                                <span>{{ prd.name }}</span>
-                                <span v-if="prd.is_pantry_item" class="float-end"><font-awesome-icon icon="fa-solid fa-star"/></span>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+<!--                <tr>-->
+<!--                    <td colspan="2" class="position-relative">-->
+<!--                        <div>-->
+<!--                            <div class="position-absolute d-inline mt-1 ps-1 text-body-tertiary">-->
+<!--                                <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>-->
+<!--                            </div>-->
+<!--                            <input type="text" v-model="s" name="search" @keyup="searchProducts"-->
+<!--                                   class="w-100 rounded ps-4 border-dark-subtle"-->
+<!--                                   placeholder="Start typing to find a product">-->
+<!--                        </div>-->
+<!--                        <div class="list-group prd-list position-absolute w-100 pe-1" v-if="prdRv.length > 0">-->
+<!--                            <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id"-->
+<!--                                 @click="getProductById(prd.id)">-->
+<!--                                <span>{{ prd.name }}</span>-->
+<!--                                <span v-if="prd.is_pantry_item" class="float-end"><font-awesome-icon icon="fa-solid fa-star"/></span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
             <BModal v-model="supplierNote.show" class="modal-lg" :title="supplierNote.title" content-class="px-3" @ok="updateSupplierNoteModal">
                 <span class="fw-bold"> Note to customer </span>
                 <BFormTextarea v-model="supplierNote.note" rows="5"></BFormTextarea>
