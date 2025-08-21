@@ -16,15 +16,16 @@
             <template #footer>
                 <div class="d-flex clear justify-content-end">
                     <div>
+                        <BButton variant="outline-primary" @click="goBack" size="sm">Close</BButton>
                         <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
                                  @click.stop="saveNClose">
                             Save & Close
                         </BButton>
                         <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
                                  @click.stop="saveNClose">
-                            Save & Print Picking Slip
+                            Save & Print Large Label
                         </BButton>
-                        <BButton variant="outline-primary" class="mx-2" size="sm" :loading="data_loading"
+                        <BButton variant="outline-primary" disabled class="mx-2" size="sm" :loading="data_loading"
                                  @click.stop="saveNClose">
                             Invoice
                         </BButton>
@@ -163,7 +164,9 @@
                     <td class="align-middle">$
                         <input type="number" v-model="p.price" class="d-inline text-end pe-0" style="width: 60px;"/>
                     </td>
-                    <td class="text-end pe-1 align-middle">${{ parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}</td>
+                    <td class="text-end pe-1 align-middle">
+                        ${{ ['n/a','backorder'].includes(p.status)?'0.00':parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}
+                    </td>
                 </tr>
 
                 <tr>
@@ -184,7 +187,6 @@
                             </div>
                         </div>
                     </td>
-                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -258,7 +260,11 @@ const saveNClose = async () => {
     }
 
     await updateOrder(order.value.id, params);
+
+    router.back();
 }
+
+const goBack = ()=> router.back()
 
 const qtyTypeChanged = function (p, evt) {
     // const prdId = p.product_id
