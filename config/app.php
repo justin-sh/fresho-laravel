@@ -125,5 +125,6 @@ return [
 
     'fresho' => [
         'cookie' => '_capsule-digital-template_session=' . env('FRESHO_COOKIE', ''),
+        'company_id'=>env('FRESHO_COMPANY_ID', '')
     ],
 ];
