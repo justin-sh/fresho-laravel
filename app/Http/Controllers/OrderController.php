@@ -336,11 +336,12 @@ class OrderController extends Controller
                         'idx' => $idx,
                         'customer_notes' => trim($tr->find('span[data-fresho-group="product-order-customer-note"]', 0)->plaintext),
                         'original_quantity' => $qty,
-                        'price_cents_per_quantity' => trim($tr->find('td[data-title="Price per quantity"]', 0)->plaintext),
+                        'price_cents_per_quantity' => intval(trim($tr->find('td[data-title="Price per quantity"]', 0)->plaintext)) * 100,
                         'prd_code' => '',
                         'group' => '', // todo
                         'prd_name' => trim($tr->find('span[data-fresho-group="product-name"]', 0)->plaintext),
                         'qty' => $qty,
+                        'qty_detail' => $qty,
                         'qty_type' => $qtyUnit,
                         'status' => trim($tr->find('td[data-title="Status"]', 0)->plaintext),
                         'supplier_notes' => trim($tr->find('span[data-fresho-group="product-order-supplier-note"]', 0)->plaintext),
