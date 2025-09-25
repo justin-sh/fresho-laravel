@@ -110,6 +110,9 @@
                     {{ row.value }}
                 </a>
             </template>
+            <template #cell(proof)="row">
+                <span v-html="row.value"></span>
+            </template>
             <template #cell(show_details)="row">
                 <BButton size="sm" @click="row.toggleDetails" class="mr-2" variant="light">
                     {{ row.detailsShowing ? 'Hide' : 'Show' }}
