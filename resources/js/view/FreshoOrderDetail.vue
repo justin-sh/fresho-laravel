@@ -22,7 +22,7 @@
                             Save & Close
                         </BButton>
                         <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
-                                 @click.stop="saveNClose">
+                                 @click.stop="saveNLabel">
                             Save & Print Large Label
                         </BButton>
                         <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
@@ -102,7 +102,7 @@
                                 <font-awesome-icon style="cursor: pointer;" icon="fa-solid fa-pencil"/>
                             </span>
                         </template>
-                        <div class="row note-fz" v-else v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
+                        <div class="row note-fz">
                             <div v-if="p.customer_notes" class="fw-bold text-danger">
                                 C: {{ p.customer_notes }}
                                 <template v-if="!p.supplier_notes && !p.best_before_date && !p.use_by_date && !p.packed_on_date">
@@ -264,6 +264,22 @@ const saveNClose = async () => {
     router.back();
 }
 
+const saveNLabel = async () => {
+    const params = {
+        'numberOfBoxes':order.value.numberOfBoxes,
+        'deliveryDate':order.value.deliveryDate,
+        'additionalNotes':order.value.additionalNotes,
+        'csrf_cookie':order.value.csrf_cookie,
+        'details':order.value.product_orders,
+    }
+
+    const rv = await updateOrder(order.value.id, params);
+    console.log(rv)
+
+    // router.back();
+}
+
+
 const goBack = ()=> router.back()
 
 const qtyTypeChanged = function (p, evt) {
@@ -272,7 +288,8 @@ const qtyTypeChanged = function (p, evt) {
     const piid = evt.srcElement.selectedOptions[0].dataset['piid']
     const pitem = order.value.product_items[piid]
 
-    p.price = (order.value.prices[pitem['price_id']]['price'] / 100).toFixed(2)
+    p.priceCents = order.value.prices[pitem['price_id']]['price']
+    p.price = (p.priceCents / 100).toFixed(2)
     p.group = pitem['product_group']
     p.code = pitem['code']
     p.cost_cents = pitem['cost_cents']

@@ -44,7 +44,7 @@ class OrderItemData
         $this->notes = $detail['customer_notes'];
         $this->original_quantity = $detail['original_quantity'];
         $this->packed_on_date = $detail['packed_on_date'];
-        $this->price_per_quantity = $detail['price'];
+        $this->price_per_quantity = $detail['priceCents'];
         $this->product_code = $detail['code'];
         $this->product_group = $detail['group'];
         $this->product_id = $detail['product_id'];

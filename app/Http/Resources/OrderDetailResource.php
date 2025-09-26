@@ -29,6 +29,7 @@ class OrderDetailResource extends JsonResource
             'original_quantity' => $this->resource->original_quantity,
             'qtyTypeId' => $this->resource->quantity_type_id,
             'qtyType' => $this->resource->qty_type,
+            'priceCents' => $this->resource->price_cents_per_quantity,
             'price' => bcdiv($this->resource->price_cents_per_quantity, 100, 2),
             'status' => $this->resource->status,
             'customer_notes' => $this->resource->customer_notes,
