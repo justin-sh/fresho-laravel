@@ -17,15 +17,26 @@
                 <div class="d-flex clear justify-content-end">
                     <div>
                         <BButton variant="outline-primary" @click="goBack" size="sm">Close</BButton>
-                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
+                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm"
+                                 :loading="save_loading"
+                                 loading-text="Save ..."
                                  @click.stop="saveNClose">
                             Save & Close
                         </BButton>
-                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
-                                 @click.stop="saveNLabel">
+                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm"
+                                 :loading="save_print_loading"
+                                 loading-text="Save & Print Large Label ..."
+                                 @click.stop="saveNLabel('large')">
                             Save & Print Large Label
                         </BButton>
-                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm" :loading="data_loading"
+                        <BButton variant="outline-primary" :disabled="order.isLocked" class="mx-2" size="sm"
+                                 :loading="save_print_loading"
+                                 loading-text="Save & Print Normal Label ..."
+                                 @click.stop="saveNLabel('normal')">
+                            Save & Print Normal Label
+                        </BButton>
+                        <BButton variant="outline-primary" :disabled="order.isLocked || true" class="mx-2" size="sm"
+                                 :loading="data_loading"
                                  @click.stop="saveNClose">
                             Invoice
                         </BButton>
@@ -41,7 +52,8 @@
                 <div class="col-4">
                     <label for="datepicker">Preferred Delivery Date:</label>
                     <div>
-                        <BFormInput type="date" id="datepicker" :disabled="order.isLocked" class="col-4 d-inline" v-model="order.deliveryDate"
+                        <BFormInput type="date" id="datepicker" :disabled="order.isLocked" class="col-4 d-inline"
+                                    v-model="order.deliveryDate"
                                     :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
                         </BFormInput>
                     </div>
@@ -76,7 +88,8 @@
                 <div class="col">
                     <label for="additionalNotes">Additional Notes:</label>
                     <div>
-                        <BFormTextarea id="additionalNotes" :disabled="order.isLocked"  class="col-4 d-inline" v-model="order.additionalNotes">
+                        <BFormTextarea id="additionalNotes" :disabled="order.isLocked" class="col-4 d-inline"
+                                       v-model="order.additionalNotes">
                         </BFormTextarea>
                     </div>
                 </div>
@@ -105,25 +118,31 @@
                         <div class="row note-fz">
                             <div v-if="p.customer_notes" class="fw-bold text-danger">
                                 C: {{ p.customer_notes }}
-                                <template v-if="!p.supplier_notes && !p.best_before_date && !p.use_by_date && !p.packed_on_date">
-                                  <font-awesome-icon class="text-success" @click="initSupplierNoteModal(p)" style="cursor: pointer;" icon="fa-solid fa-pencil"/>
+                                <template
+                                    v-if="!p.supplier_notes && !p.best_before_date && !p.use_by_date && !p.packed_on_date">
+                                    <font-awesome-icon class="text-success" @click="initSupplierNoteModal(p)"
+                                                       style="cursor: pointer;" icon="fa-solid fa-pencil"/>
                                 </template>
                             </div>
-                            <div @click="initSupplierNoteModal(p)" style="cursor: pointer;" class="fw-bold text-success">
+                            <div @click="initSupplierNoteModal(p)" style="cursor: pointer;"
+                                 class="fw-bold text-success">
                                 <div v-if="p.supplier_notes">
                                     S: {{ p.supplier_notes }}
-                                    <font-awesome-icon v-if="!p.best_before_date && !p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>
+                                    <font-awesome-icon v-if="!p.best_before_date && !p.use_by_date && !p.packed_on_date"
+                                                       icon="fa-solid fa-pencil"/>
                                 </div>
                                 <div v-if="p.best_before_date">
                                     Best before: {{ p.best_before_date }}
-                                    <font-awesome-icon v-if="!p.use_by_date && !p.packed_on_date" icon="fa-solid fa-pencil"/>
+                                    <font-awesome-icon v-if="!p.use_by_date && !p.packed_on_date"
+                                                       icon="fa-solid fa-pencil"/>
                                 </div>
                                 <div v-if="p.use_by_date">
                                     Use by: {{ p.use_by_date }}
                                     <font-awesome-icon v-if="!p.packed_on_date" icon="fa-solid fa-pencil"/>
                                 </div>
                                 <div v-if="p.packed_on_date">
-                                    Packed on: {{ p.packed_on_date }} <font-awesome-icon icon="fa-solid fa-pencil"/>
+                                    Packed on: {{ p.packed_on_date }}
+                                    <font-awesome-icon icon="fa-solid fa-pencil"/>
                                 </div>
                             </div>
                         </div>
@@ -140,13 +159,16 @@
                         </select>
                     </td>
                     <td class="align-middle position-relative">
-                        <input type="number" v-model="p.qty" disabled placeholder="0" class="text-end pe-0" style="width: 75px;"/>
+                        <input type="number" v-model="p.qty" disabled placeholder="0" class="text-end pe-0"
+                               style="width: 75px;"/>
                         <div>
-                            <textarea v-model="p.qty_detail" :id="p.id" :disabled="order.isLocked" placeholder="0" rows="1" @keyup="updateTotalQty(p, $event)"></textarea>
+                            <textarea v-model="p.qty_detail" :id="p.id" :disabled="order.isLocked" placeholder="0"
+                                      rows="1" @keyup="updateTotalQty(p, $event)"></textarea>
                         </div>
                     </td>
                     <td class="align-middle">
-                        <template v-if="!order.isLocked && (order.products[p.product_id]['product_item_ids'].length??0) > 1">
+                        <template
+                            v-if="!order.isLocked && (order.products[p.product_id]['product_item_ids'].length??0) > 1">
 
                             <select :id="'qtyType-' + p.id " v-model="p.qtyTypeId" @change="qtyTypeChanged(p, $event)">
                                 <option value="" disabled>Select</option>
@@ -162,10 +184,13 @@
                         </template>
                     </td>
                     <td class="align-middle">$
-                        <input type="number" v-model="p.price" :disabled="order.isLocked" class="d-inline text-end pe-0" style="width: 60px;"/>
+                        <input type="number" v-model="p.price" :disabled="order.isLocked" class="d-inline text-end pe-0"
+                               style="width: 60px;"/>
                     </td>
                     <td class="text-end pe-1 align-middle">
-                        ${{ ['n/a','backorder'].includes(p.status)?'0.00':parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2) }}
+                        ${{
+                            ['n/a', 'backorder'].includes(p.status) ? '0.00' : parseFloat(bigDecimal.multiply(p.qty, p.price)).toFixed(2)
+                        }}
                     </td>
                 </tr>
 
@@ -183,14 +208,16 @@
                             <div class="list-group-item list-group-item-action" v-for="prd in prdRv" key="prd.id"
                                  @click="getProductById(prd.id)">
                                 <span>{{ prd.name }}</span>
-                                <span v-if="prd.is_pantry_item" class="float-end"><font-awesome-icon icon="fa-solid fa-star"/></span>
+                                <span v-if="prd.is_pantry_item" class="float-end"><font-awesome-icon
+                                    icon="fa-solid fa-star"/></span>
                             </div>
                         </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <BModal v-model="supplierNote.show" class="modal-lg" :title="supplierNote.title" content-class="px-3" @ok="updateSupplierNoteModal">
+            <BModal v-model="supplierNote.show" class="modal-lg" :title="supplierNote.title" content-class="px-3"
+                    @ok="updateSupplierNoteModal">
                 <span class="fw-bold"> Note to customer </span>
                 <BFormTextarea v-model="supplierNote.note" rows="5" :disabled="order.isLocked"></BFormTextarea>
                 <div class="row justify-content-between mt-4">
@@ -220,6 +247,11 @@
                     </div>
                 </div>
             </BModal>
+
+            <BModal v-model="popupBbd.show" class="modal-lg" :title="popupBbd.title" content-class="px-3"
+                    @ok="bbdConfirmed">
+                <div v-html="popupBbd.msg"></div>
+            </BModal>
         </BCard>
     </BOverlay>
 </template>
@@ -227,7 +259,7 @@
 <script lang="ts" setup>
 import {onMounted, reactive, ref, shallowRef, useTemplateRef} from "vue";
 import bigDecimal from "js-big-decimal";
-import {getProductInfoById, searchProductsByKey, syncOrderDetailByOrderNo, updateOrder} from '../api'
+import {getProductInfoById, printZt411Label, searchProductsByKey, syncOrderDetailByOrderNo, updateOrder} from '../api'
 
 import {format, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
@@ -245,42 +277,84 @@ const prdRv = ref([])
 const order = ref({'id': ''})
 
 const data_loading = shallowRef(false)
+const save_print_loading = shallowRef(false)
+const save_loading = shallowRef(false)
 
-const supplierNote = reactive({title:'', note:'', bbd:'', useBy:'', packedOn:'', show:false, ref: null})
+const supplierNote = reactive({title: '', note: '', bbd: '', useBy: '', packedOn: '', show: false, ref: null})
+const popupBbd = reactive({title: 'Warning!!', msg: '', size:'', confirm: false, show: false})
 
 let abortController: AbortController | null = null;
 
-const saveNClose = async () => {
+const save = async () => {
     const params = {
-        'numberOfBoxes':order.value.numberOfBoxes,
-        'deliveryDate':order.value.deliveryDate,
-        'additionalNotes':order.value.additionalNotes,
-        'csrf_cookie':order.value.csrf_cookie,
-        'details':order.value.product_orders,
+        'numberOfBoxes': order.value.numberOfBoxes,
+        'deliveryDate': order.value.deliveryDate,
+        'additionalNotes': order.value.additionalNotes,
+        'csrf_cookie': order.value.csrf_cookie,
+        'details': order.value.product_orders,
     }
 
-    await updateOrder(order.value.id, params);
+    return await updateOrder(order.value.id, params);
+}
 
+const saveNClose = async () => {
+    save_loading.value = true;
+    await save();
+    save_loading.value = false;
     router.back();
 }
 
-const saveNLabel = async () => {
-    const params = {
-        'numberOfBoxes':order.value.numberOfBoxes,
-        'deliveryDate':order.value.deliveryDate,
-        'additionalNotes':order.value.additionalNotes,
-        'csrf_cookie':order.value.csrf_cookie,
-        'details':order.value.product_orders,
+const saveNLabel = async (size: 'large' | 'normal') => {
+
+    if (!popupBbd.confirm) {
+        // check packed_on_date / best_before_date is set or not
+        // if not set, packed date is today and best_before_date is packed data + 365d if it's hotpot /frozen, otherwise +7d
+        let isAllSet = true
+        for (let i in order.value.product_orders) {
+            const e = order.value.product_orders[i]
+
+            if (!e.best_before_date || !e.packed_on_date) {
+
+                const packedDate = e.packed_on_date ?? order.value.deliveryDate;
+                let x = toDate(packedDate);
+                if (e.group?.includes('Frozen') || e.group?.includes('Hot')) {
+                    x.setDate(x.getDate() + 365);
+                } else {
+                    x.setDate(x.getDate() + 7);
+                }
+                const bbd = format(x, 'yyyy-MM-dd');
+
+                popupBbd.title = 'Warning: ' + e.name;
+                popupBbd.msg = (!e.packed_on_date ? '<b>Packed Date</b> ' : '') + (!e.best_before_date && !e.packed_on_date ? ' and ' : '');
+                popupBbd.msg += (!e.best_before_date ? '<b>Best Before Date</b> ' : '') + 'is not set.<br/>'
+                popupBbd.msg += 'And they will be set to default.<br/><br/>'
+                popupBbd.msg += !e.packed_on_date ? (' Packed Date :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>' + packedDate + '</b><br/>') : '';
+                popupBbd.msg += !e.best_before_date ? (' Best Before Date: <b>' + bbd + '</b>') : '';
+                isAllSet = false
+                break;
+            }
+        }
+        popupBbd.size = size;
+        popupBbd.show = true;
+        return
     }
+    popupBbd.confirm = false;
 
-    const rv = await updateOrder(order.value.id, params);
-    console.log(rv)
+    save_print_loading.value = true;
+    const rv = (await save()).data;
 
-    // router.back();
+    // await printLabel('large');
+    await printLabel(size);
+    save_print_loading.value = false;
 }
 
+const bbdConfirmed = async () => {
+    popupBbd.confirm = true
 
-const goBack = ()=> router.back()
+    await saveNLabel(popupBbd.size)
+}
+
+const goBack = () => router.back()
 
 const qtyTypeChanged = function (p, evt) {
     // const prdId = p.product_id
@@ -306,32 +380,32 @@ const qtyTypeChanged = function (p, evt) {
     // console.log(`pitem    d=${pitem}`)
 }
 
-const updateTotalQty = function (p, evt){
+const updateTotalQty = function (p, evt) {
     const x = p.qty_detail.replace(/[\n\s]/g, '').split('+');
     let sum = new bigDecimal('0')
     // console.log(evt)
     const el = document.getElementById(p.id)
-    for (let i of x){
+    for (let i of x) {
         try {
             sum = sum.add(new bigDecimal(i))
-        }catch (e) {
+        } catch (e) {
             console.error('Not Number value:' + i)
             const spos = el.value.indexOf(i)
             // console.log(spos)
-            el.setSelectionRange(spos, spos+i.length)
+            el.setSelectionRange(spos, spos + i.length)
         }
     }
     // console.log('sum=' + sum.getValue())
     // console.log(el.value)
     p.qty = sum.stripTrailingZero().getValue()
 
-    if(p.original_quantity == null){
+    if (p.original_quantity == null) {
         p.original_quantity = p.qty
     }
-    if(p.qty == 0){
+    if (p.qty == 0) {
         console.log('delete this item')
         p._destroy = true
-    }else{
+    } else {
         p._destroy = false
     }
 }
@@ -401,7 +475,7 @@ const getProductById = async (pid) => {
         'price': prd.prices.length == 1 ? (prd.prices[0].price / 100).toFixed(2) : 0,
         'product_id': pid,
         'qty': '',
-        'qty_detail':'',
+        'qty_detail': '',
         'qtyType': prd.quantity_types.length == 1 ? prd.quantity_types[0].name : '',
         'qtyTypeId': prd.quantity_types.length == 1 ? prd.quantity_types[0].id : '',
         'status': 'supplied',
@@ -414,7 +488,7 @@ const getProductById = async (pid) => {
     order.value.product_orders.push(curPrd)
 }
 
-const initSupplierNoteModal = function (p){
+const initSupplierNoteModal = function (p) {
     // console.log(p)
     supplierNote.title = 'Supplier\'s note for ' + p.name
     supplierNote.note = p.supplier_notes
@@ -425,7 +499,7 @@ const initSupplierNoteModal = function (p){
     supplierNote.show = true
 }
 
-const updateSupplierNoteModal = function (){
+const updateSupplierNoteModal = function () {
     // console.log(supplierNote)
     supplierNote.ref.supplier_notes = supplierNote.note
     supplierNote.ref.best_before_date = supplierNote.bbd
@@ -462,41 +536,13 @@ onMounted(() => {
 //     }, {immediate: true})
 
 
-const printLabel = async function (row) {
-
-    const f = document.forms[row.id];
-    f.querySelector('input[name="_token"]').value = getCsrfToken();
-    const prds = [];
-    row.product_orders.forEach(p => {
-
-        if (!['backorder', 'n/a'].includes(p.status)) {
-            var x = toDate(row.deliveryDate);
-            if (p.group?.includes('Frozen') || p.group?.includes('Hot')) {
-                x.setDate(x.getDate() + 365)
-            } else {
-                x.setDate(x.getDate() + 7)
-            }
-
-            prds.push({
-                'cus': row.customer,
-                'prd': p.name,
-                'qty': p.qty + " " + p.qtyType,
-                'pd': row.deliveryDate,
-                'bbd': format(x, 'yyyy-MM-dd'),
-                'orderNo': 'F' + row.orderNo,
-                'run': row.run,
-            });
-        }
-    })
-
-    f.querySelector('input[name="data"]').value = JSON.stringify(prds);
-
-    f.submit();
-    // await printZt411Label(row)
-}
-
-const getCsrfToken = () => {
-    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const printLabel = async function (size: 'large' | 'normal') {
+    console.log("print label size: " + size)
+    const rv = (await printZt411Label(order.value.id, size)).data
+    console.log(rv)
+    if (rv.ok) {
+        window.open('/file-download?f=' + rv.data, '_blank')
+    }
 }
 
 </script>
@@ -534,7 +580,7 @@ const getCsrfToken = () => {
     background-color: rgb(239, 239, 239);
 }
 
-.note-fz{
+.note-fz {
     font-size: 0.8rem;
 }
 </style>

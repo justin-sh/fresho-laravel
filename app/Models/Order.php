@@ -19,7 +19,7 @@ use Ramsey\Uuid\Nonstandard\Uuid;
  * @property string $contact_name
  * @property string $contact_phone
  * @property string $delivery_address
- * @property array $details
+ * @property array<OrderDetail> $details
  * @property OrderState $state
  * @property int $number_of_boxes
  * @property string $formatted_cached_payable_total

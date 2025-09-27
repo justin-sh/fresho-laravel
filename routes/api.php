@@ -30,6 +30,7 @@ Route::get('/fresho-orders/sync-detail-by-order-no', [OrderController::class, 's
 Route::get('/fresho-orders/search_products', [OrderController::class, 'searchProductsByKey']);
 Route::get('/fresho-orders/get-product-info', [OrderController::class, 'getProductInfoById']);
 Route::post('/fresho-orders/print-label/large', [OrderController::class, 'printLabelLarge']);
+Route::post('/fresho-orders/{order_id}/label/{size}', [OrderController::class, 'printZT411Label']);
 Route::post('/fresho-orders/{order_id}', [OrderController::class, 'updateFreshoOrder']);
 Route::get('/fresho-orders', [OrderController::class, 'searchFreshoOrders']);
 

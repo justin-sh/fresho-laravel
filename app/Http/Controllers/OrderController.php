@@ -173,6 +173,65 @@ class OrderController extends Controller
 
     }
 
+    public function printZT411Label(string $order_id, string $size): false|string
+    {
+        if (!in_array($size, ['large', 'normal'])) {
+            Log::warning('The parameter size for print zt411 label is not supported. It should be large/normal');
+            $size = 'large'; // unsupported size, set default to large
+        }
+
+        Log::debug(sprintf("print %s label for order:%s", $size, $order_id));
+
+        $isLargeLabel = 'large' == $size;
+
+        /** @var Order $order */
+        $order = Order::with("details")->find($order_id);
+
+        if ($isLargeLabel) {
+            $label = new MpdfZt411LabelLarge();
+        } else {
+            $label = new MpdfZt411Label();
+        }
+
+        foreach ($order->details as $detail) {
+            Log::debug($detail->prd_name);
+            Log::debug($detail->qty);
+            Log::debug($detail->qty_detail);
+            Log::debug($detail->qty_type);
+            Log::debug($detail->packed_on_date);
+            Log::debug($detail->best_before_date);
+
+            $pd = $detail->packed_on_date ?? $order->delivery_date;
+            $bbd = $detail->best_before_date;
+            if (is_null($bbd)) {
+                if (Str::contains($detail->group, ['Frozen', 'Hot'])) {
+                    $bbd = Carbon::create($pd)->addDays(365);
+                } else {
+                    $bbd = Carbon::create($pd)->addDays(7);
+                }
+            }
+            $pdStr = Carbon::create($pd)->toDateString();
+            $bbdStr = $bbd->toDateString();
+            $qtys = explode('+', $detail->qty_detail);
+            foreach ($qtys as $qty) {
+                $qtyWUnit = sprintf("%.3f", floatval(Str::trim($qty))) . ' ' . $detail->qty_type;
+                if ($isLargeLabel) {
+                    $label->addNew($detail->prd_name, $qtyWUnit, $pdStr, $bbdStr);
+                } else {
+                    $label->addNew($order->receiving_company_name, $detail->prd_name, $qtyWUnit, $pdStr, $bbdStr, 'F' . $order->order_number, $order->delivery_run);
+                }
+            }
+        }
+
+        $filename = sprintf('label-%s-%s-%s.pdf', $size, $order->order_number, date('YmdHis'));
+        if (!is_dir(storage_path('app/tmp/label/'))) {
+            mkdir(storage_path('app/tmp/label/'), 0777, true);
+        }
+
+        $label->print(name: storage_path('app/tmp/label/' . $filename), dest: Destination::FILE);
+        return json_encode(['ok' => true, 'data' => $filename]);
+    }
+
     public function syncSummary(Request $request): string
     {
         $delivery_date = $request->str('delivery_date');
@@ -425,7 +484,7 @@ class OrderController extends Controller
             $idx = 0;
 
             $detailMap = [];
-            foreach ($order->details() as $detail) {
+            foreach ($order->details as $detail) {
                 $detailMap[$detail->id] = $detail;
             }
 
