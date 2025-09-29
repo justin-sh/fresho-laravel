@@ -23,13 +23,18 @@ class SyncOrderDeliveryProof implements ShouldQueue
     {
     }
 
+    public function getName(): string
+    {
+        return "SyncOrderSummary";
+    }
+
     /**
      * Execute the job.
      */
     public function handle(): void
     {
         //step 1: get delivery page url
-//        Log::debug("SyncOrderDeliveryProof step 0");
+        Log::info("SyncOrderDeliveryProof start");
         $url0 = 'https://app.fresho.com/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/deliveries';
         $rv = Http::get($url0)->body();
 
@@ -80,6 +85,6 @@ class SyncOrderDeliveryProof implements ShouldQueue
                     ->update($info);
             });
         });
-//        Log::debug("SyncOrderDeliveryProof step 5");
+        Log::info("SyncOrderDeliveryProof finish");
     }
 }

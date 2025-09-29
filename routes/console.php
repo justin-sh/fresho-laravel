@@ -2,6 +2,7 @@
 
 use App\Console\Commands\SyncFreshoProductGroup;
 use App\Console\Commands\SyncFreshoProducts;
+use App\Jobs\SyncOrderDeliveryProof;
 use App\Jobs\SyncOrderSummary;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Carbon;
@@ -31,6 +32,24 @@ use Illuminate\Console\Scheduling\Schedule as Weekdays;
 //        }
 //        return false;
 //    });
+
+Schedule::job(SyncOrderDeliveryProof::class)->everyMinute()
+    ->skip(Weekdays::SUNDAY)
+    ->skip(function (){
+        $t = Carbon::now('Australia/Adelaide');
+
+        if($t->weekday() == Weekdays::SATURDAY){
+            if($t->hour < 9 || $t->hour > 17){
+                return true;
+            }
+        }else{
+            if($t->hour < 9 || $t->hour > 19){
+                return true;
+            }
+        }
+
+        return false;
+    });
 
 Schedule::command(SyncFreshoProducts::class)->hourly()->between('5:00', '15:00')->skip(function () {
     $t = Carbon::now('Australia/Adelaide');
