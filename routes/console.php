@@ -69,3 +69,24 @@ Schedule::command(SyncFreshoProductGroup::class)->hourly()->between('5:00', '15:
     touch($filename);
     return false;
 });
+
+Schedule::command(SyncFreshoProductGroup::class, ['-s'])->hourly()->between('5:00', '15:00')->skip(function () {
+    $t = Carbon::now('Australia/Adelaide');
+
+    if ($t->weekday() == Weekdays::SUNDAY || $t->weekday() == Weekdays::SATURDAY) {
+        return true;
+    }
+
+    $filename = sys_get_temp_dir() . '/sync-fresho-products-'.$t->toDateString().'.tmp';
+    if(!file_exists($filename)){
+        return true;
+    }
+
+    $filename = sys_get_temp_dir() . '/sync-fresho-products-group-s-'.$t->toDateString().'.tmp';
+    if(file_exists($filename)){
+        return true;
+    }
+
+    touch($filename);
+    return false;
+});

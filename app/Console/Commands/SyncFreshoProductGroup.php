@@ -47,6 +47,7 @@ class SyncFreshoProductGroup extends Command
 
     private function syncMktCategoryByGroup(): void
     {
+        Log::info("fresho sync products group started");
         $url = 'https://app.fresho.com/api/v1/my/customers/product_items';
         $params = [
             'modelPath' => 'controller.product-items',
@@ -94,16 +95,19 @@ class SyncFreshoProductGroup extends Command
 //            break;
             Sleep::for(CarbonInterval::seconds());
         }
+        Log::info("fresho sync products group finished");
     }
 
     private function syncMktCategoryBySingleProductDetail()
     {
+        Log::info("fresho sync products group Single started");
         $productsWithoutMktCat = FreshoProduct::query()
             ->whereNull('mkt_cat')
             ->orWhere('mkt_cat', '')
-            ->get('id');
+            ->get(['id', 'name']);
 
         $productsWithoutMktCat->each(function ($prd) {
+            Log::info("fresho sync products group Single for $prd->name [ $prd->id ]");
             $prdDetailUrl = 'https://app.fresho.com/companies/b181ee08-2214-46ec-ad1e-926a2bbfb8fb/selling/supplier_product_items/%s/edit';
 
             $url = sprintf($prdDetailUrl, $prd->id);
@@ -115,7 +119,7 @@ class SyncFreshoProductGroup extends Command
             if (empty($mktCatValue)) {
                 $mktCatValue = 'NA';
             }
-            Log::info($prd->id . '->' . $mktCatValue);
+//            Log::info($prd->id . '->' . $mktCatValue);
 
             DB::table('fresho_products')
                 ->where('id', $prd->id)
@@ -123,5 +127,6 @@ class SyncFreshoProductGroup extends Command
 
             Sleep::for(CarbonInterval::seconds());
         });
+        Log::info("fresho sync products group Single finished");
     }
 }
