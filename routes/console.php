@@ -4,13 +4,18 @@ use App\Console\Commands\SyncFreshoProductGroup;
 use App\Console\Commands\SyncFreshoProducts;
 use App\Jobs\SyncOrderDeliveryProof;
 use App\Jobs\SyncOrderSummary;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schedule;
 use Illuminate\Console\Scheduling\Schedule as Weekdays;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schedule;
 
+/**
+ * Cron: min hour day month weekday
+ * SyncOrderSummary             every minute        04:10 - 15:00 Mon/Fri 05:10 - 15:00 Tue-Thur
+ * SyncOrderDeliveryProof       every 5 minute      09:00 - 19:00 Mon-Sat
+ * SyncFreshoProducts           once per day        09:00 - 19:00 Mon-Sat
+ * SyncFreshoProductGroup       once per day        09:00 - 19:00 Mon-Sat
+ * SyncFreshoProductGroup -s    once per day        09:00 - 19:00 Mon-Sat
+ */
 //Artisan::command('inspire', function () {
 //    Log::debug("current time: " . Carbon::now('Australia/Adelaide'));
 //    Log::debug("current time: " . Carbon::now());
@@ -33,17 +38,21 @@ use Illuminate\Console\Scheduling\Schedule as Weekdays;
 //        return false;
 //    });
 
-Schedule::job(SyncOrderDeliveryProof::class)->everyMinute()
-    ->skip(Weekdays::SUNDAY)
-    ->skip(function (){
-        $t = Carbon::now('Australia/Adelaide');
+$t = Carbon::now();
+$his = $t->toTimeString();
 
-        if($t->weekday() == Weekdays::SATURDAY){
-            if($t->hour < 9 || $t->hour > 17){
+Schedule::call(function () use ($t) {
+    SyncOrderSummary::dispatchSync($t->toDateString());
+})->name(SyncOrderSummary::class)
+    ->everyMinute()
+    ->skip(Weekdays::SUNDAY)
+    ->skip(function () use ($t, $his) {
+        if ($t->weekday() == Weekdays::MONDAY || $t->weekday() == Weekdays::FRIDAY) {
+            if ($his < '04:10:00' || $his > '15:00:00') {
                 return true;
             }
-        }else{
-            if($t->hour < 9 || $t->hour > 19){
+        } else {
+            if ($his < '05:10:00' || $his > '15:00:00') {
                 return true;
             }
         }
@@ -51,61 +60,95 @@ Schedule::job(SyncOrderDeliveryProof::class)->everyMinute()
         return false;
     });
 
-Schedule::command(SyncFreshoProducts::class)->hourly()->between('5:00', '15:00')->skip(function () {
-    $t = Carbon::now('Australia/Adelaide');
+Schedule::call(function () {
+    SyncOrderDeliveryProof::dispatchSync();
+})->name(SyncOrderDeliveryProof::class)
+    ->everyFiveMinutes()
+    ->skip(Weekdays::SUNDAY)
+    ->skip(function () use ($t, $his) {
+        if ($t->weekday() == Weekdays::SATURDAY) {
+            if ($his < '09:00:00' || $his > '17:00:00') {
+                return true;
+            }
+        } else {
+            if ($his < '09:00:00' || $his > '19:00:00') {
+                return true;
+            }
+        }
 
-    if ($t->weekday() == Weekdays::SUNDAY || $t->weekday() == Weekdays::SATURDAY) {
-        return true;
-    }
+        return false;
+    });
 
-    $filename = sys_get_temp_dir() . '/sync-fresho-products-'.$t->toDateString().'.tmp';
-    if(file_exists($filename)){
-        return true;
-    }
+Schedule::command(SyncFreshoProducts::class)
+    ->hourlyAt(1)
+    ->skip(Weekdays::SUNDAY)
+    ->skip(function () use ($t, $his) {
+        if ($t->weekday() == Weekdays::MONDAY || $t->weekday() == Weekdays::FRIDAY) {
+            if ($his < '05:00:00' || $his > '15:00:00') {
+                return true;
+            }
+        } else {
+            if ($his < '05:10:00' || $his > '15:00:00') {
+                return true;
+            }
+        }
 
-    touch($filename);
-    return false;
-});
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-' . $t->toDateString() . '.tmp';
+        if (file_exists($filename)) {
+            return true;
+        }
+
+        return false;
+    })->onSuccess(function () use ($t) {
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-' . $t->toDateString() . '.tmp';
+        touch($filename);
+    });;
 
 
-Schedule::command(SyncFreshoProductGroup::class)->hourly()->between('5:00', '15:00')->skip(function () {
-    $t = Carbon::now('Australia/Adelaide');
+Schedule::command(SyncFreshoProductGroup::class)
+    ->hourlyAt(3)
+    ->skip(Weekdays::SUNDAY)
+    ->skip(function () use ($t, $his) {
+        if ($his < '05:00:00' || $his > '15:00:00') {
+            return true;
+        }
 
-    if ($t->weekday() == Weekdays::SUNDAY || $t->weekday() == Weekdays::SATURDAY) {
-        return true;
-    }
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-' . $t->toDateString() . '.tmp';
+        if (!file_exists($filename)) {
+            return true;
+        }
 
-    $filename = sys_get_temp_dir() . '/sync-fresho-products-'.$t->toDateString().'.tmp';
-    if(!file_exists($filename)){
-        return true;
-    }
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-group-' . $t->toDateString() . '.tmp';
+        if (file_exists($filename)) {
+            return true;
+        }
 
-    $filename = sys_get_temp_dir() . '/sync-fresho-products-group-'.$t->toDateString().'.tmp';
-    if(file_exists($filename)){
-        return true;
-    }
+        return false;
+    })->onSuccess(function () use ($t) {
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-group-' . $t->toDateString() . '.tmp';
+        touch($filename);
+    });;
 
-    touch($filename);
-    return false;
-});
+Schedule::command(SyncFreshoProductGroup::class, ['-s'])
+    ->hourlyAt(5)
+    ->skip(Weekdays::SUNDAY)
+    ->skip(function () use ($t, $his) {
+        if ($his < '05:00:00' || $his > '15:00:00') {
+            return true;
+        }
 
-Schedule::command(SyncFreshoProductGroup::class, ['-s'])->hourly()->between('5:00', '15:00')->skip(function () {
-    $t = Carbon::now('Australia/Adelaide');
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-' . $t->toDateString() . '.tmp';
+        if (!file_exists($filename)) {
+            return true;
+        }
 
-    if ($t->weekday() == Weekdays::SUNDAY || $t->weekday() == Weekdays::SATURDAY) {
-        return true;
-    }
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-group-s-' . $t->toDateString() . '.tmp';
+        if (file_exists($filename)) {
+            return true;
+        }
 
-    $filename = sys_get_temp_dir() . '/sync-fresho-products-'.$t->toDateString().'.tmp';
-    if(!file_exists($filename)){
-        return true;
-    }
-
-    $filename = sys_get_temp_dir() . '/sync-fresho-products-group-s-'.$t->toDateString().'.tmp';
-    if(file_exists($filename)){
-        return true;
-    }
-
-    touch($filename);
-    return false;
-});
+        return false;
+    })->onSuccess(function () use ($t) {
+        $filename = sys_get_temp_dir() . '/sync-fresho-products-group-s-' . $t->toDateString() . '.tmp';
+        touch($filename);
+    });

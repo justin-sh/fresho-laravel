@@ -25,7 +25,7 @@ class SyncOrderDeliveryProof implements ShouldQueue
 
     public function getName(): string
     {
-        return "SyncOrderSummary";
+        return "SyncOrderDeliveryProof";
     }
 
     /**
@@ -82,6 +82,7 @@ class SyncOrderDeliveryProof implements ShouldQueue
             $deliveredInfos->each(function ($info, $orderNo) use (&$i) {
                 Order::query()
                     ->where('order_number', strval($orderNo))
+                    ->whereNull('delivery_at')
                     ->update($info);
             });
         });

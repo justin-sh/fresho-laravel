@@ -39,7 +39,7 @@ class SyncFreshoProducts extends Command
         $loop = 0;
 
         while ($search_after_key <= $total_page && $loop < 100) {
-            Log::info("fresho sync product in loop:" . $loop);
+            Log::info("sync fresho products in loop:" . $loop);
             $loop += 1;
 
             if ($search_after_key > 0) {
@@ -80,6 +80,6 @@ class SyncFreshoProducts extends Command
             FreshoProduct::upsert($data, ['id'], ['code', 'name', 'cost', 'price_text', 'product_id', 'qty_type']);
         }
 
-        Log::info("fresho sync product finished");
+        Log::info("sync fresho products finished");
     }
 }

@@ -34,7 +34,7 @@ class SyncOrderSummary implements ShouldQueue
         $curPage = 1;
         while ($curPage < 100) {
 
-            Log::debug("sync order for date [{$this->deliveryDate}] page: " . $curPage);
+            Log::info("sync order for date [{$this->deliveryDate}] page: " . $curPage);
 
             $params = [
                 'page' => $curPage,

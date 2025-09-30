@@ -47,7 +47,7 @@ class SyncFreshoProductGroup extends Command
 
     private function syncMktCategoryByGroup(): void
     {
-        Log::info("fresho sync products group started");
+        Log::info("sync all fresho products mkt cat started");
         $url = 'https://app.fresho.com/api/v1/my/customers/product_items';
         $params = [
             'modelPath' => 'controller.product-items',
@@ -63,7 +63,7 @@ class SyncFreshoProductGroup extends Command
         $prdMktGroups = $rv['supplier']['marketplace_categories'];
 
         foreach ($prdMktGroups as $g) {
-            Log::info("sync product category for $g");
+            Log::info("sync fresho products mkt cat for $g");
             // get products by marketplace categories
             $params['page'] = 1;
             $params['q[marketplace_category]'] = $g;
@@ -81,7 +81,7 @@ class SyncFreshoProductGroup extends Command
                     foreach ($prds as $prd) {
                         $bindings[] = $prd['id'];
                     }
-                    Log::debug(json_encode($bindings));
+//                    Log::debug(json_encode($bindings));
 
                     DB::table('fresho_products')
                         ->whereIn('product_id', $bindings)
@@ -95,12 +95,12 @@ class SyncFreshoProductGroup extends Command
 //            break;
             Sleep::for(CarbonInterval::seconds());
         }
-        Log::info("fresho sync products group finished");
+        Log::info("sync all fresho products mkt cat finished");
     }
 
     private function syncMktCategoryBySingleProductDetail()
     {
-        Log::info("fresho sync products group Single started");
+        Log::info("sync fresho products mkt cat one by one for who's mkt cat is null started");
         $productsWithoutMktCat = FreshoProduct::query()
             ->whereNull('mkt_cat')
             ->orWhere('mkt_cat', '')
@@ -127,6 +127,6 @@ class SyncFreshoProductGroup extends Command
 
             Sleep::for(CarbonInterval::seconds());
         });
-        Log::info("fresho sync products group Single finished");
+        Log::info("sync fresho products mkt cat one by one for who's mkt cat is null finished");
     }
 }
