@@ -214,6 +214,7 @@ const porkKV = {
     'Belly R/Off': 'bellyROff',
     'Belly B/IN': 'bellyBoneIn',
     'BBQ': 'bbq',
+    'BBQ(Leg)': 'bbqleg',
     'Ribs': 'pribs',
     'Leg B/L': 'plegmeat',
     'Neck': 'pneck',
@@ -278,6 +279,10 @@ const reportData = ref({
         "details": []
     },
     "bbq": {
+        "sum": 0,
+        "details": []
+    },
+    "bbqleg": {
         "sum": 0,
         "details": []
     },
@@ -379,6 +384,7 @@ const stockData = ref({
     "bellyROff": 0,
     "bellyBoneIn": 0,
     "bbq": 0,
+    "bbqleg": 0,
     "plegmeat": 0,
     "pribs": 0,
     "pneck": 0,
