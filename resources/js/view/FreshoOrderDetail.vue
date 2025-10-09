@@ -306,34 +306,35 @@ const saveNClose = async () => {
 
 const saveNLabel = async (size: 'large' | 'normal') => {
 
-    if (!popupBbd.confirm) {
-        // check packed_on_date / best_before_date is set or not
-        // if not set, packed date is today and best_before_date is packed data + 365d if it's hotpot /frozen, otherwise +7d
-        let isAllSet = true
-        for (let i in order.value.product_orders) {
-            const e = order.value.product_orders[i]
 
-            if (!e.best_before_date || !e.packed_on_date) {
+    // check packed_on_date / best_before_date is set or not
+    // if not set, packed date is today and best_before_date is packed data + 365d if it's hotpot /frozen, otherwise +7d
+    let isAllSet = true
+    for (let i in order.value.product_orders) {
+        const e = order.value.product_orders[i]
 
-                const packedDate = e.packed_on_date ?? order.value.deliveryDate;
-                let x = toDate(packedDate);
-                if (e.group?.includes('Frozen') || e.group?.includes('Hot')) {
-                    x.setDate(x.getDate() + 365);
-                } else {
-                    x.setDate(x.getDate() + 7);
-                }
-                const bbd = format(x, 'yyyy-MM-dd');
+        if (!e.best_before_date || !e.packed_on_date) {
 
-                popupBbd.title = 'Warning: ' + e.name;
-                popupBbd.msg = (!e.packed_on_date ? '<b>Packed Date</b> ' : '') + (!e.best_before_date && !e.packed_on_date ? ' and ' : '');
-                popupBbd.msg += (!e.best_before_date ? '<b>Best Before Date</b> ' : '') + 'is not set.<br/>'
-                popupBbd.msg += 'And they will be set to default.<br/><br/>'
-                popupBbd.msg += !e.packed_on_date ? (' Packed Date :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>' + packedDate + '</b><br/>') : '';
-                popupBbd.msg += !e.best_before_date ? (' Best Before Date: <b>' + bbd + '</b>') : '';
-                isAllSet = false
-                break;
+            const packedDate = e.packed_on_date ?? order.value.deliveryDate;
+            let x = toDate(packedDate);
+            if (e.group?.includes('Frozen') || e.group?.includes('Hot')) {
+                x.setDate(x.getDate() + 365);
+            } else {
+                x.setDate(x.getDate() + 7);
             }
+            const bbd = format(x, 'yyyy-MM-dd');
+
+            popupBbd.title = 'Warning: ' + e.name;
+            popupBbd.msg = (!e.packed_on_date ? '<b>Packed Date</b> ' : '') + (!e.best_before_date && !e.packed_on_date ? ' and ' : '');
+            popupBbd.msg += (!e.best_before_date ? '<b>Best Before Date</b> ' : '') + 'is not set.<br/>'
+            popupBbd.msg += 'And they will be set to default.<br/><br/>'
+            popupBbd.msg += !e.packed_on_date ? (' Packed Date :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>' + packedDate + '</b><br/>') : '';
+            popupBbd.msg += !e.best_before_date ? (' Best Before Date: <b>' + bbd + '</b>') : '';
+            isAllSet = false
+            break;
         }
+    }
+    if (!(isAllSet || popupBbd.confirm)) {
         popupBbd.size = size;
         popupBbd.show = true;
         return
