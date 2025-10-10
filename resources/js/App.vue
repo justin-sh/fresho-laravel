@@ -32,6 +32,9 @@
                         <BNavItem :to="{name:'inventory'}">
                             Inventory
                         </BNavItem>
+                        <BNavItem :to="{name:'palletLabel'}">
+                            Pallet Label
+                        </BNavItem>
                     </BNavbarNav>
 
                     <BNavbarNav>

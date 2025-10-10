@@ -14,6 +14,7 @@ import DailyMorningReport from "@/view/DailyMorningReport.vue";
 import DriverTrainingS011CRM from "@/view/contract/DriverTrainingS011CRM.vue";
 import DriverTrainings from "@/view/contract/index.vue"
 import Inventory from "@/view/Inventory.vue";
+import PalletLabel from "@/view/PalletLabel.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,6 +88,11 @@ const router = createRouter({
             path: '/inventory',
             name: 'inventory',
             component: Inventory
+        },
+        {
+            path: '/pallet-label',
+            name: 'palletLabel',
+            component: PalletLabel
         },
         {
             path: '/driver-training',
