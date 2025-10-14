@@ -25,6 +25,16 @@
                     <BFormTextarea id="palletInfo" rows="6" v-model="palletInfo"/>
                 </BCol>
             </BRow>
+            <BRow class="mt-2">
+                <BCol sm="2">
+                    <label for="palletInfo">Delivery Date</label>
+                </BCol>
+                <BCol>
+                    <BFormInput type="date" id="datepicker" class="col-4 d-inline" v-model="deliveryDate"
+                                :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }">
+                    </BFormInput>
+                </BCol>
+            </BRow>
         </BForm>
     </BCard>
     <div id="print_labels" class="flex text-center">
@@ -58,11 +68,13 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref, shallowRef} from "vue";
+import {onMounted, reactive, ref, shallowRef} from "vue";
+import {formatInTimeZone} from "date-fns-tz";
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const palletInfo = ref<string>();
+const deliveryDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"))
 const pallets = reactive<Array<{
     name: string,
     qty: number,
@@ -87,7 +99,7 @@ const generate = async function () {
             name: p[4],
             qty:p[1],
             palletNo: p[0],
-            deliveryDate: new Date().toDateString(),
+            deliveryDate: deliveryDate.value,
             palletIdx: idx,
             palletTotal: t.length
         })
@@ -100,6 +112,9 @@ const generate = async function () {
 const clearClick = function () {
     palletInfo.value = ''
 }
+
+onMounted(function (){
+})
 </script>
 
 <style scoped>
