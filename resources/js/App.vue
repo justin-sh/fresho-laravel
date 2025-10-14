@@ -115,4 +115,10 @@ onMounted(async function () {
         max-width: calc(100vw - 80px);
     }
 }
+
+@media print {
+    header, footer{
+        display: none;
+    }
+}
 </style>

@@ -9,8 +9,9 @@
         <template #footer>
             <BRow>
                 <BCol class="d-flex justify-content-center">
-                    <BButton variant="outline-primary" :loading="processing" @click="generate">Generate</BButton>
                     <BButton variant="outline-primary" :loading="processing" @click="generate">Print</BButton>
+                    <BButton variant="outline-primary" class="ms-5" :loading="processing" @click="clearClick">Clean
+                    </BButton>
                 </BCol>
             </BRow>
         </template>
@@ -26,26 +27,30 @@
             </BRow>
         </BForm>
     </BCard>
-    <div id="print_labels">
-        <div class="text-center">
-            <h1>Pork Belly Rindless Rivalea 48 cartons</h1>
+    <div id="print_labels" class="flex text-center">
+        <div class="text-center page mx-auto" v-for="p in pallets">
+            <h1 class="fs-1">House of Carnivore Pty Ltd</h1>
+            <h2 class="mt-5">{{ p.name }} {{ p.qty }} cartons</h2>
 
-            <div>
-                <span>PALLET Number #:</span><span>HOC-0010</span>
-            </div>
-            <div>
-                Delivery Date:         10/13/2025
+            <div class="text-start mt-5 page-left fs-4">
+                <span>PALLET Number #:</span><span class="fw-bold">{{ p.palletNo }}</span>
             </div>
 
-
-            <div>
-            Address：  28 Tolley St, Wingfield SA 5013
-            Phone No.: +61 410 334 213
+            <div class="text-start page-left fs-4">
+                Delivery Date: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">{{ p.deliveryDate }}</span>
             </div>
 
 
-            <div>
-            Pallet  04/ 04
+            <div class="text-start mt-5 page-left fs-4">
+                Address： &nbsp;<span class="fw-bold">28 Tolley St, Wingfield SA 5013</span>
+            </div>
+            <div class="text-start page-left fs-4">
+                Phone No.: <span class="fw-bold">+61 410 334 213</span>
+            </div>
+
+
+            <div class="text-center mt-5 fs-4 fw-bold">
+                Pallet {{ p.palletIdx + 1 }}/ {{ p.palletTotal }}
             </div>
 
         </div>
@@ -53,11 +58,19 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, shallowRef} from "vue";
+import {reactive, ref, shallowRef} from "vue";
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const palletInfo = ref<string>();
+const pallets = reactive<Array<{
+    name: string,
+    qty: number,
+    palletNo: string,
+    deliveryDate: string,
+    palletIdx: number,
+    palletTotal: number
+}>>([]);
 const processing = shallowRef(false)
 
 
@@ -66,15 +79,26 @@ const generate = async function () {
 
     const t = palletInfo.value.split('\n');
 
-    t.forEach((v,idx)=>{
+    t.forEach((v, idx) => {
         console.log(idx, v)
+        const p = v.split('\t')
+        console.log(p)
+        pallets.push({
+            name: p[4],
+            qty:p[1],
+            palletNo: p[0],
+            deliveryDate: new Date().toDateString(),
+            palletIdx: idx,
+            palletTotal: t.length
+        })
     })
 
+    processing.value = false
 
-    try {
-    } finally {
-        processing.value = false
-    }
+}
+
+const clearClick = function () {
+    palletInfo.value = ''
 }
 </script>
 
@@ -85,5 +109,24 @@ const generate = async function () {
 
 .card-header ul {
     margin-bottom: 0;
+}
+
+.page{
+    width: 18cm;
+    margin-top: 300px;
+}
+
+.page-left{
+    margin-left: 2cm;
+}
+
+@media print {
+    .card{
+        display: none;
+    }
+
+    .page{
+        page-break-after:always;
+    }
 }
 </style>
