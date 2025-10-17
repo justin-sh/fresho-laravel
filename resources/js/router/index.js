@@ -15,6 +15,7 @@ import DriverTrainingS011CRM from "@/view/contract/DriverTrainingS011CRM.vue";
 import DriverTrainings from "@/view/contract/index.vue"
 import Inventory from "@/view/Inventory.vue";
 import PalletLabel from "@/view/PalletLabel.vue";
+import Login from "@/view/Login.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,11 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: Order
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: Login
         },
         {
             path: '/orders',
