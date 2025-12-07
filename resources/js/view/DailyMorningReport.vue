@@ -8,11 +8,11 @@
                     <span class="fw-bold fs-4">Production Plan</span>
                 </div>
                 <div class="col-auto">
-                    <BFormInput id="arrive-at" type="date" v-model="reportDate" />
+                    <BFormInput id="arrive-at" type="date" v-model="reportDate"/>
                 </div>
                 <div class="col-auto">
                     <BButton variant="outline-primary" @click="generateReport" :loading="processing"
-                        :disabled="processing">
+                             :disabled="processing">
                         Refresh Data
                     </BButton>
                 </div>
@@ -20,6 +20,30 @@
         </template>
 
         <BRow>
+            <BCol>
+                Pork Meat Ratio:
+                <span class="d-block ps-5">
+                    1 side = <b>{{ porkRatio.side.bbq }}</b>kg BBQ Shoulder + <b>{{ porkRatio.side.shoulderTrim }}</b>kg Pork Shoulder Trim
+                    + <b>{{ porkRatio.side.belly }}</b>kg Belly + <b>{{porkRatio.side.bbqleg }}</b>kg BBQ Leg
+                    + <b>{{ porkRatio.side.plegmeat }}</b>kg Pork Leg Meat
+                    + <b>{{ porkRatio.side.pribs }}</b>kg Ribs + <b>{{ porkRatio.side.pneck }}</b>kg Neck
+                </span>
+                <span class="d-block ps-5">
+                    1 Pork Shoulder B/IN = <b>{{ porkRatio.shoulder.bbq }}</b>kg BBQ Shoulder
+                    + <b>{{ porkRatio.shoulder.shoulderTrim }}</b>kg Pork Shoulder Trim
+                </span>
+            </BCol>
+        </BRow>
+        <BRow class="mt-1">
+            <BCol>
+                Chicken Meat Ratio:
+                <span class="ps-2">
+                    Breast 31% ( Tdr = BR * 9% ) + ML s/off 21% + Wings 11%
+                </span>
+            </BCol>
+        </BRow>
+
+        <BRow class="mt-2">
             <BCol class="col-auto">
                 <BTableSimple hover bordered class="fss text-center">
                     <BThead head-variant="dark" class="fsn">
@@ -29,6 +53,7 @@
                             <BTh class="prd-order">Order</BTh>
                             <BTh class="prd-stock">Stock</BTh>
                             <BTh class="prd-produced">Produce</BTh>
+                            <BTh class="prd-produced">Diff</BTh>
                         </BTr>
                     </BThead>
 
@@ -41,8 +66,11 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData['belly']"></BFormInput>
                             </BTd>
+                            <BTd @click="showDetail('belly', 'Belly')">{{ porkBoning.side * porkRatio.side.belly }}</BTd>
                             <BTd @click="showDetail('belly', 'Belly')">
-                                {{ get2Decimal(stockData['belly'] - reportData.belly.sum ) }}
+                                {{
+                                    get2Decimal(stockData['belly'] + porkBoning.side * porkRatio.side.belly - reportData.belly.sum)
+                                }}
                             </BTd>
                         </BTr>
 
@@ -52,7 +80,15 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail(v, k)">{{ get2Decimal(stockData[v] - reportData[v].sum) }}</BTd>
+                            <BTd @click="showDetail(v, k)">
+                                {{
+                                    sumPorkPotion(v)
+                                }}
+                            </BTd>
+                            <BTd @click="showDetail(v, k)">{{
+                                    get2Decimal(stockData[v] - reportData[v].sum + sumPorkPotion(v))
+                                }}
+                            </BTd>
                         </BTr>
 
                         <BTr>
@@ -67,7 +103,10 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData.ckbr"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail('ckbr', 'Breast')">{{ get2Decimal(stockData.ckbr - reportData.ckbr.sum) }}</BTd>
+                            <BTd @click="showDetail('ckbr', 'Breast')">Diff</BTd>
+                            <BTd @click="showDetail('ckbr', 'Breast')">
+                                {{ get2Decimal(stockData.ckbr - reportData.ckbr.sum) }}
+                            </BTd>
                         </BTr>
 
                         <BTr class="align-middle" v-for="(v,k) in ckKV">
@@ -76,6 +115,7 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
+                            <BTd @click="showDetail(v, k)">Diff</BTd>
                             <BTd @click="showDetail(v, k)">{{ get2Decimal(stockData[v] - reportData[v].sum) }}</BTd>
                         </BTr>
                     </BTbody>
@@ -85,8 +125,12 @@
                 <BTableSimple hover bordered class="fss text-center">
                     <BThead head-variant="dark" class="fsn">
                         <BTr class="align-middle">
-                            <BTh class="text-start col-7">Side: -</BTh>
-                            <BTh class="text-start">F/QTR: -</BTh>
+                            <BTh class="text-start col-7">Side:
+                                <BFormInput size="sm" type="number" v-model="porkBoning.side"></BFormInput>
+                            </BTh>
+                            <BTh class="text-start">F/QTR:
+                                <BFormInput size="sm" type="number" v-model="porkBoning.shoulder"></BFormInput>
+                            </BTh>
                         </BTr>
                     </BThead>
                     <BTbody>
@@ -105,10 +149,18 @@
                 <BTableSimple hover bordered class="fss text-center">
                     <BThead head-variant="dark" class="fsn">
                         <BTr class="align-middle">
-                            <BTh colspan="2">CK Special Order</BTh>
+                            <BTh>Whole CK(Kg)
+                                <BFormInput size="sm" type="number" v-model="ckBoning.w"></BFormInput>
+                            </BTh>
+                            <BTh>Supreme
+                                <BFormInput size="sm" type="number" v-model="ckBoning.w"></BFormInput>
+                            </BTh>
                         </BTr>
                     </BThead>
                     <BTbody>
+                        <BTr>
+                            <BTd colspan="2">CK Special Order</BTd>
+                        </BTr>
                         <BTr class="align-middle" v-for="(v,k) in ckSpecial" @click="showDetail(v, k)">
                             <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
                             <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
@@ -198,7 +250,7 @@ import {dailyReport} from "../api";
 import {onMounted, ref, shallowRef, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {formatInTimeZone} from "date-fns-tz";
-import { BButton } from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 
 
 const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -209,6 +261,15 @@ const router = useRouter()
 const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"));
 const status = shallowRef(['accepted'])
 const showAll = shallowRef(false)
+
+const porkBoning = ref({"side": 0, "shoulder": 0})
+const porkRatio = {
+    side: {bbq: 2.8, shoulderTrim: 1, belly: 5, bbqleg: 6, plegmeat: 1.6, pneck: 1.8, pribs: 1.2},
+    shoulder: {bbq: 2.8, shoulderTrim: 1, belly: 0, bbqleg: 0, plegmeat: 0, pneck: 1.8, pribs: 0}
+}
+
+const ckBoning = ref({"w": 0, "s": 0})
+const ckRatio = {br: 0.31, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0279}
 
 const porkKV = {
     'Belly R/Off': 'bellyROff',
@@ -374,8 +435,7 @@ const reportData = ref({
         "sum": 0,
         "details": []
     },
-    "others": {
-    }
+    "others": {}
 })
 
 const zero = ref(0)
@@ -442,7 +502,7 @@ const showDetailByKV = function (name, data) {
     modalShow.value = !modalShow.value
 }
 
-const toggleProduct = function(product: string){
+const toggleProduct = function (product: string) {
     // const hPrds = getHidenProducts()
     console.log(product)
 
@@ -453,19 +513,27 @@ const toggleProduct = function(product: string){
     const idx = hPrds.value.indexOf(product)
     if (idx === -1) {
         hPrds.value.push(product)
-    }else{
+    } else {
         hPrds.value.splice(idx, 1)
     }
 
     localStorage.setItem('dmrHidenPrds', JSON.stringify(hPrds.value))
 }
 
-const getHidenProducts = function(){
+const getHidenProducts = function () {
     return JSON.parse(localStorage.getItem('dmrHidenPrds') ?? '[]')
 }
 
-const get2Decimal = function (num){
+const get2Decimal = function (num) {
     return Math.round((num + Number.EPSILON) * 100) / 100
+}
+
+const sumPorkPotion = function(portion){
+    const sideRitio = porkRatio['side'][portion]??0
+    const shRitio = porkRatio['shoulder'][portion]??0
+    const ssd = sideRitio * parseInt(porkBoning.value.side.toString().trim()||'0')
+    const ssh = shRitio * parseInt(porkBoning.value.shoulder.toString().trim()||'0')
+    return get2Decimal(ssd + ssh)
 }
 
 const hPrds = ref([])
@@ -511,7 +579,7 @@ onMounted(async function () {
     font-size: 1rem;
 }
 
-tbody tr{
+tbody tr {
     cursor: pointer;
 }
 
@@ -540,8 +608,8 @@ table td {
 }
 
 .prd-produced {
-    width: 8%;
-    min-width: 105px;
+    width: 4%;
+    min-width: 50px;
 }
 
 .prd-ex-item-name {
