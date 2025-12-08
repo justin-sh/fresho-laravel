@@ -38,7 +38,7 @@
             <BCol>
                 Chicken Meat Ratio:
                 <span class="ps-2">
-                    Breast 31% ( Tdr = BR * 9% ) + ML s/off 21% + Wings 11%
+                    Whole CK: Breast 31% ( Tdr = BR * 9% ) + ML s/off 21% + Wings 11%  <span class="ps-4">Supreme: ML s/off 66%</span>
                 </span>
             </BCol>
         </BRow>
@@ -66,10 +66,10 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData['belly']"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail('belly', 'Belly')">{{ porkBoning.side * porkRatio.side.belly }}</BTd>
-                            <BTd @click="showDetail('belly', 'Belly')">
+                            <BTd @click="showDetail('belly', 'Belly')">{{ sumPorkPotion('belly') }}</BTd>
+                            <BTd @click="showDetail('belly', 'Belly')" :class="{'text-danger': (parseFloat(stockData['belly']||'0') + sumPorkPotion('belly') - reportData.belly.sum) < 0}">
                                 {{
-                                    get2Decimal(stockData['belly'] + porkBoning.side * porkRatio.side.belly - reportData.belly.sum)
+                                    get2Decimal(parseFloat(stockData['belly']||'0') + sumPorkPotion('belly') - reportData.belly.sum)
                                 }}
                             </BTd>
                         </BTr>
@@ -81,12 +81,11 @@
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
                             <BTd @click="showDetail(v, k)">
-                                {{
-                                    sumPorkPotion(v)
-                                }}
+                                {{ sumPorkPotion(v) }}
                             </BTd>
-                            <BTd @click="showDetail(v, k)">{{
-                                    get2Decimal(stockData[v] - reportData[v].sum + sumPorkPotion(v))
+                            <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') - reportData[v].sum + sumPorkPotion(v)) < 0}">
+                                {{
+                                    get2Decimal(parseFloat(stockData[v]||'0') - reportData[v].sum + sumPorkPotion(v))
                                 }}
                             </BTd>
                         </BTr>
@@ -103,9 +102,10 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData.ckbr"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail('ckbr', 'Breast')">Diff</BTd>
-                            <BTd @click="showDetail('ckbr', 'Breast')">
-                                {{ get2Decimal(stockData.ckbr - reportData.ckbr.sum) }}
+                            <BTd @click="showDetail('ckbr', 'Breast')">{{ sumCkPotion('ckbr') }}</BTd>
+                            <BTd @click="showDetail('ckbr', 'Breast')" 
+                                :class="{'text-danger': (parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) < 0}">
+                                {{ get2Decimal(parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) }}
                             </BTd>
                         </BTr>
 
@@ -115,8 +115,10 @@
                             <BTd>
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail(v, k)">Diff</BTd>
-                            <BTd @click="showDetail(v, k)">{{ get2Decimal(stockData[v] - reportData[v].sum) }}</BTd>
+                            <BTd @click="showDetail(v, k)">{{ sumCkPotion(v) }}</BTd>
+                            <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') + sumCkPotion(v) - reportData[v].sum) < 0}">
+                                {{ get2Decimal(parseFloat(stockData[v]||'0') + sumCkPotion(v) - reportData[v].sum) }}
+                            </BTd>
                         </BTr>
                     </BTbody>
                 </BTableSimple>
@@ -153,7 +155,7 @@
                                 <BFormInput size="sm" type="number" v-model="ckBoning.w"></BFormInput>
                             </BTh>
                             <BTh>Supreme
-                                <BFormInput size="sm" type="number" v-model="ckBoning.w"></BFormInput>
+                                <BFormInput size="sm" type="number" v-model="ckBoning.s"></BFormInput>
                             </BTh>
                         </BTr>
                     </BThead>
@@ -269,7 +271,7 @@ const porkRatio = {
 }
 
 const ckBoning = ref({"w": 0, "s": 0})
-const ckRatio = {br: 0.31, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0279}
+const ckRatio = {w: {ckbr: 0.31-0.0279, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0279}, s: {ckbr:0, cksoff:0.66, ckwings:0, cktdr:0}}
 
 const porkKV = {
     'Belly R/Off': 'bellyROff',
@@ -529,10 +531,18 @@ const get2Decimal = function (num) {
 }
 
 const sumPorkPotion = function(portion){
-    const sideRitio = porkRatio['side'][portion]??0
-    const shRitio = porkRatio['shoulder'][portion]??0
+    const sideRitio = porkRatio['side'][portion]||0
+    const shRitio = porkRatio['shoulder'][portion]||0
     const ssd = sideRitio * parseInt(porkBoning.value.side.toString().trim()||'0')
     const ssh = shRitio * parseInt(porkBoning.value.shoulder.toString().trim()||'0')
+    return get2Decimal(ssd + ssh)
+}
+
+const sumCkPotion = function(portion){
+    const sideRitio = ckRatio['w'][portion]||0
+    const shRitio = ckRatio['s'][portion]||0
+    const ssd = sideRitio * parseInt(ckBoning.value.w.toString().trim()||'0')
+    const ssh = shRitio * parseInt(ckBoning.value.s.toString().trim()||'0')
     return get2Decimal(ssd + ssh)
 }
 
