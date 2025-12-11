@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\DailyStock;
 use App\Models\FreshoProduct;
 use App\Models\Order;
+use App\Models\OrderPrdState;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class DailyReportController extends Controller
 {
@@ -146,22 +149,19 @@ class DailyReportController extends Controller
             $freshoPrdMap[$p->code] = $p;
         });
 
-//        $freshoPrdMap = $products->map(function ($p) {
-//            return [$p->code => $p];
-//        })->all();
-
-//        Log::info(json_encode($freshoPrdMap));
-
-        $ignore_mkt_cats = ['BEEF', 'ANGUS BEEF', 'DUCK', 'GOAT', 'HOT POT', 'LAMB', 'SEA FOOD', 'SEAFOOD', 'SMALL GOODS', 'WAGYU'];
+        $ignore_mkt_cats = ['BEEF', 'ANGUS BEEF', 'DUCK', 'GOAT', 'HOT POT', '-LAMB', 'SEA FOOD', 'SEAFOOD', 'SMALL GOODS', '-WAGYU'];
 
         foreach ($orders as $odr) {
             foreach ($odr->details as $d) {
 
                 // not chicken and not pork then skip
-//                Log::debug($d->prd_code . ' -> ' . (array_key_exists($d->prd_code, $freshoPrdMap) ? 'yes' : 'no'));
-//                Log::debug($d->prd_code . ' -> ' . json_encode($freshoPrdMap[$d->prd_code]));
                 if (array_key_exists($d->prd_code, $freshoPrdMap)
                     && in_array($freshoPrdMap[$d->prd_code]->mkt_cat, $ignore_mkt_cats)) {
+                    continue;
+                }
+
+                // back order
+                if($d->status->name == OrderPrdState::BackOrder->name){
                     continue;
                 }
 
@@ -194,6 +194,7 @@ class DailyReportController extends Controller
 
                     continue;
                 }
+                // Chicken Thigh Fillet Skin Off
                 if ('3023' == $d->prd_code) {
 
                     if (str_contains($d->supplier_notes, "size22")) {
@@ -223,6 +224,23 @@ class DailyReportController extends Controller
                         continue;
                     }
 
+                }
+
+                // Linh Vietnamese Fast Food + Vuche & Co Viet Eatery sum bbq shoulder to bbq leg
+                if( '1055' == $d->prd_code){
+                    if(in_array($odr->receiving_company_name, ["Linh Vietnamese Fast Food", "Vuche & Co Viet Eatery"])){
+                        $rv['bbqleg']['sum'] += $d->qty;
+                        $rv["bbqleg"]['details'][] = [
+                            'customer' => $odr->receiving_company_name,
+                            'prd_code' => $d->prd_code,
+                            'prd_name' => $d->prd_name,
+                            'qty' => $d->qty,
+                            'customer_notes' => $d->customer_notes ?? '',
+                            'supplier_notes' => $d->supplier_notes ?? '',
+                        ];
+
+                        continue;
+                    }
                 }
 
                 // normal rules
@@ -298,12 +316,13 @@ class DailyReportController extends Controller
             $rd->subDay();
         }
 
-//        Log::info('prev day:' . $rd->toDateString());
         $prevDayStock = DailyStock::query()->where('stock_date', $rd->toDateString())->first()?->stock ?? [];
         $dailyStockKV = [
             'belly' => 'Pork-Belly Rind On',
             'bellyROff' => 'Pork-Belly Rind Off',
             'bellyBoneIn' => 'NA',
+            'ploinrindoff' => 'NA',
+            'ploinrindon' => 'NA',
             'bbq' => 'Pork-BBQ',
             'bbqleg' => 'Pork-BBQ-LeG',
             'plegmeat' => 'Pork-Leg Rind Off',

@@ -19,30 +19,6 @@
             </div>
         </template>
 
-        <BRow>
-            <BCol>
-                Pork Meat Ratio:
-                <span class="d-block ps-5">
-                    1 side = <b>{{ porkRatio.side.bbq }}</b>kg BBQ Shoulder + <b>{{ porkRatio.side.shoulderTrim }}</b>kg Pork Shoulder Trim
-                    + <b>{{ porkRatio.side.belly }}</b>kg Belly + <b>{{porkRatio.side.bbqleg }}</b>kg BBQ Leg
-                    + <b>{{ porkRatio.side.plegmeat }}</b>kg Pork Leg Meat
-                    + <b>{{ porkRatio.side.pribs }}</b>kg Ribs + <b>{{ porkRatio.side.pneck }}</b>kg Neck
-                </span>
-                <span class="d-block ps-5">
-                    1 Pork Shoulder B/IN = <b>{{ porkRatio.shoulder.bbq }}</b>kg BBQ Shoulder
-                    + <b>{{ porkRatio.shoulder.shoulderTrim }}</b>kg Pork Shoulder Trim
-                </span>
-            </BCol>
-        </BRow>
-        <BRow class="mt-1">
-            <BCol>
-                Chicken Meat Ratio:
-                <span class="ps-2">
-                    Whole CK: Breast 31% ( Tdr = BR * 9% ) + ML s/off 21% + Wings 11%  <span class="ps-4">Supreme: ML s/off 66%</span>
-                </span>
-            </BCol>
-        </BRow>
-
         <BRow class="mt-2">
             <BCol class="col-auto">
                 <BTableSimple hover bordered class="fss text-center">
@@ -53,7 +29,7 @@
                             <BTh class="prd-order">Order</BTh>
                             <BTh class="prd-stock">Stock</BTh>
                             <BTh class="prd-produced">Produce</BTh>
-                            <BTh class="prd-produced">Diff</BTh>
+                            <BTh class="prd-produced">Status</BTh>
                         </BTr>
                     </BThead>
 
@@ -103,7 +79,7 @@
                                 <BFormInput size="sm" type="number" v-model="stockData.ckbr"></BFormInput>
                             </BTd>
                             <BTd @click="showDetail('ckbr', 'Breast')">{{ sumCkPotion('ckbr') }}</BTd>
-                            <BTd @click="showDetail('ckbr', 'Breast')" 
+                            <BTd @click="showDetail('ckbr', 'Breast')"
                                 :class="{'text-danger': (parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) < 0}">
                                 {{ get2Decimal(parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) }}
                             </BTd>
@@ -171,6 +147,35 @@
                 </BTableSimple>
             </BCol>
         </BRow>
+
+        <BRow>
+            <BCol>
+                Pork Meat Ratio:
+                <span class="d-block ps-5">
+                    1 side = <b>{{ porkRatio.side.bbq }}</b>kg BBQ Shoulder + <b>{{ porkRatio.side.shoulderTrim }}</b>kg Shoulder Trim
+                    + <b>{{ porkRatio.side.belly }}</b>kg Belly + <b>{{porkRatio.side.ploin }}</b>kg Loin
+                    + <b>{{porkRatio.side.bbqleg }}</b>kg BBQ Leg
+                    + <b>{{ porkRatio.side.plegmeat }}</b>kg Pork Leg Meat
+                    + <b>{{ porkRatio.side.pribs }}</b>kg Ribs + <b>{{ porkRatio.side.pneck }}</b>kg Neck
+                </span>
+                <span class="d-block ps-5">
+                    1 Pork Shoulder B/IN = <b>{{ porkRatio.shoulder.bbq }}</b>kg BBQ Shoulder
+                    + <b>{{ porkRatio.shoulder.shoulderTrim }}</b>kg Shoulder Trim
+                    + <b>{{ porkRatio.side.pneck }}</b>kg Neck
+                </span>
+            </BCol>
+        </BRow>
+        <BRow class="mt-1">
+            <BCol>
+                Chicken Meat Ratio:
+                <span class="ps-2">
+                    Whole CK: Breast 31% ( Tdr = BR * 15% ) + ML s/off 21% + Wings 11%
+                    Mid-Wingettes: 40% from Wings, ML s/off = Thigh:65% + Legette 35%
+                    <span class="d-block ps-5">Supreme: ML s/off 66%</span>
+                </span>
+            </BCol>
+        </BRow>
+
         <BModal id="popover-m" v-model="modalShow" scrollable :title="modalTitle" ok-only size="xl">
             <BTableSimple bordered striped hover>
                 <BThead>
@@ -266,16 +271,17 @@ const showAll = shallowRef(false)
 
 const porkBoning = ref({"side": 0, "shoulder": 0})
 const porkRatio = {
-    side: {bbq: 2.8, shoulderTrim: 1, belly: 5, bbqleg: 6, plegmeat: 1.6, pneck: 1.8, pribs: 1.2},
-    shoulder: {bbq: 2.8, shoulderTrim: 1, belly: 0, bbqleg: 0, plegmeat: 0, pneck: 1.8, pribs: 0}
+    side: {bbq: 2.7, shoulderTrim: 1.7, belly: 6, bbqleg: 6, plegmeat: 1.3, ploinrindoff:2.3, pneck: 1.85, pribs: 1.2},
+    shoulder: {bbq: 2.7, shoulderTrim: 1.7, belly: 0, bbqleg: 0, plegmeat: 0, pneck: 1.85, pribs: 0}
 }
 
 const ckBoning = ref({"w": 0, "s": 0})
-const ckRatio = {w: {ckbr: 0.31-0.0279, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0279}, s: {ckbr:0, cksoff:0.66, ckwings:0, cktdr:0}}
+const ckRatio = {w: {ckbr: 0.31-0.0465, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0465}, s: {ckbr:0, cksoff:0.66, ckwings:0, cktdr:0}}
 
 const porkKV = {
     'Belly R/Off': 'bellyROff',
-    'Belly B/IN': 'bellyBoneIn',
+    'Loin Rind OFF': 'ploinrindoff',
+    'Loin Rind ON': 'ploinrindon',
     'BBQ': 'bbq',
     'BBQ(Leg)': 'bbqleg',
     'Ribs': 'pribs',
@@ -292,8 +298,7 @@ const porkSpecial = {
     'EX-Meaty Leg Bone': 'pexmeatylegbone',
     'Meaty Neck Bone': 'pmeatyneckbone',
     'EX-Meaty Neck Bone': 'pexmeatyneckbone',
-    'Loin Rind OFF': 'ploinrindoff',
-    'Loin Rind ON': 'ploinrindon',
+    'Belly B/IN': 'bellyBoneIn',
     'Shoulder Rind ON': 'pshrindon',
     'Middle': 'pmiddle',
     'Fat': 'pfat',
@@ -338,6 +343,14 @@ const reportData = ref({
         "details": []
     },
     "bellyBoneIn": {
+        "sum": 0,
+        "details": []
+    },
+    "ploinrindoff": {
+        "sum": 0,
+        "details": []
+    },
+    "ploinrindon": {
         "sum": 0,
         "details": []
     },
@@ -445,6 +458,8 @@ const stockData = ref({
     "belly": 0,
     "bellyROff": 0,
     "bellyBoneIn": 0,
+    "ploinrindoff": 0,
+    "ploinrindon": 0,
     "bbq": 0,
     "bbqleg": 0,
     "plegmeat": 0,
