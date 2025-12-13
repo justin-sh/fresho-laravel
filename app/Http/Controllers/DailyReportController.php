@@ -71,7 +71,9 @@ class DailyReportController extends Controller
             'ckwboff15',
             'ckbrbf',
 
-//            'others'
+            'lshoulder',
+            'lleg',
+            'lrump',
         ];
 
         $rv = ['others' => []];
@@ -118,7 +120,11 @@ class DailyReportController extends Controller
             'REPORT_DAILY_CK_BR_ON' => 'ckbron',
             'REPORT_DAILY_CK_DRUMSTICK' => 'ckdrumstick',
             'REPORT_DAILY_CK_CHOP_ON' => 'ckchopon',
-            'REPORT_DAILY_CK_BR_BUTTERFLIED' => 'ckbrbf'
+            'REPORT_DAILY_CK_BR_BUTTERFLIED' => 'ckbrbf',
+
+            'REPORT_DAILY_LAMB_SHOULDER' => 'lshoulder',
+            'REPORT_DAILY_LAMB_LEG' => 'lleg',
+            'REPORT_DAILY_LAMB_RUMP' => 'lrump',
         ];
 
         //REPORT_DAILY_PORK_BELLY_RON_BI_EXCLUDED

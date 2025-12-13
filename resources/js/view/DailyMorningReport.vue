@@ -120,6 +120,14 @@
                             <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
                             <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
                         </BTr>
+
+                        <BTr>
+                            <BTd colspan="2" class="text-center fw-bolder fsn prd-ex-item-name">Lamb</BTd>
+                        </BTr>
+                        <BTr class="align-middle" v-for="(v,k) in lambSpecial" @click="showDetail(v, k)">
+                            <BTd class="text-start prd-ex-item-name">{{ k }}</BTd>
+                            <BTd>{{ reportData[v]?.sum === 0 ? '' : reportData[v]?.sum }}</BTd>
+                        </BTr>
                     </BTbody>
                 </BTableSimple>
             </BCol>
@@ -320,6 +328,12 @@ const ckSpecial = {
     'Legette r/ON': 'cklegetteon',
     'Drumsticks': 'ckdrumstick',
     'Chop s/ON	': 'ckchopon',
+}
+
+const lambSpecial = {
+    'Shoulder': 'lshoulder',
+    'Leg': 'lleg',
+    'Rump': 'lrump',
 }
 
 const ckKV = {
