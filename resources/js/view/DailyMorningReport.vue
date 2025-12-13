@@ -37,15 +37,15 @@
                         <BTr class="align-middle" id="order-Belly">
                             <BTd :rowspan="Object.keys(porkKV).length + 1" class="text-center fw-bolder fsn">Pork
                             </BTd>
-                            <BTd class="text-start" @click="showDetail('belly', 'Belly')">Belly</BTd>
-                            <BTd @click="showDetail('belly', 'Belly')">{{ reportData.belly.sum }}</BTd>
+                            <BTd class="text-start" @click="showDetail('belly_fresh', 'Belly')">Belly Fresh Boning</BTd>
+                            <BTd @click="showDetail('belly_fresh', 'Belly')">{{ reportData.belly_fresh.sum }}</BTd>
                             <BTd>
-                                <BFormInput size="sm" type="number" v-model="stockData['belly']"></BFormInput>
+                                <BFormInput size="sm" type="number" v-model="stockData['belly_fresh']"></BFormInput>
                             </BTd>
-                            <BTd @click="showDetail('belly', 'Belly')">{{ sumPorkPotion('belly') }}</BTd>
-                            <BTd @click="showDetail('belly', 'Belly')" :class="{'text-danger': (parseFloat(stockData['belly']||'0') + sumPorkPotion('belly') - reportData.belly.sum) < 0}">
+                            <BTd @click="showDetail('belly_fresh', 'Belly')">{{ sumPorkPotion('belly') }}</BTd>
+                            <BTd @click="showDetail('belly_fresh', 'Belly')" :class="{'text-danger': (parseFloat(stockData['belly_fresh']||'0') + sumPorkPotion('belly') - reportData.belly_fresh.sum) < 0}">
                                 {{
-                                    get2Decimal(parseFloat(stockData['belly']||'0') + sumPorkPotion('belly') - reportData.belly.sum)
+                                    get2Decimal(parseFloat(stockData['belly_fresh']||'0') + sumPorkPotion('belly') - reportData.belly_fresh.sum)
                                 }}
                             </BTd>
                         </BTr>
@@ -57,11 +57,11 @@
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
                             <BTd @click="showDetail(v, k)">
-                                {{ sumPorkPotion(v) }}
+                                {{ 0 }}
                             </BTd>
-                            <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') - reportData[v].sum + sumPorkPotion(v)) < 0}">
+                            <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') - reportData[v].sum) < 0}">
                                 {{
-                                    get2Decimal(parseFloat(stockData[v]||'0') - reportData[v].sum + sumPorkPotion(v))
+                                    get2Decimal(parseFloat(stockData[v]||'0') - reportData[v].sum)
                                 }}
                             </BTd>
                         </BTr>
@@ -279,6 +279,7 @@ const ckBoning = ref({"w": 0, "s": 0})
 const ckRatio = {w: {ckbr: 0.31-0.0465, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0465}, s: {ckbr:0, cksoff:0.66, ckwings:0, cktdr:0}}
 
 const porkKV = {
+    'Belly': 'belly',
     'Belly R/Off': 'bellyROff',
     'Loin Rind OFF': 'ploinrindoff',
     'Loin Rind ON': 'ploinrindon',
@@ -335,6 +336,10 @@ const ckKV = {
 
 const reportData = ref({
     "belly": {
+        "sum": 0,
+        "details": []
+    },
+    "belly_fresh": {
         "sum": 0,
         "details": []
     },
@@ -455,6 +460,7 @@ const reportData = ref({
 
 const zero = ref(0)
 const stockData = ref({
+    "belly_fresh": 0,
     "belly": 0,
     "bellyROff": 0,
     "bellyBoneIn": 0,

@@ -20,10 +20,12 @@ class DailyReportController extends Controller
         $orders = Order::query()
             ->with('details')
             ->where('delivery_date', $report_date)
+            ->where("payable_total_in_cents", ">", 0)
             ->get(['id', 'order_number', 'receiving_company_name', 'additional_notes']);
 
         $prds = [
             'belly',
+            'belly_fresh',
             'bellyROff',
             'bellyBoneIn',
             'bbq',
@@ -142,6 +144,9 @@ class DailyReportController extends Controller
             });
         }
 
+        $cusForFreshBoningBelly = explode(",", env("REPORT_DAILY_PORK_BELLY_RON_BL_FRESH_CUS",''));
+        $codeForBellyBL = explode(",", env("REPORT_DAILY_PORK_BELLY_RON_BL",''));
+
         $products = FreshoProduct::query()->get(['code', 'name', 'mkt_cat']);
         $freshoPrdMap = [];
 
@@ -245,7 +250,14 @@ class DailyReportController extends Controller
 
                 // normal rules
                 if (array_key_exists($d->prd_code, $codePrdMap)) {
-                    $prd = $codePrdMap[$d->prd_code];
+//                    Log::debug("Fresh boning belly for ".$odr->receiving_company_name);
+                    if(in_array($d->prd_code, $codeForBellyBL) && in_array($odr->receiving_company_name, $cusForFreshBoningBelly)){
+                        Log::debug("Fresh boning belly for $odr->receiving_company_name");
+                        $prd = 'belly_fresh';
+                    }else{
+                        $prd = $codePrdMap[$d->prd_code];
+                    }
+
 
                     $rv[$prd]['sum'] += $d->qty;
                     $rv[$prd]['details'][] = [
@@ -318,6 +330,7 @@ class DailyReportController extends Controller
 
         $prevDayStock = DailyStock::query()->where('stock_date', $rd->toDateString())->first()?->stock ?? [];
         $dailyStockKV = [
+            'belly_fresh' => 'NA',
             'belly' => 'Pork-Belly Rind On',
             'bellyROff' => 'Pork-Belly Rind Off',
             'bellyBoneIn' => 'NA',
