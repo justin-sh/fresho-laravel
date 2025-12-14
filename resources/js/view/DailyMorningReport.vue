@@ -57,11 +57,11 @@
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
                             <BTd @click="showDetail(v, k)">
-                                {{ 0 }}
+                                {{ v == 'belly' ? 0 : sumPorkPotion(v) }}
                             </BTd>
                             <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') - reportData[v].sum) < 0}">
                                 {{
-                                    get2Decimal(parseFloat(stockData[v]||'0') - reportData[v].sum)
+                                    get2Decimal(parseFloat(stockData[v]||'0') + (v == 'belly' ? 0 : sumPorkPotion(v)) - reportData[v].sum)
                                 }}
                             </BTd>
                         </BTr>
