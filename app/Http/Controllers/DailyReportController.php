@@ -20,6 +20,7 @@ class DailyReportController extends Controller
         $orders = Order::query()
             ->with('details')
             ->where('delivery_date', $report_date)
+            ->whereIn("state", ['submitted', 'accepted', 'invoiced', 'paid'])
             ->where("payable_total_in_cents", ">", 0)
             ->get(['id', 'order_number', 'receiving_company_name', 'additional_notes']);
 
