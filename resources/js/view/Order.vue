@@ -74,9 +74,13 @@
                              @click.stop="syncDeliveryProofs">
                         Sync Delivery Proof
                     </BButton>
-                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm" :loading="delete_detail_syncing"
+                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm"
+                             :loading="delete_detail_syncing"
                              @click.stop="deleteDetails">
                         Delete Details
+                    </BButton>
+                    <BButton variant="outline-primary" v-model:pressed="debug" class="ms-5" size="sm">Debug :
+                        {{ debug ? "ON" : "Off" }}
                     </BButton>
                 </div>
             </div>
@@ -137,8 +141,10 @@
                         <div class="row" v-if="p.customer_notes.length>0 || p.supplier_notes.length > 0">
                             <div class="col-2"></div>
                             <div class="col">
-                            <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
-                            <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{ p.supplier_notes }} </span>
+                                <span v-if="p.customer_notes" class="fw-bold text-danger">C: {{ p.customer_notes }} &nbsp;</span>
+                                <span v-if="p.supplier_notes" class="fw-bold text-success">S: {{
+                                        p.supplier_notes
+                                    }} </span>
                             </div>
                         </div>
                     </template>
@@ -200,6 +206,7 @@ const page_size_options = [
 ]
 const sortBy = ref([{key: 'delivery_date_md', order: 'desc'}, {key: 'customer', order: 'asc'}])
 
+const debug = shallowRef(true)
 
 let abortController: AbortController | null = null;
 
@@ -247,13 +254,13 @@ const loading_data = async () => {
 }
 const initOrder2Server = async () => {
     init_loading.value = true
-    await initOrders(deliveryDate.value)
+    await initOrders(deliveryDate.value, debug.value ? import.meta.env.VITE_API_BASE_URL : '')
     init_loading.value = false
     await loading_data()
 }
 const syncDetails = async () => {
     detail_syncing.value = true
-    await syncOrderDetails(deliveryDate.value)
+    await syncOrderDetails(deliveryDate.value, debug.value ? import.meta.env.VITE_API_BASE_URL : '')
     detail_syncing.value = false
     await loading_data()
 }
@@ -265,7 +272,7 @@ const deleteDetails = async () => {
 }
 const syncDeliveryProofs = async () => {
     syncing_del_proof.value = true
-    await syncOrderDeliveryProofs()
+    await syncOrderDeliveryProofs(debug.value ? import.meta.env.VITE_API_BASE_URL : '')
     syncing_del_proof.value = false
     await loading_data()
 }
@@ -291,6 +298,9 @@ onBeforeRouteLeave((to, before) => {
         }
     }
 })
+
+console.log(import.meta.env.VITE_API_BASE_URL) // "/my-app/"
+
 
 watch([deliveryDate, deliveryDate2, customer, product, status, credit, runs],
     async ([deliveryDate_new, deliveryDate2_new, customer_new, product_new, status_new, credit_new, runs_new],
@@ -325,15 +335,15 @@ const goTableHead = (page: number) => {
     tableHeaderRefEl.value?.scrollIntoView({behavior: 'smooth'})
 }
 
-const printLabel = async function (row){
+const printLabel = async function (row) {
     // console.log(row)
 
     const f = document.forms[row.id];
     f.querySelector('input[name="_token"]').value = getCsrfToken();
     const prds = [];
-    row.products.forEach(p=>{
+    row.products.forEach(p => {
 
-        if(!['backorder','n/a'].includes(p.status)) {
+        if (!['backorder', 'n/a'].includes(p.status)) {
             var x = toDate(row.deliveryDate);
             if (p.group?.includes('Frozen') || p.group?.includes('Hot')) {
                 x.setDate(x.getDate() + 365)
@@ -359,7 +369,7 @@ const printLabel = async function (row){
     // await printZt411Label(row)
 }
 
-const getCsrfToken = ()=>{
+const getCsrfToken = () => {
     return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
 
