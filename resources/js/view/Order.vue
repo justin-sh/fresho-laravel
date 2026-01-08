@@ -74,11 +74,11 @@
                              @click.stop="syncDeliveryProofs">
                         Sync Delivery Proof
                     </BButton>
-                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm"
-                             :loading="delete_detail_syncing"
-                             @click.stop="deleteDetails">
-                        Delete Details
-                    </BButton>
+<!--                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm"-->
+<!--                             :loading="delete_detail_syncing"-->
+<!--                             @click.stop="deleteDetails">-->
+<!--                        Delete Details-->
+<!--                    </BButton>-->
                     <BButton variant="outline-primary" v-model:pressed="debug" class="ms-5" size="sm">Debug :
                         {{ debug ? "ON" : "Off" }}
                     </BButton>
