@@ -67,18 +67,22 @@
                              @click.stop="syncDetails">
                         S2: Sync Detail
                     </BButton>
-                    <BButton variant="outline-primary" class="ms-2" size="sm" @click.stop="goDeptRepot">
-                        Dept Report
-                    </BButton>
+                    <!--                    <BButton variant="outline-primary" class="ms-2" size="sm" @click.stop="goDeptRepot">-->
+                    <!--                        Dept Report-->
+                    <!--                    </BButton>-->
                     <BButton variant="outline-primary" class="ms-2" size="sm" :loading="syncing_del_proof"
                              @click.stop="syncDeliveryProofs">
                         Sync Delivery Proof
                     </BButton>
-<!--                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm"-->
-<!--                             :loading="delete_detail_syncing"-->
-<!--                             @click.stop="deleteDetails">-->
-<!--                        Delete Details-->
-<!--                    </BButton>-->
+                    <!--                    <BButton variant="outline-primary" class="ms-5 bg-danger text-white" size="sm"-->
+                    <!--                             :loading="delete_detail_syncing"-->
+                    <!--                             @click.stop="deleteDetails">-->
+                    <!--                        Delete Details-->
+                    <!--                    </BButton>-->
+                    <BButton variant="outline-danger" class="ms-5" size="sm" :loading="check_detail"
+                             @click.stop="checkSyncStatus">
+                        Check Sync Status
+                    </BButton>
                     <BButton variant="outline-primary" v-model:pressed="debug" class="ms-5" size="sm">Debug :
                         {{ debug ? "ON" : "Off" }}
                     </BButton>
@@ -89,11 +93,16 @@
 
     <BCard class="orders">
         <template #header>
-            <div class="col align-content-center" ref="tableHeaderRefEl">
+            <div class="col-auto align-content-center" ref="tableHeaderRefEl">
                 <span class="fw-bold fs-4">Orders </span>
                 <span class="inline fw-light fs-6" v-if="!data_loading">(Total {{ orders.length }})</span>
             </div>
 
+            <div class="col ms-2 ps-2">
+                <span class="mx-2 border-bottom border-black" v-for="d in checkRV">
+                    {{ d.customer + " : " + d.detailCnt??0 }}
+                </span>
+            </div>
             <BFormRadioGroup v-model="page_size" :options="page_size_options" class="ms-3 align-content-center"
                              value-field="item" text-field="name"/>
         </template>
@@ -158,7 +167,14 @@
 <script lang="ts" setup>
 import {ref, shallowRef, watch} from "vue";
 import {CanceledError} from "axios";
-import {deleteOrderDetails, getOrdersWithFilters, initOrders, syncOrderDeliveryProofs, syncOrderDetails} from '../api'
+import {
+    checkSyncOrderStatus,
+    deleteOrderDetails,
+    getOrdersWithFilters,
+    initOrders,
+    syncOrderDeliveryProofs,
+    syncOrderDetails
+} from '../api'
 
 import {format, formatInTimeZone, toDate} from "date-fns-tz";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
@@ -193,9 +209,11 @@ const fields = [
 
 const init_loading = shallowRef(false)
 const detail_syncing = shallowRef(false)
-const delete_detail_syncing = shallowRef(false)
+const check_detail = shallowRef(false)
 const syncing_del_proof = shallowRef(false)
 const data_loading = shallowRef(false)
+
+const checkRV = shallowRef([])
 
 const currentPage = shallowRef(1)
 const page_size = shallowRef(30)
@@ -264,11 +282,20 @@ const syncDetails = async () => {
     detail_syncing.value = false
     await loading_data()
 }
-const deleteDetails = async () => {
-    detail_syncing.value = true
-    await deleteOrderDetails(deliveryDate.value)
-    detail_syncing.value = false
-    await loading_data()
+// const deleteDetails = async () => {
+//     detail_syncing.value = true
+//     await deleteOrderDetails(deliveryDate.value)
+//     detail_syncing.value = false
+//     await loading_data()
+// }
+
+const checkSyncStatus = async () => {
+    check_detail.value = true
+    const rv = (await checkSyncOrderStatus(deliveryDate.value, debug.value ? import.meta.env.VITE_API_BASE_URL : '')).data
+    console.log(rv)
+    checkRV.value = rv.code == 200 ? rv.data.data : [{customer:"Check failed! Pls do it again."}]
+    check_detail.value = false
+    // await loading_data()
 }
 const syncDeliveryProofs = async () => {
     syncing_del_proof.value = true

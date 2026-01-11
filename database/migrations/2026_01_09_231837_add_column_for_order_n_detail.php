@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::table('order_details', function (Blueprint $table) {
             $table->date('delivery_date')->nullable()->after("order_number");
             $table->string("receiving_company_name",255)->nullable()->after("delivery_date");
+
+            $table->index("delivery_date", "order_details_del_date_index");
         });
     }
 
@@ -23,6 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('order_details', function (Blueprint $table) {
+            $table->dropIndex("order_details_del_date_index");
             $table->dropColumn('delivery_date');
             $table->dropColumn('receiving_company_name');
         });

@@ -30,6 +30,7 @@ export const getFreshoProductsWithFilters = (params: ProductFilter, options?: Op
 export const initOrders = (delivery_date: string, apiHost:string='') => axios.get(apiHost+'/api/orders/sync-summary', {params: {delivery_date}})
 export const syncOrderDetails = (delivery_date: string, apiHost:string='') => axios.get(apiHost+'/api/orders/sync-detail', {params: {delivery_date}})
 export const deleteOrderDetails = (delivery_date: string, apiHost:string='') => axios.get(apiHost+ '/api/orders/delete-details', {params: {delivery_date}})
+export const checkSyncOrderStatus = (delivery_date: string, apiHost:string='') => axios.get(apiHost+ '/api/orders/check', {params: {delivery_date}})
 export const syncOrderDeliveryProofs = (apiHost:string='') => axios.get(apiHost+'/api/orders/sync-delivery-proof')
 export const getAllProducts = () => axios.get('/api/products/all')
 export const getWarehousesWithFilters = (options?: OptionConfig) => axios.get('/api/warehouses', {...options})
