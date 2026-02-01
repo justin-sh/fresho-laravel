@@ -257,9 +257,9 @@ class DailyReportController extends Controller
 
                 // normal rules
                 if (array_key_exists($d->prd_code, $codePrdMap)) {
-//                    Log::debug("Fresh boning belly for ".$odr->receiving_company_name);
+//                    Log::debug("Fresh boning belly 000 for ".$odr->receiving_company_name .  '-<>' . json_encode($cusForFreshBoningBelly) .' -->' . $d->prd_code . ' code:' . (in_array($d->prd_code, $codeForBellyBL)?'yes':'NO'));
                     if(in_array($d->prd_code, $codeForBellyBL) && in_array($odr->receiving_company_name, $cusForFreshBoningBelly)){
-                        Log::debug("Fresh boning belly for $odr->receiving_company_name");
+//                        Log::debug("Fresh boning belly 111 for $odr->receiving_company_name");
                         $prd = 'belly_fresh';
                     }else{
                         $prd = $codePrdMap[$d->prd_code];

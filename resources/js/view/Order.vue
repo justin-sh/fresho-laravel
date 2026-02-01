@@ -100,7 +100,7 @@
 
             <div class="col ms-2 ps-2">
                 <span class="mx-2 border-bottom border-black" v-for="d in checkRV">
-                    {{ d.customer + " : " + d.detailCnt??0 }}
+                    {{ d.customer + " : " + (d.detailCnt??0) }}
                 </span>
             </div>
             <BFormRadioGroup v-model="page_size" :options="page_size_options" class="ms-3 align-content-center"
