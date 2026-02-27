@@ -606,6 +606,8 @@ class OrderController extends Controller
                 } else {
                     // update this one
                     $d->update([
+                        'receiving_company_name' => $order->receiving_company_name,
+                        'delivery_date' => $order->delivery_date,
                         'qty' => $detail['qty'],
                         'qty_detail' => $detail['qty_detail'],
                         'quantity_type_id' => $detail['qtyTypeId'],
