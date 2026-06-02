@@ -201,7 +201,7 @@
                             {{ d.customer.substring(0, 20) }}
                         </BTd>
                         <BTd>
-                            {{ ('(' + d.prd_code + ') ' + d.prd_name).substring(0, 40) }}
+                            {{ (d.prd_name).substring(0, 40) }}
                         </BTd>
                         <BTd>
                             {{ d.qty }}
@@ -320,7 +320,8 @@ const ckSpecial = {
     '#16 Thigh s/ON': 'ckthon16',
     '#22 Thigh s/ON': 'na',
     '#28 Thigh s/ON': 'na',
-    'Special Br s/ON': 'ckbron',
+    'Br Kiev s/ON': 'ckbron',
+    'Barrel s/On': 'ckbron2',
     'Butterfly Cut': 'ckbrbf',
     '#15 WB s/off': 'ckwboff15',
     'Butt': 'ckbutt',
