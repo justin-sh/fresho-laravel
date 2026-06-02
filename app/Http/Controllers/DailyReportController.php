@@ -239,8 +239,8 @@ class DailyReportController extends Controller
                 }
 
                 // Linh Vietnamese Fast Food + Vuche & Co Viet Eatery sum bbq shoulder to bbq leg
-                if( '1055' == $d->prd_code){
-                    if(in_array($odr->receiving_company_name, ["Linh Vietnamese Fast Food", "Vuche & Co Viet Eatery"])){
+                if( '1055' == $d->prd_code || '1126' == $d->prd_code){
+                    if(in_array($odr->receiving_company_name, ["Linh Vietnamese Fast Food", "Vuche & Co Viet Eatery", "Meng Kee"])){
                         $rv['bbqleg']['sum'] += $d->qty;
                         $rv["bbqleg"]['details'][] = [
                             'customer' => $odr->receiving_company_name,
