@@ -160,7 +160,7 @@ class OrderController extends Controller
 //
         $label = new MpdfZt411LabelLarge();
         foreach ($data as $item) {
-            $label->addNew($item['prd'], $item['qty'], $item['pd'], $item['bbd']);
+            $label->addNew($item['orderNo'], $item['prd'], $item['qty'], $item['pd'], $item['bbd']);
         }
 
         $filename = sprintf('label-large-%s.pdf', date('YmdHis'));
@@ -180,7 +180,7 @@ class OrderController extends Controller
             $size = 'large'; // unsupported size, set default to large
         }
 
-        Log::debug(sprintf("print %s label for order:%s", $size, $order_id));
+//        Log::debug(sprintf("print %s label for order:%s", $size, $order_id));
 
         $isLargeLabel = 'large' == $size;
 
@@ -194,12 +194,12 @@ class OrderController extends Controller
         }
 
         foreach ($order->details as $detail) {
-            Log::debug($detail->prd_name);
-            Log::debug($detail->qty);
-            Log::debug($detail->qty_detail);
-            Log::debug($detail->qty_type);
-            Log::debug($detail->packed_on_date);
-            Log::debug($detail->best_before_date);
+//            Log::debug($detail->prd_name);
+//            Log::debug($detail->qty);
+//            Log::debug($detail->qty_detail);
+//            Log::debug($detail->qty_type);
+//            Log::debug($detail->packed_on_date);
+//            Log::debug($detail->best_before_date);
 
             $pd = $detail->packed_on_date ?? $order->delivery_date;
             $bbd = $detail->best_before_date;
@@ -216,7 +216,7 @@ class OrderController extends Controller
             foreach ($qtys as $qty) {
                 $qtyWUnit = sprintf("%.3f", floatval(Str::trim($qty))) . ' ' . $detail->qty_type;
                 if ($isLargeLabel) {
-                    $label->addNew($detail->prd_name, $qtyWUnit, $pdStr, $bbdStr);
+                    $label->addNew('F' . $detail->order_number,$detail->prd_name, $qtyWUnit, $pdStr, $bbdStr);
                 } else {
                     $label->addNew($order->receiving_company_name, $detail->prd_name, $qtyWUnit, $pdStr, $bbdStr, 'F' . $order->order_number, $order->delivery_run);
                 }

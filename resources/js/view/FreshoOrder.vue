@@ -340,6 +340,7 @@ const printLabelLarge = async function (row){
                 'orderNo': 'F' + row.orderNo,
                 'run': row.run,
             });
+            4
         }
     })
 

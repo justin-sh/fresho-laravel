@@ -44,6 +44,7 @@ class MpdfZt411LabelLarge
     protected $widthOfWholeRow;
     protected $topOfQty;
     protected $topOfLabelPD;
+    protected $topOfLabelBatchNo;
     protected $topOfLabelBBD;
     protected $topOfAccNo;
     protected $widthOfAccNo;
@@ -93,8 +94,9 @@ class MpdfZt411LabelLarge
         $this->widthOfWholeRow = $this->pageWidth - $this->marginXY - $this->marginXY;
         $this->widthOfCustomer = $this->widthOfWholeRow;
         $this->topOfProduct = 18;
-        $this->topOfQty = $this->topOfProduct + 25;
-        $this->topOfLabelPD = $this->topOfQty + 18;
+        $this->topOfQty = $this->topOfProduct + 20;
+        $this->topOfLabelBatchNo = $this->topOfQty + 12;
+        $this->topOfLabelPD = $this->topOfLabelBatchNo + 8;
         $this->topOfLabelBBD = $this->topOfLabelPD + 6;
         $this->topOfAccNo = $this->topOfLabelBBD + 10;
         $this->widthOfAccNo = $this->widthOfWholeRow;
@@ -106,7 +108,7 @@ class MpdfZt411LabelLarge
         $this->widthOfPhoneNo = $this->widthOfWholeRow;
     }
 
-    function addNew($prdName, $qty, $pDate, $bbDate): void
+    function addNew($batchNo, $prdName, $qty, $pDate, $bbDate): void
     {
         $this->pdf->AddPage();
         $this->pdf->SetFont($this->font, '', 12);
@@ -126,6 +128,11 @@ class MpdfZt411LabelLarge
         $this->pdf->setXY($this->leftMargin + 35, $this->topOfQty);
         $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $qty);
 
+        $this->pdf->SetFont($this->font, '', 12);
+        $this->pdf->SetXY($this->leftMargin, $this->topOfLabelBatchNo);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, "BATCH NO.:");
+        $this->pdf->SetXY($this->leftMargin + 35, $this->topOfLabelBatchNo);
+        $this->pdf->Cell($this->widthOfWholeRow, $this->lineHeight, $batchNo);
 
         $this->pdf->SetFont($this->font, '', 12);
         $this->pdf->SetXY($this->leftMargin, $this->topOfLabelPD);
