@@ -8,7 +8,7 @@ import { setupCache } from 'axios-cache-interceptor/dev';
 import {stringify} from 'qs'
 
 const instance: AxiosInstance = axiosFactory.create({
-    // baseURL: import.meta.env.VITE_API_HOST,
+    baseURL: import.meta.env.VITE_BASE_URL,
     withCredentials: true,
     paramsSerializer: params => stringify(params, {arrayFormat: 'brackets', skipNulls: true})
 })
