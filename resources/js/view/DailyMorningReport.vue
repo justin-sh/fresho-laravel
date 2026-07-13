@@ -1,6 +1,6 @@
 <template>
 
-    <BCard>
+    <BCard class="">
         <template #header>
             <div class="row">
 
@@ -138,7 +138,7 @@
                             <BTh>Whole CK(Kg)
                                 <BFormInput size="sm" type="number" v-model="ckBoning.w"></BFormInput>
                             </BTh>
-                            <BTh>Supreme
+                            <BTh>Supreme(ctns)
                                 <BFormInput size="sm" type="number" v-model="ckBoning.s"></BFormInput>
                             </BTh>
                         </BTr>
@@ -177,9 +177,9 @@
             <BCol>
                 Chicken Meat Ratio:
                 <span class="ps-2">
-                    Whole CK: Breast 31% ( Tdr = BR * 15% ) + ML s/off 21% + Wings 11%
+                    Whole CK: Breast <b>31% (26.35% + 4.65%,  Tdr = BR * 15% )</b> + ML s/off <b>21%</b> + Wings <b>11%</b>
                     Mid-Wingettes: 40% from Wings, ML s/off = Thigh:65% + Legette 35%
-                    <span class="d-block ps-5">Supreme: ML s/off 66%</span>
+                    <span class="d-block ps-5">Supreme: ML s/off <b>66%</b>, ML s/on <b>76%</b></span>
                 </span>
             </BCol>
         </BRow>
@@ -578,7 +578,7 @@ const sumCkPotion = function(portion){
     const sideRitio = ckRatio['w'][portion]||0
     const shRitio = ckRatio['s'][portion]||0
     const ssd = sideRitio * parseInt(ckBoning.value.w.toString().trim()||'0')
-    const ssh = shRitio * parseInt(ckBoning.value.s.toString().trim()||'0')
+    const ssh = shRitio * 12 * parseInt(ckBoning.value.s.toString().trim()||'0')
     return get2Decimal(ssd + ssh)
 }
 
