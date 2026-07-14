@@ -3,7 +3,6 @@
     <BCard class="">
         <template #header>
             <div class="row">
-
                 <div class="col-auto">
                     <span class="fw-bold fs-4">Production Plan</span>
                 </div>
@@ -43,9 +42,10 @@
                                 <BFormInput size="sm" type="number" v-model="stockData['belly_fresh']"></BFormInput>
                             </BTd>
                             <BTd @click="showDetail('belly_fresh', 'Belly')">{{ sumPorkPotion('belly') }}</BTd>
-                            <BTd @click="showDetail('belly_fresh', 'Belly')" :class="{'text-danger': (parseFloat(stockData['belly_fresh']||'0') + sumPorkPotion('belly') - reportData.belly_fresh.sum) < 0}">
+                            <BTd @click="showDetail('belly_fresh', 'Belly')"
+                                 :class="{'text-danger': (parseFloat(stockData['belly_fresh']||'0') + sumPorkPotion('belly') - reportData.belly_fresh.sum) < 0}">
                                 {{
-                                    get2Decimal(parseFloat(stockData['belly_fresh']||'0') + sumPorkPotion('belly') - reportData.belly_fresh.sum)
+                                    get2Decimal(parseFloat(stockData['belly_fresh'] || '0') + sumPorkPotion('belly') - reportData.belly_fresh.sum)
                                 }}
                             </BTd>
                         </BTr>
@@ -59,9 +59,10 @@
                             <BTd @click="showDetail(v, k)">
                                 {{ v == 'belly' ? 0 : sumPorkPotion(v) }}
                             </BTd>
-                            <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') - reportData[v].sum) < 0}">
+                            <BTd @click="showDetail(v, k)"
+                                 :class="{'text-danger': (parseFloat(stockData[v]||'0') - reportData[v].sum) < 0}">
                                 {{
-                                    get2Decimal(parseFloat(stockData[v]||'0') + (v == 'belly' ? 0 : sumPorkPotion(v)) - reportData[v].sum)
+                                    get2Decimal(parseFloat(stockData[v] || '0') + (v == 'belly' ? 0 : sumPorkPotion(v)) - reportData[v].sum)
                                 }}
                             </BTd>
                         </BTr>
@@ -80,8 +81,10 @@
                             </BTd>
                             <BTd @click="showDetail('ckbr', 'Breast')">{{ sumCkPotion('ckbr') }}</BTd>
                             <BTd @click="showDetail('ckbr', 'Breast')"
-                                :class="{'text-danger': (parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) < 0}">
-                                {{ get2Decimal(parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) }}
+                                 :class="{'text-danger': (parseFloat(stockData.ckbr||'0') + sumCkPotion('ckbr') - reportData.ckbr.sum) < 0}">
+                                {{
+                                    get2Decimal(parseFloat(stockData.ckbr || '0') + sumCkPotion('ckbr') - reportData.ckbr.sum)
+                                }}
                             </BTd>
                         </BTr>
 
@@ -92,8 +95,9 @@
                                 <BFormInput size="sm" type="number" v-model="stockData[v]"></BFormInput>
                             </BTd>
                             <BTd @click="showDetail(v, k)">{{ sumCkPotion(v) }}</BTd>
-                            <BTd @click="showDetail(v, k)" :class="{'text-danger': (parseFloat(stockData[v]||'0') + sumCkPotion(v) - reportData[v].sum) < 0}">
-                                {{ get2Decimal(parseFloat(stockData[v]||'0') + sumCkPotion(v) - reportData[v].sum) }}
+                            <BTd @click="showDetail(v, k)"
+                                 :class="{'text-danger': (parseFloat(stockData[v]||'0') + sumCkPotion(v) - reportData[v].sum) < 0}">
+                                {{ get2Decimal(parseFloat(stockData[v] || '0') + sumCkPotion(v) - reportData[v].sum) }}
                             </BTd>
                         </BTr>
                     </BTbody>
@@ -136,10 +140,22 @@
                     <BThead head-variant="dark" class="fsn">
                         <BTr class="align-middle">
                             <BTh>Whole CK(Kg)
-                                <BFormInput size="sm" type="number" v-model="ckBoning.w"></BFormInput>
+                                <BFormInput size="sm" type="text" v-model="wholeChickWeight" class="mt-2"></BFormInput>
+                                <BInputGroup prepend="Sum:" append="Kg" class="m-0 mt-1">
+                                    <BFormInput size="sm" type="number" class="bg-light"
+                                                v-model="ckBoning.w"></BFormInput>
+                                </BInputGroup>
                             </BTh>
                             <BTh>Supreme(ctns)
-                                <BFormInput size="sm" type="number" v-model="ckBoning.s"></BFormInput>
+                                <BInputGroup prepend="ML s/off:">
+                                    <BFormInput size="sm" type="number" v-model="ckBoning.ssoff"></BFormInput>
+                                </BInputGroup>
+                                <BInputGroup prepend="ML s/on:">
+                                    <BFormInput size="sm" type="number" v-model="ckBoning.sson"></BFormInput>
+                                </BInputGroup>
+                                <BInputGroup prepend="Th s/off:">
+                                    <BFormInput size="sm" type="number" v-model="ckBoning.sthoff"></BFormInput>
+                                </BInputGroup>
                             </BTh>
                         </BTr>
                     </BThead>
@@ -161,8 +177,8 @@
                 Pork Meat Ratio:
                 <span class="d-block ps-5">
                     1 side = <b>{{ porkRatio.side.bbq }}</b>kg BBQ Shoulder + <b>{{ porkRatio.side.shoulderTrim }}</b>kg Shoulder Trim
-                    + <b>{{ porkRatio.side.belly }}</b>kg Belly + <b>{{porkRatio.side.ploin }}</b>kg Loin
-                    + <b>{{porkRatio.side.bbqleg }}</b>kg BBQ Leg
+                    + <b>{{ porkRatio.side.belly }}</b>kg Belly + <b>{{ porkRatio.side.ploin }}</b>kg Loin
+                    + <b>{{ porkRatio.side.bbqleg }}</b>kg BBQ Leg
                     + <b>{{ porkRatio.side.plegmeat }}</b>kg Pork Leg Meat
                     + <b>{{ porkRatio.side.pribs }}</b>kg Ribs + <b>{{ porkRatio.side.pneck }}</b>kg Neck
                 </span>
@@ -277,14 +293,22 @@ const reportDate = shallowRef(formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"
 const status = shallowRef(['accepted'])
 const showAll = shallowRef(false)
 
+const wholeChickWeight = shallowRef('0')
+
 const porkBoning = ref({"side": 0, "shoulder": 0})
 const porkRatio = {
-    side: {bbq: 2.7, shoulderTrim: 1.7, belly: 6, bbqleg: 6, plegmeat: 1.3, ploinrindoff:2.3, pneck: 1.85, pribs: 1.2},
+    side: {bbq: 2.7, shoulderTrim: 1.7, belly: 6, bbqleg: 6, plegmeat: 1.3, ploinrindoff: 2.3, pneck: 1.85, pribs: 1.2},
     shoulder: {bbq: 2.7, shoulderTrim: 1.7, belly: 0, bbqleg: 0, plegmeat: 0, pneck: 1.85, pribs: 0}
 }
 
-const ckBoning = ref({"w": 0, "s": 0})
-const ckRatio = {w: {ckbr: 0.31-0.0465, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0465}, s: {ckbr:0, cksoff:0.66, ckwings:0, cktdr:0}}
+const ckBoning = ref({"w": 0, "s": 0, "ssoff":0, "sson":0, "sthoff":0 })
+const ckRatio = {
+    w: {ckbr: 0.31 - 0.0465, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0465},
+    s: {ckbr: 0, cksoff: 0.66, ckwings: 0, cktdr: 0},
+    ssoff: {ckbr: 0, cksoff: 0.66, ckwings: 0, cktdr: 0},
+    sson: {ckbr: 0, ckson: 0.76, ckwings: 0, cktdr: 0},
+    sthoff: {ckbr: 0, ckthoff: 0.66 * 0.66, cklegette: 0.66 * 0.34, cktdr: 0}
+}
 
 const porkKV = {
     'Belly': 'belly',
@@ -566,40 +590,34 @@ const get2Decimal = function (num) {
     return Math.round((num + Number.EPSILON) * 100) / 100
 }
 
-const sumPorkPotion = function(portion){
-    const sideRitio = porkRatio['side'][portion]||0
-    const shRitio = porkRatio['shoulder'][portion]||0
-    const ssd = sideRitio * parseInt(porkBoning.value.side.toString().trim()||'0')
-    const ssh = shRitio * parseInt(porkBoning.value.shoulder.toString().trim()||'0')
+const sumPorkPotion = function (portion) {
+    const sideRitio = porkRatio['side'][portion] || 0
+    const shRitio = porkRatio['shoulder'][portion] || 0
+    const ssd = sideRitio * parseInt(porkBoning.value.side.toString().trim() || '0')
+    const ssh = shRitio * parseInt(porkBoning.value.shoulder.toString().trim() || '0')
     return get2Decimal(ssd + ssh)
 }
 
-const sumCkPotion = function(portion){
-    const sideRitio = ckRatio['w'][portion]||0
-    const shRitio = ckRatio['s'][portion]||0
-    const ssd = sideRitio * parseInt(ckBoning.value.w.toString().trim()||'0')
-    const ssh = shRitio * 12 * parseInt(ckBoning.value.s.toString().trim()||'0')
-    return get2Decimal(ssd + ssh)
+const sumCkPotion = function (portion) {
+    const wholeChickenRitio = ckRatio['w'][portion] || 0
+    const supremeForMLsoffRatio = ckRatio['ssoff'][portion] || 0
+    const supremeForMLsonRatio = ckRatio['sson'][portion] || 0
+    const supremeForThsoffRatio = ckRatio['sthoff'][portion] || 0
+    const wholeCkWeight = wholeChickenRitio * parseInt(ckBoning.value.w.toString().trim() || '0')
+    const supremeMLOffWeight = supremeForMLsoffRatio * 12 * parseInt(ckBoning.value.ssoff.toString().trim() || '0')
+    const supremeMLOnWeight = supremeForMLsonRatio * 12 * parseInt(ckBoning.value.sson.toString().trim() || '0')
+    const supremeThOffWeight = supremeForThsoffRatio * 12 * parseInt(ckBoning.value.sthoff.toString().trim() || '0')
+    return get2Decimal(wholeCkWeight + supremeMLOffWeight + supremeMLOnWeight + supremeThOffWeight)
 }
 
 const hPrds = ref([])
 
 watchEffect(() => {
-    // so.value.id = route.params.id ?? ''
-    //
-    // if (isNew.value) {
-    //     pageTitle.value = 'New'
-    //
-    //     so.value = {
-    //         pickupAt: formatInTimeZone(new Date(), localTZ, "yyyy-MM-dd"),
-    //     }
-    // } else if (isView.value) {
-    //     pageTitle.value = "View"
-    // } else {
-    //     pageTitle.value = "Update"
-    // }
+    ckBoning.value.w = wholeChickWeight.value.split(/[\s+,]+/)
+        .filter(Boolean)
+        .map(Number)
+        .reduce((total, n) => total + n, 0)
 });
-
 
 onMounted(async function () {
     hPrds.value = getHidenProducts()
@@ -607,15 +625,6 @@ onMounted(async function () {
 </script>
 
 <style scoped>
-/*
-:deep(.card-header) {
-    display: flex;
-}
-
-.card-header ul {
-    margin-bottom: 0;
-}
-*/
 
 .fss {
     font-size: 0.75rem;

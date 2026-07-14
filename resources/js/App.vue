@@ -38,20 +38,23 @@
                     </BNavbarNav>
 
                     <BNavbarNav>
-                        <BNavItemDropdown>
-                            <template #button-content>
-                                Reports
-                            </template>
-                            <BDropdownItem :to="{name:'deptReport'}">
-                                Dept Report + Picking Slip
-                            </BDropdownItem>
-                            <BDropdownItem :to="{name:'dailyMorningReport'}">
-                                Daily Morning Report
-                            </BDropdownItem>
-                            <!-- <BDropdownItem :to="{name:'purchaseOrderNew'}">
-                                new Product
-                            </BDropdownItem> -->
-                        </BNavItemDropdown>
+                        <BNavItem :to="{name:'dailyMorningReport'}">
+                            Daily Morning Report
+                        </BNavItem>
+<!--                        <BNavItemDropdown>-->
+<!--                            <template #button-content>-->
+<!--                                Reports-->
+<!--                            </template>-->
+<!--                            <BDropdownItem :to="{name:'deptReport'}">-->
+<!--                                Dept Report + Picking Slip-->
+<!--                            </BDropdownItem>-->
+<!--                            <BDropdownItem :to="{name:'dailyMorningReport'}">-->
+<!--                                Daily Morning Report-->
+<!--                            </BDropdownItem>-->
+<!--                            &lt;!&ndash; <BDropdownItem :to="{name:'purchaseOrderNew'}">-->
+<!--                                new Product-->
+<!--                            </BDropdownItem> &ndash;&gt;-->
+<!--                        </BNavItemDropdown>-->
                     </BNavbarNav>
 
 <!--                    <BNavbarNav>-->
@@ -113,6 +116,12 @@ onMounted(async function () {
 @media (min-width: 1200px and max-width: 1400px) {
     .vw-mix{
         max-width: calc(100vw - 80px);
+    }
+}
+
+@media (min-width: 1500px) {
+    .container{
+        max-width: 1480px;
     }
 }
 
