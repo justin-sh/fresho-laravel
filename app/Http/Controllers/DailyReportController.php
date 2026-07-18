@@ -76,12 +76,78 @@ class DailyReportController extends Controller
             'lshoulder',
             'lleg',
             'lrump',
+
+            'c15br',
+            'c15bron',
+            'c15kiev',
+            'c15barrel',
+            'c15son',
+            'c15chopon',
+            'c15thoff',
+            'c15soff',
+            'c20br',
+            'c20kiev',
+            'c20barrel',
+            'c20son',
+            'c20soff',
+            'c20thoff',
         ];
 
         $rv = ['others' => []];
         foreach ($prds as $p) {
             $rv[$p] = ['sum' => 0, 'details' => []];
         }
+
+        $wck_cus = ['REPORT_DAILY_15_BR', 'REPORT_DAILY_15_BRON', 'REPORT_DAILY_15_KIEV', 'REPORT_DAILY_15_BARREL', 'REPORT_DAILY_15_CHOPON', 'REPORT_DAILY_15_SON', 'REPORT_DAILY_15_THOFF', 'REPORT_DAILY_15_SOFF'];
+        $wck_cus = [...$wck_cus, 'REPORT_DAILY_20_BR', 'REPORT_DAILY_20_KIEV', 'REPORT_DAILY_20_BARREL', 'REPORT_DAILY_20_SON', 'REPORT_DAILY_20_THOFF', 'REPORT_DAILY_20_SOFF'];
+
+        $smallCkEnvKey = [
+            'REPORT_DAILY_15_BR' => 'c15br',
+            'REPORT_DAILY_15_BR_CODE' => [...explode(',', env('REPORT_DAILY_CK_BREAST', '')), ...explode(',', env('REPORT_DAILY_CK_BR_BUTTERFLIED', ''))],
+            'REPORT_DAILY_15_BRON' => 'c15bron',
+            'REPORT_DAILY_15_BRON_CODE' => explode(',', env('REPORT_DAILY_CK_BR_ON', '')),
+            'REPORT_DAILY_15_KIEV' => 'c15kiev',
+            'REPORT_DAILY_15_KIEV_CODE' => explode(',', env('REPORT_DAILY_CK_BR_ON', '')),
+            'REPORT_DAILY_15_BARREL' => 'c15barrel',
+            'REPORT_DAILY_15_BARREL_CODE' => explode(',', env('REPORT_DAILY_CK_BR_ON2', '')),
+            'REPORT_DAILY_15_SON' => 'c15son',
+            'REPORT_DAILY_15_SON_CODE' => explode(',', env('REPORT_DAILY_CK_SON', '')),
+            'REPORT_DAILY_15_SOFF' => 'c15soff',
+            'REPORT_DAILY_15_SOFF_CODE' => explode(',', env('REPORT_DAILY_CK_SOFF', '')),
+            'REPORT_DAILY_15_THOFF' => 'c15thoff',
+            'REPORT_DAILY_15_THOFF_CODE' => ['3023'],
+            'REPORT_DAILY_15_CHOPON' => 'c15chopon',
+            'REPORT_DAILY_15_CHOPON_CODE' => explode(',', env('REPORT_DAILY_CK_CHOP_ON', '')),
+            'REPORT_DAILY_20_BR' => 'c20br',
+            # exclude the strip
+            'REPORT_DAILY_20_BR_CODE' => array_values(array_filter([...explode(',', env('REPORT_DAILY_CK_BREAST', '')), ...explode(',', env('REPORT_DAILY_CK_BR_BUTTERFLIED', ''))], fn($v) => $v != '3078')),
+            'REPORT_DAILY_20_KIEV' => 'c20kiev',
+            'REPORT_DAILY_20_KIEV_CODE' => explode(',', env('REPORT_DAILY_CK_BR_ON', '')),
+            'REPORT_DAILY_20_BARREL' => 'c20barrel',
+            'REPORT_DAILY_20_BARREL_CODE' => explode(',', env('REPORT_DAILY_CK_BR_ON2', '')),
+            'REPORT_DAILY_20_SON' => 'c20son',
+            'REPORT_DAILY_20_SON_CODE' => explode(',', env('REPORT_DAILY_CK_SON', '')),
+            'REPORT_DAILY_20_SOFF' => 'c20soff',
+            'REPORT_DAILY_20_SOFF_CODE' => explode(',', env('REPORT_DAILY_CK_SOFF', '')),
+            'REPORT_DAILY_20_THOFF' => 'c20thoff',
+            'REPORT_DAILY_20_THOFF_CODE' => ['3023'],
+        ];
+
+
+        $wc_all_cus_prd = [];
+        foreach ($wck_cus as $k) {
+            if (empty(env($k))) continue;
+//            Log::debug("$k==>" . env($k) . "==>" . json_encode($smallCkEnvKey["{$k}_CODE"]));
+
+            collect($smallCkEnvKey["{$k}_CODE"])->filter()->each(function ($prdCode) use ($smallCkEnvKey, $k, &$wc_all_cus_prd,) {
+                collect(explode(',', env($k, '')))->filter()->each(function ($cus) use ($k, $smallCkEnvKey, &$wc_all_cus_prd, $prdCode) {
+                    $wc_all_cus_prd["{$cus}_{$prdCode}"] = $smallCkEnvKey[$k];
+                });
+            });
+        }
+
+
+//        Log::debug(json_encode($wc_all_cus_prd));
 
         $envPrdMap = [
             'REPORT_DAILY_PORK_BELLY_RON_BL' => 'belly',
@@ -153,8 +219,8 @@ class DailyReportController extends Controller
             });
         }
 
-        $cusForFreshBoningBelly = explode(",", env("REPORT_DAILY_PORK_BELLY_RON_BL_FRESH_CUS",''));
-        $codeForBellyBL = explode(",", env("REPORT_DAILY_PORK_BELLY_RON_BL",''));
+        $cusForFreshBoningBelly = explode(",", env("REPORT_DAILY_PORK_BELLY_RON_BL_FRESH_CUS", ''));
+        $codeForBellyBL = explode(",", env("REPORT_DAILY_PORK_BELLY_RON_BL", ''));
 
         $products = FreshoProduct::query()->get(['code', 'name', 'mkt_cat']);
         $freshoPrdMap = [];
@@ -175,8 +241,25 @@ class DailyReportController extends Controller
                 }
 
                 // back order
-                if($d->status->name == OrderPrdState::BackOrder->name){
+                if ($d->status->name == OrderPrdState::BackOrder->name) {
                     continue;
+                }
+
+                // check all whole chicken (size 15 / 20)
+                $cus_prd = "{$odr->receiving_company_name}_{$d->prd_code}";
+//                Log::debug("$cus_prd");
+                if (key_exists($cus_prd, $wc_all_cus_prd)) {
+//                    Log::debug("$cus_prd --- > " . json_encode($d));
+
+                    $rv[$wc_all_cus_prd[$cus_prd]]['sum'] += $d->qty;
+                    $rv[$wc_all_cus_prd[$cus_prd]]['details'][] = [
+                        'customer' => $odr->receiving_company_name,
+                        'prd_code' => $d->prd_code,
+                        'prd_name' => $d->prd_name,
+                        'qty' => $d->qty,
+                        'customer_notes' => $d->customer_notes ?? '',
+                        'supplier_notes' => $d->supplier_notes ?? '',
+                    ];
                 }
 
                 // special rules
@@ -241,8 +324,8 @@ class DailyReportController extends Controller
                 }
 
                 // Linh Vietnamese Fast Food + Vuche & Co Viet Eatery sum bbq shoulder to bbq leg
-                if( '1055' == $d->prd_code || '1126' == $d->prd_code){
-                    if(in_array($odr->receiving_company_name, ["Linh Vietnamese Fast Food", "Vuche & Co Viet Eatery", "Meng Kee"])){
+                if ('1055' == $d->prd_code || '1126' == $d->prd_code) {
+                    if (in_array($odr->receiving_company_name, ["Linh Vietnamese Fast Food", "Vuche & Co Viet Eatery", "Meng Kee"])) {
                         $rv['bbqleg']['sum'] += $d->qty;
                         $rv["bbqleg"]['details'][] = [
                             'customer' => $odr->receiving_company_name,
@@ -260,10 +343,10 @@ class DailyReportController extends Controller
                 // normal rules
                 if (array_key_exists($d->prd_code, $codePrdMap)) {
 //                    Log::debug("Fresh boning belly 000 for ".$odr->receiving_company_name .  '-<>' . json_encode($cusForFreshBoningBelly) .' -->' . $d->prd_code . ' code:' . (in_array($d->prd_code, $codeForBellyBL)?'yes':'NO'));
-                    if(in_array($d->prd_code, $codeForBellyBL) && in_array($odr->receiving_company_name, $cusForFreshBoningBelly)){
+                    if (in_array($d->prd_code, $codeForBellyBL) && in_array($odr->receiving_company_name, $cusForFreshBoningBelly)) {
 //                        Log::debug("Fresh boning belly 111 for $odr->receiving_company_name");
                         $prd = 'belly_fresh';
-                    }else{
+                    } else {
                         $prd = $codePrdMap[$d->prd_code];
                     }
 
@@ -363,10 +446,10 @@ class DailyReportController extends Controller
         ];
 
         $dailyStock = [];
-        foreach ($dailyStockKV as $k=>$v){
-            if(key_exists($v, $prevDayStock)){
+        foreach ($dailyStockKV as $k => $v) {
+            if (key_exists($v, $prevDayStock)) {
                 $dailyStock[$k] = $prevDayStock[$v];
-            }else{
+            } else {
                 $dailyStock[$k] = 0;
             }
         }

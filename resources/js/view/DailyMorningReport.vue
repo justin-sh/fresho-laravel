@@ -172,6 +172,206 @@
             </BCol>
         </BRow>
 
+        <BRow class="mt-2">
+            <BTableSimple bordered hover style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width:200px">
+                    <col style="width:250px">
+                    <col>
+                </colgroup>
+                <BTbody>
+                    <BTr @click="showDetail('c15br', 'Size 15 Breast')">
+                        <BTd rowspan="8">
+                            Whole Chicken Size 15
+                        </BTd>
+                        <BTd>
+                            Breast
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15br?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15br?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15bron', 'Size 15 Breast S/ON')">
+                        <BTd>
+                            Breast S/On
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15bron?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15bron?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15kiev', 'Size 15 Kiev')">
+                        <BTd>
+                            Breast Fillets Kiev Cut S/On
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15kiev?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15kiev?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15barrel', 'Size 15 Barrel')">
+                        <BTd>
+                            Barrel Skin On
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15barrel?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15barrel?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15thoff', 'Size 15 Thigh S/OFF')">
+                        <BTd>
+                            Thigh Skin Off
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15thoff?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15thoff?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15soff', 'Size 15 ML Fillet S/OFF')">
+                        <BTd>
+                            Maryland Fillet Skin Off
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15soff?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15soff?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15son', 'Size 15 ML Fillet S/ON')">
+                        <BTd>
+                            Maryland Fillet Skin ON
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15son?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15son?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c15chopon', 'Size 15 CHOP S/ON')">
+                        <BTd>
+                            CHOP Skin ON
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c15chopon?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c15chopon?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c20br', 'Size 20 Breast')">
+                        <BTd rowspan="6">
+                            Whole Chicken Size 20
+                        </BTd>
+                        <BTd>
+                            Breast
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c20br?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c20br?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c20kiev', 'Size 20 Kiev')">
+                        <BTd>
+                            Breast Fillets Kiev Cut S/On
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c20kiev?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c20kiev?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c20barrel', 'Size 20 Barrel')">
+                        <BTd>
+                            Chicken Barrel Skin On
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c20barrel?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c20barrel?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c20thoff', 'Size 20 Thigh S/OFF')">
+                        <BTd>
+                            Thigh Skin Off
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c20thoff?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c20thoff?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c20soff', 'Size 20 ML Fillet S/OFF')">
+                        <BTd>
+                            Maryland Fillet Skin Off
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c20soff?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c20soff?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                    <BTr @click="showDetail('c20son', 'Size 20 ML Fillet S/ON')">
+                        <BTd>
+                            Maryland Fillet Skin ON
+                        </BTd>
+                        <BTd>
+                            {{ reportData?.c20son?.sum ?? 0 }}
+                            (
+                            <template v-for="v in reportData?.c20son?.details">
+                                {{v.qty + '+ '}}
+                            </template>
+                            )
+                        </BTd>
+                    </BTr>
+                </BTbody>
+            </BTableSimple>
+        </BRow>
+
         <BRow>
             <BCol>
                 Pork Meat Ratio:
@@ -301,7 +501,7 @@ const porkRatio = {
     shoulder: {bbq: 2.7, shoulderTrim: 1.7, belly: 0, bbqleg: 0, plegmeat: 0, pneck: 1.85, pribs: 0}
 }
 
-const ckBoning = ref({"w": 0, "s": 0, "ssoff":0, "sson":0, "sthoff":0 })
+const ckBoning = ref({"w": 0, "s": 0, "ssoff": 0, "sson": 0, "sthoff": 0})
 const ckRatio = {
     w: {ckbr: 0.31 - 0.0465, cksoff: 0.21, ckwings: 0.11, cktdr: 0.0465},
     s: {ckbr: 0, cksoff: 0.66, ckwings: 0, cktdr: 0},
