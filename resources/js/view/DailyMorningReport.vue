@@ -401,7 +401,7 @@
         </BRow>
 
         <BModal id="popover-m" v-model="modalShow" scrollable :title="modalTitle" ok-only size="xl">
-            <BTableSimple bordered striped hover>
+            <BTableSimple bordered striped hover class="fs-6">
                 <BThead>
                     <BTr>
                         <BTh>Customer</BTh>

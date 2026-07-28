@@ -9,6 +9,7 @@ use App\Models\OrderPrdState;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class DailyReportController extends Controller
 {
@@ -246,9 +247,16 @@ class DailyReportController extends Controller
                 }
 
                 // check all whole chicken (size 15 / 20)
+                // RANDOM SIZE Rollbusch  Chicken Breast
+                $excludedSmallChicken = false;
+                if (Str::contains($odr->receiving_company_name, "Rollbusch")
+                    && Str::contains($d->supplier_notes, "RANDOM SIZE")
+                    && $d->prd_code == '3007') {
+                    $excludedSmallChicken = true;
+                }
                 $cus_prd = "{$odr->receiving_company_name}_{$d->prd_code}";
 //                Log::debug("$cus_prd");
-                if (key_exists($cus_prd, $wc_all_cus_prd)) {
+                if (key_exists($cus_prd, $wc_all_cus_prd) && !$excludedSmallChicken) {
 //                    Log::debug("$cus_prd --- > " . json_encode($d));
 
                     $rv[$wc_all_cus_prd[$cus_prd]]['sum'] += $d->qty;
