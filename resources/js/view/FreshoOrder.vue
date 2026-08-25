@@ -114,7 +114,7 @@
                 <BButton size="sm" @click="printLabelLarge(row.item)" class="mr-2 ms-2" variant="light">
                     Label Large
                 </BButton>
-                <BButton size="sm" :href="'/fresho-order/' + row.item.id" class="mr-2 ms-2" variant="light">
+                <BButton size="sm" :to="{ name:'freshoOrderDetail', params:{id: row.item.id} }"  class="mr-2 ms-2" variant="light">
                     {{ row.item.isLocked?'View':'Edit' }}
                 </BButton>
             </template>
